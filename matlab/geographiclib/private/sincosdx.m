@@ -16,13 +16,15 @@ function [sinx, cosx] = sincosdx(x)
     % workaround rem's bad handling of -0 in octave; fixed 2015-07-22
     % http://savannah.gnu.org/bugs/?45587
     r(x == 0 & signbit(x)) = -0;
-    q = floor(r / 90 + 0.5);
+    q = 0 + round(r / 90);
     r = r - 90 * q;
     q = mod(q, 4);
     r = r * (pi/180);
     sinx = sin(r); cosx = cos(r);
-    t = q == 1; z = 0 - sinx(t); sinx(t) = cosx(t); cosx(t) = z;
-    t = q == 2; sinx(t) = 0 - sinx(t); cosx(t) = 0 - cosx(t);
-    t = q == 3; z = sinx(t); sinx(t) = 0 - cosx(t); cosx(t) = z;
+    t = q == 1; z = -sinx(t); sinx(t) = cosx(t); cosx(t) = z;
+    t = q == 2; sinx(t) = -sinx(t); cosx(t) = -cosx(t);
+    t = q == 3; z = sinx(t); sinx(t) = -cosx(t); cosx(t) = z;
   end
+  sinx(x ~= 0) = 0 + sinx(x ~= 0);
+  cosx(x ~= 0) = 0 + cosx(x ~= 0);
 end

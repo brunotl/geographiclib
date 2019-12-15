@@ -7,7 +7,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 namespace NETGeographicLib
@@ -21,12 +21,12 @@ namespace NETGeographicLib
    * This computes the area of a geodesic polygon using the method given
    * Section 6 of
    * - C. F. F. Karney,
-   *   <a href="https://dx.doi.org/10.1007/s00190-012-0578-z">
+   *   <a href="https://doi.org/10.1007/s00190-012-0578-z">
    *   Algorithms for geodesics</a>,
    *   J. Geodesy <b>87</b>, 43--55 (2013);
-   *   DOI: <a href="https://dx.doi.org/10.1007/s00190-012-0578-z">
+   *   DOI: <a href="https://doi.org/10.1007/s00190-012-0578-z">
    *   10.1007/s00190-012-0578-z</a>;
-   *   addenda: <a href="http://geographiclib.sourceforge.net/geod-addenda.html">
+   *   addenda: <a href="https://geographiclib.sourceforge.io/geod-addenda.html">
    *   geod-addenda.html</a>.
    *
    * This class lets you add vertices one at a time to the polygon.  The area
@@ -44,7 +44,7 @@ namespace NETGeographicLib
    * \include example-PolygonArea.vb
    *
    * <B>INTERFACE DIFFERENCES:</B><BR>
-   * The MajorRadius and Flattening functions are implemented as properties.
+   * The EquatorialRadius and Flattening functions are implemented as properties.
    **********************************************************************/
     public ref class PolygonArea
     {
@@ -187,7 +187,7 @@ namespace NETGeographicLib
          * @return \e a the equatorial radius of the ellipsoid (meters).  This is
          *   the value inherited from the Geodesic object used in the constructor.
          **********************************************************************/
-        property double MajorRadius { double get(); }
+        property double EquatorialRadius { double get(); }
 
         /**
          * @return \e f the flattening of the ellipsoid.  This is the value
@@ -355,7 +355,7 @@ namespace NETGeographicLib
          * @return \e a the equatorial radius of the ellipsoid (meters).  This is
          *   the value inherited from the Geodesic object used in the constructor.
          **********************************************************************/
-        property double MajorRadius { double get(); }
+        property double EquatorialRadius { double get(); }
 
         /**
          * @return \e f the flattening of the ellipsoid.  This is the value
@@ -523,7 +523,7 @@ namespace NETGeographicLib
          * @return \e a the equatorial radius of the ellipsoid (meters).  This is
          *   the value inherited from the Geodesic object used in the constructor.
          **********************************************************************/
-        property double MajorRadius { double get(); }
+        property double EquatorialRadius { double get(); }
 
         /**
          * @return \e f the flattening of the ellipsoid.  This is the value

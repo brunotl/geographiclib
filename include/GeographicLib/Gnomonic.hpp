@@ -2,9 +2,9 @@
  * \file Gnomonic.hpp
  * \brief Header for GeographicLib::Gnomonic class
  *
- * Copyright (c) Charles Karney (2010-2015) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2010-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #if !defined(GEOGRAPHICLIB_GNOMONIC_HPP)
@@ -22,12 +22,13 @@ namespace GeographicLib {
    * %Gnomonic projection centered at an arbitrary position \e C on the
    * ellipsoid.  This projection is derived in Section 8 of
    * - C. F. F. Karney,
-   *   <a href="https://dx.doi.org/10.1007/s00190-012-0578-z">
+   *   <a href="https://doi.org/10.1007/s00190-012-0578-z">
    *   Algorithms for geodesics</a>,
    *   J. Geodesy <b>87</b>, 43--55 (2013);
-   *   DOI: <a href="https://dx.doi.org/10.1007/s00190-012-0578-z">
+   *   DOI: <a href="https://doi.org/10.1007/s00190-012-0578-z">
    *   10.1007/s00190-012-0578-z</a>;
-   *   addenda: <a href="http://geographiclib.sourceforge.net/geod-addenda.html">
+   *   addenda:
+   *   <a href="https://geographiclib.sourceforge.io/geod-addenda.html">
    *   geod-addenda.html</a>.
    * .
    * The projection of \e P is defined as follows: compute the geodesic line
@@ -68,7 +69,7 @@ namespace GeographicLib {
    * The conversions all take place using a Geodesic object (by default
    * Geodesic::WGS84()).  For more information on geodesics see \ref geodesic.
    *
-   * <b>CAUTION:</b> The definition of this projection for a sphere is
+   * \warning The definition of this projection for a sphere is
    * standard.  However, there is no standard for how it should be extended to
    * an ellipsoid.  The choices are:
    * - Declare that the projection is undefined for an ellipsoid.
@@ -104,7 +105,15 @@ namespace GeographicLib {
     real eps0_, eps_;
     Geodesic _earth;
     real _a, _f;
-    static const int numit_ = 10;
+    // numit_ increased from 10 to 20 to fix convergence failure with high
+    // precision (e.g., GEOGRAPHICLIB_DIGITS=2000) calculations.  Reverse uses
+    // Newton's method which converges quadratically and so numit_ = 10 would
+    // normally be big enough.  However, since the Geodesic class is based on a
+    // series it is of limited accuracy; in particular, the derivative rules
+    // used by Reverse only hold approximately.  Consequently, after a few
+    // iterations, the convergence in the Reverse falls back to improvements in
+    // each step by a constant (albeit small) factor.
+    static const int numit_ = 20;
   public:
 
     /**
@@ -153,7 +162,7 @@ namespace GeographicLib {
      *
      * \e lat0 should be in the range [&minus;90&deg;, 90&deg;].  \e lat will
      * be in the range [&minus;90&deg;, 90&deg;] and \e lon will be in the
-     * range [&minus;180&deg;, 180&deg;).  The scale of the projection is
+     * range [&minus;180&deg;, 180&deg;].  The scale of the projection is
      * 1/<i>rk</i><sup>2</sup> in the "radial" direction, \e azi clockwise from
      * true north, and is 1/\e rk in the direction perpendicular to this.  Even
      * though all inputs should return a valid \e lat and \e lon, it's possible
@@ -190,13 +199,19 @@ namespace GeographicLib {
      * @return \e a the equatorial radius of the ellipsoid (meters).  This is
      *   the value inherited from the Geodesic object used in the constructor.
      **********************************************************************/
-    Math::real MajorRadius() const { return _earth.MajorRadius(); }
+    Math::real EquatorialRadius() const { return _earth.EquatorialRadius(); }
 
     /**
      * @return \e f the flattening of the ellipsoid.  This is the value
      *   inherited from the Geodesic object used in the constructor.
      **********************************************************************/
     Math::real Flattening() const { return _earth.Flattening(); }
+
+    /**
+      * \deprecated An old name for EquatorialRadius().
+      **********************************************************************/
+    // GEOGRAPHICLIB_DEPRECATED("Use EquatorialRadius()")
+    Math::real MajorRadius() const { return EquatorialRadius(); }
     ///@}
 
   };

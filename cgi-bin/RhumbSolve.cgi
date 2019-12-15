@@ -3,9 +3,9 @@
 # RhumbSolve.cgi
 # cgi script for rhumb line calculations
 #
-# Copyright (c) Charles Karney (2014) <charles@karney.com> and licensed
-# under the MIT/X11 License.  For more information, see
-# http://geographiclib.sourceforge.net/
+# Copyright (c) Charles Karney (2014-2018) <charles@karney.com> and
+# licensed under the MIT/X11 License.  For more information, see
+# https://geographiclib.sourceforge.io/
 
 . ./utils.sh
 DEFAULTRADIUS=6378137
@@ -56,42 +56,43 @@ if test "$INPUT"; then
     OUTPUT=`echo $INPUT | $EXECDIR/$COMMAND -e "$RADIUS" "$FLATTENING" 2>&1 |
             head -1`
     if test $? -eq 0; then
-	STATUS=OK
-	GOUTPUT=`echo $INPUT | $EXECDIR/$GCOMMAND -e "$RADIUS" "$FLATTENING" |
+        STATUS=OK
+        GOUTPUT=`echo $INPUT | $EXECDIR/$GCOMMAND -e "$RADIUS" "$FLATTENING" |
             head -1`
-	OUTPUTF=`echo $INPUT | $EXECDIR/$COMMANDX -e "$RADIUS" "$FLATTENING" |
-                 head -1`
-	GOUTPUTF=`echo $INPUT | $EXECDIR/$GCOMMANDX -e "$RADIUS" "$FLATTENING" |
-                 head -1`
-	if test "$TYPE" = D; then
-	    POS1="`echo $GOUTPUT | cut -f1-2 -d' '`"
-	    POSG1="`echo $GOUTPUTF | cut -f1-2 -d' '`"
-	    AZI12="`echo $GOUTPUT | cut -f3 -d' '`"
-	    DIST12="`echo $GOUTPUT | cut -f7 -d' '`"
-	    POS2="`echo $OUTPUT | cut -f1-2 -d' '`"
-	    POSG2="`echo $OUTPUTF | cut -f1-2 -d' '`"
-	    S12="`echo $OUTPUT | cut -f3 -d' '`"
-	    POSITION1=$(geohack $POSG1 $POS1 Black)
-	    POSITION2=$F$(geohack $POSG2 $POS2 Blue)$G
-	    echo $POS2 | grep nan > /dev/null &&
-	    POSITION2=$F$(convertdeg "$POS2")$G
-	    AZIMUTH=$(convertdeg "$AZI12")
-	    DIST12=$(encodevalue "$DIST12")
-	else
-	    POS1="`echo $GOUTPUT | cut -f1-2 -d' '`"
-	    POSG1="`echo $GOUTPUTF | cut -f1-2 -d' '`"
-	    POS2="`echo $GOUTPUT | cut -f4-5 -d' '`"
-	    POSG2="`echo $GOUTPUTF | cut -f4-5 -d' '`"
-	    AZI12="`echo $OUTPUT | cut -f1 -d' '`"
-	    DIST12="`echo $OUTPUT | cut -f2 -d' '`"
-	    S12="`echo $OUTPUT | cut -f3 -d' '`"
-	    POSITION1=$(geohack $POSG1 $POS1 Black)
-	    POSITION2=$(geohack $POSG2 $POS2 Black)
-	    AZIMUTH=$F$(convertdeg "$AZI12")$G
-	    DIST12=$F$(encodevalue "$DIST12")$G
-	fi
+        OUTPUTF=`echo $INPUT | $EXECDIR/$COMMANDX -e "$RADIUS" "$FLATTENING" |
+            head -1`
+        GOUTPUTF=`echo $INPUT |
+            $EXECDIR/$GCOMMANDX -e "$RADIUS" "$FLATTENING" |
+            head -1`
+        if test "$TYPE" = D; then
+            POS1="`echo $GOUTPUT | cut -f1-2 -d' '`"
+            POSG1="`echo $GOUTPUTF | cut -f1-2 -d' '`"
+            AZI12="`echo $GOUTPUT | cut -f3 -d' '`"
+            DIST12="`echo $GOUTPUT | cut -f7 -d' '`"
+            POS2="`echo $OUTPUT | cut -f1-2 -d' '`"
+            POSG2="`echo $OUTPUTF | cut -f1-2 -d' '`"
+            S12="`echo $OUTPUT | cut -f3 -d' '`"
+            POSITION1=$(geohack $POSG1 $POS1 Black)
+            POSITION2=$F$(geohack $POSG2 $POS2 Blue)$G
+            echo $POS2 | grep nan > /dev/null &&
+            POSITION2=$F$(convertdeg "$POS2")$G
+            AZIMUTH=$(convertdeg "$AZI12")
+            DIST12=$(encodevalue "$DIST12")
+        else
+            POS1="`echo $GOUTPUT | cut -f1-2 -d' '`"
+            POSG1="`echo $GOUTPUTF | cut -f1-2 -d' '`"
+            POS2="`echo $GOUTPUT | cut -f4-5 -d' '`"
+            POSG2="`echo $GOUTPUTF | cut -f4-5 -d' '`"
+            AZI12="`echo $OUTPUT | cut -f1 -d' '`"
+            DIST12="`echo $OUTPUT | cut -f2 -d' '`"
+            S12="`echo $OUTPUT | cut -f3 -d' '`"
+            POSITION1=$(geohack $POSG1 $POS1 Black)
+            POSITION2=$(geohack $POSG2 $POS2 Black)
+            AZIMUTH=$F$(convertdeg "$AZI12")$G
+            DIST12=$F$(encodevalue "$DIST12")$G
+        fi
     else
-	STATUS="$OUTPUT"
+        STATUS="$OUTPUT"
     fi
     # echo `date +"%F %T"` "$COMMAND: $INPUT" >> ../persistent/utilities.log
 fi
@@ -107,24 +108,24 @@ cat <<EOF
     <meta name="description" content="Online rhumb line calculator" />
     <meta name="author" content="Charles F. F. Karney" />
     <meta name="keywords"
-	  content="rhumb line, loxodrome,
-		   rhumb line distance,
-		   geographic distance,
-		   direct rhumb line problem,
-		   inverse rhumb line problem,
-		   distance and azimuth,
-		   distance and heading,
-		   range and bearing,
-		   latitude and longitude,
-		   online calculator,
-		   WGS84 ellipsoid,
-		   GeographicLib" />
+          content="rhumb line, loxodrome,
+                   rhumb line distance,
+                   geographic distance,
+                   direct rhumb line problem,
+                   inverse rhumb line problem,
+                   distance and azimuth,
+                   distance and heading,
+                   range and bearing,
+                   latitude and longitude,
+                   online calculator,
+                   WGS84 ellipsoid,
+                   GeographicLib" />
   </head>
   <body>
     <h3>
       Online rhumb line calculations using the
-      <a href="http://geographiclib.sourceforge.net/html/RhumbSolve.1.html">
-	 RhumbSolve</a> utility
+      <a href="https://geographiclib.sourceforge.io/html/RhumbSolve.1.html">
+         RhumbSolve</a> utility
     </h3>
     <form action="/cgi-bin/RhumbSolve" method="get">
       <p>
@@ -133,11 +134,11 @@ cat <<EOF
           <tr>
             <td valign='baseline'>
               &nbsp;&nbsp;&nbsp;
-	      <label for='I'>
-		<input type="radio" name="type" value="I" id='I'
+              <label for='I'>
+                <input type="radio" name="type" value="I" id='I'
                        `test "$TYPE" = I && echo CHECKED`>
-		&nbsp;Inverse:&nbsp;
-	      </label>
+                &nbsp;Inverse:&nbsp;
+              </label>
             </td>
             <td valign='baseline'>
               <em>lat1 lon1 lat2 lon2</em>
@@ -149,11 +150,11 @@ cat <<EOF
           <tr>
             <td valign='baseline'>
               &nbsp;&nbsp;&nbsp;
-	      <label for='D'>
-		<input type="radio" name="type" value="D" id='D'
+              <label for='D'>
+                <input type="radio" name="type" value="D" id='D'
                        `test "$TYPE" = D && echo CHECKED`>
-		&nbsp;Direct:&nbsp;
-	      </label>
+                &nbsp;Direct:&nbsp;
+              </label>
             </td>
             <td valign='baseline'>
               <em>lat1 lon1 azi12 s12</em>
@@ -166,10 +167,10 @@ cat <<EOF
       </p>
       <p>
         Input (ex. &laquo;<tt>40.6 -73.8 49&deg;01'N 2&deg;33'E</tt>&raquo;
-	[inverse],
-	&laquo;<tt>40d38'23"N 073d46'44"W 53d30' 5850e3</tt>&raquo;
-	[direct]):
-	<br>
+        [inverse],
+        &laquo;<tt>40d38'23"N 073d46'44"W 53d30' 5850e3</tt>&raquo;
+        [direct]):
+        <br>
         &nbsp;&nbsp;&nbsp;
         <input type=text name="input" size=72 value="$INPUTENC">
       </p>
@@ -220,19 +221,19 @@ cat <<EOF
               </select>
             </td>
           </tr>
-	  <tr>
-	    <td>Equatorial radius:</td>
-	    <td>
-	      <input type=text name="radius" size=20 value="$RADIUS">
+          <tr>
+            <td>Equatorial radius:</td>
+            <td>
+              <input type=text name="radius" size=20 value="$RADIUS">
             </td>
-	    <td>meters</td>
-	  </tr>
-	  <tr>
-	    <td>Flattening:</td>
-	    <td>
-	      <input type=text name="flattening" size=20 value="$FLATTENING">
+            <td>meters</td>
+          </tr>
+          <tr>
+            <td>Flattening:</td>
+            <td>
+              <input type=text name="flattening" size=20 value="$FLATTENING">
             </td>
-	  </tr>
+          </tr>
         </table>
       </p>
       <p>
@@ -257,7 +258,7 @@ cat <<EOF
     </form>
     <hr>
     <p>
-      <a href="http://geographiclib.sourceforge.net/html/RhumbSolve.1.html">
+      <a href="https://geographiclib.sourceforge.io/html/RhumbSolve.1.html">
         RhumbSolve (version $VERSION)</a>
       performs rhumb line calculations for an arbitrary ellipsoid of
       revolution.  The path with a constant heading between two points
@@ -268,8 +269,8 @@ cat <<EOF
       length.  <b>NOTE:</b> the rhumb line is <em>not</em> the shortest
       path between two points; that is the geodesic and it is calculated
       by
-      <a href="http://geographiclib.sourceforge.net/cgi-bin/GeodSolve">
-	GeodSolve</a>.
+      <a href="https://geographiclib.sourceforge.io/cgi-bin/GeodSolve">
+        GeodSolve</a>.
     </p>
     <p>
       There are two standard rhumb line problems:
@@ -286,15 +287,22 @@ cat <<EOF
         16d47' -3d1'
         W3&deg;0'34" N16&deg;46'33"
         3:0:34W 16:46:33N</pre>
-      Azimuths are given in degress clockwise from north.  The
+      Azimuths are given in degrees clockwise from north.  The
       distance <em>s12</em> is in meters.
     </p>
     <p>
       The additional quantity computed is:
       <ul>
-	<li> <em>S12</em>, the area between the rhumb line
-	  and the equator (m<sup>2</sup>).
+        <li> <em>S12</em>, the area between the rhumb line
+          and the equator (m<sup>2</sup>).
       </ul>
+    </p>
+    <p>
+      A point at a pole is treated as a point a tiny distance away from
+      the pole on the given line of longitude.  The longitude becomes
+      indeterminate when a rhumb line passes through a pole, and
+      RhumbSolve reports NaNs for the longitude and the area in this
+      case.
     </p>
     <p>
       The ellipsoid is specified by its equatorial radius, <em>a</em>,
@@ -316,24 +324,24 @@ cat <<EOF
       number) for <em>lon2</em> and <em>S12</em> in this case.
     </p>
     <p>
-      <a href="http://geographiclib.sourceforge.net/html/RhumbSolve.1.html">
+      <a href="https://geographiclib.sourceforge.io/html/RhumbSolve.1.html">
         RhumbSolve</a>,
       which is a simple wrapper of the
-      <a href="http://geographiclib.sourceforge.net/html/classGeographicLib_1_1Rhumb.html">
+      <a href="https://geographiclib.sourceforge.io/html/classGeographicLib_1_1Rhumb.html">
         GeographicLib::Rhumb</a> class, is one of the utilities provided
-      with <a href="http://geographiclib.sourceforge.net/">
+      with <a href="https://geographiclib.sourceforge.io/">
       GeographicLib</a>.  See also the section of the GeographicLib
       documentation on
-      <a href="http://geographiclib.sourceforge.net/html/rhumb.html">
-	Rhumb lines</a> and the Wikipedia page,
+      <a href="https://geographiclib.sourceforge.io/html/rhumb.html">
+        Rhumb lines</a> and the Wikipedia page,
       <a href="https://en.wikipedia.org/wiki/Rhumb_line">
-	Rhumb line</a>.
+        Rhumb line</a>.
     </P>
     <hr>
     <address>Charles Karney
       <a href="mailto:charles@karney.com">&lt;charles@karney.com&gt;</a>
       (2014-12-05)</address>
-    <a href="http://geographiclib.sourceforge.net">
+    <a href="https://geographiclib.sourceforge.io">
       GeographicLib home page
     </a>
   </body>

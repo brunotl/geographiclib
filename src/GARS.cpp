@@ -2,9 +2,9 @@
  * \file GARS.cpp
  * \brief Implementation for GeographicLib::GARS class
  *
- * Copyright (c) Charles Karney (2015) <charles@karney.com> and licensed under
- * the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * Copyright (c) Charles Karney (2015-2019) <charles@karney.com> and licensed
+ * under the MIT/X11 License.  For more information, see
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #include <GeographicLib/GARS.hpp>
@@ -14,8 +14,8 @@ namespace GeographicLib {
 
   using namespace std;
 
-  const string GARS::digits_ = "0123456789";
-  const string GARS::letters_ = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  const char* const GARS::digits_ = "0123456789";
+  const char* const GARS::letters_ = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
   void GARS::Forward(real lat, real lon, int prec, std::string& gars) {
     if (abs(lat) > 90)
@@ -25,7 +25,8 @@ namespace GeographicLib {
       gars = "INVALID";
       return;
     }
-    lon = Math::AngNormalize(lon); // lon in [-180,180)
+    lon = Math::AngNormalize(lon);
+    if (lon == 180) lon = -180; // lon now in [-180,180)
     if (lat == 90) lat *= (1 - numeric_limits<real>::epsilon() / 2);
     prec = max(0, min(int(maxprec_), prec));
     int

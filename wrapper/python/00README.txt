@@ -1,7 +1,7 @@
 The geodesic routines in GeographicLib have been implemented as a native
 Python library.  See
 
-  http://geographiclib.sourceforge.net/html/python/
+  https://geographiclib.sourceforge.io/html/python/
 
 It is also possible to call the C++ version of GeographicLib directly
 from Python and this directory contains a small example,
@@ -9,7 +9,10 @@ PyGeographicLib.cpp, which uses boost-python and the Geoid class to
 convert heights above the geoid to heights above the ellipsoid.  More
 information on calling boost-python, see
 
-  http://www.boost.org/doc/libs/release/libs/python
+  https://www.boost.org/doc/libs/release/libs/python
+
+An alternative to boost-python is provided by Cython.  For more
+information, see below.
 
 To build and install this interface, do
 
@@ -67,3 +70,13 @@ Acknowledgment:
 
 Thanks to Jonathan Takahashi <jtakahashi@gmail.com> for the sample code
 in PyGeographicLib.cpp and the commands needed to compile and link this.
+
+An alternative to boost-python is provided by Cython.  See
+
+  https::/cython.org
+
+Sergey Serebryakov offers the github project
+
+  https://github.com/megaserg/geographiclib-cython-bindings
+
+which provides a fast python interface to the geodesic routines.

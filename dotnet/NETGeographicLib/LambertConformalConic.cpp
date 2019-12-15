@@ -6,7 +6,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 #include "stdafx.h"
 #include "GeographicLib/LambertConformalConic.hpp"
@@ -167,8 +167,8 @@ void LambertConformalConic::Reverse(double lon0, double x, double y,
 }
 
 //*****************************************************************************
-double LambertConformalConic::MajorRadius::get()
-{ return m_pLambertConformalConic->MajorRadius(); }
+double LambertConformalConic::EquatorialRadius::get()
+{ return m_pLambertConformalConic->EquatorialRadius(); }
 
 //*****************************************************************************
 double LambertConformalConic::Flattening::get()

@@ -6,7 +6,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 #include "stdafx.h"
 #include <GeographicLib/Geodesic.hpp>
@@ -507,7 +507,7 @@ GeodesicLine^ Geodesic::GenDirectLine(double lat1, double lon1, double azi1,
 }
 
 //*****************************************************************************
-double Geodesic::MajorRadius::get() { return m_pGeodesic->MajorRadius(); }
+double Geodesic::EquatorialRadius::get() { return m_pGeodesic->EquatorialRadius(); }
 
 //*****************************************************************************
 double Geodesic::Flattening::get() { return m_pGeodesic->Flattening(); }

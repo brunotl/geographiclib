@@ -1,9 +1,9 @@
 /**
  * Implementation of the net.sf.geographiclib.GeodesicLine class
  *
- * Copyright (c) Charles Karney (2013-2016) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2013-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 package net.sf.geographiclib;
 
@@ -33,7 +33,7 @@ package net.sf.geographiclib;
  * <p>
  * The calculations are accurate to better than 15 nm (15 nanometers).  See
  * Sec. 9 of
- * <a href="http://arxiv.org/abs/1102.1215v1">arXiv:1102.1215v1</a> for
+ * <a href="https://arxiv.org/abs/1102.1215v1">arXiv:1102.1215v1</a> for
  * details.  The algorithms used by this class are based on series expansions
  * using the flattening <i>f</i> as a small parameter.  These are only accurate
  * for |<i>f</i>| &lt; 0.02; however reasonably accurate results will be
@@ -43,10 +43,10 @@ package net.sf.geographiclib;
  * <ul>
  * <li>
  *   C. F. F. Karney,
- *   <a href="https://dx.doi.org/10.1007/s00190-012-0578-z">
+ *   <a href="https://doi.org/10.1007/s00190-012-0578-z">
  *   Algorithms for geodesics</a>,
  *   J. Geodesy <b>87</b>, 43&ndash;55 (2013)
- *   (<a href="http://geographiclib.sourceforge.net/geod-addenda.html">addenda</a>).
+ *   (<a href="https://geographiclib.sourceforge.io/geod-addenda.html">addenda</a>).
  * </ul>
  * <p>
  * Here's an example of using this class
@@ -211,9 +211,9 @@ public class GeodesicLine {
 
     // Evaluate alp0 from sin(alp1) * cos(bet1) = sin(alp0),
     _salp0 = _salp1 * cbet1; // alp0 in [0, pi/2 - |bet1|]
-    // Alt: calp0 = hypot(sbet1, calp1 * cbet1).  The following
+    // Alt: calp0 = Math.hypot(sbet1, calp1 * cbet1).  The following
     // is slightly better (consider the case salp1 = 0).
-    _calp0 = GeoMath.hypot(_calp1, _salp1 * sbet1);
+    _calp0 = Math.hypot(_calp1, _salp1 * sbet1);
     // Evaluate sig with tan(bet1) = tan(sig1) * cos(alp1).
     // sig = 0 is nearest northward crossing of equator.
     // With bet1 = 0, alp1 = pi/2, we have sig1 = 0 (equatorial line).
@@ -303,7 +303,7 @@ public class GeodesicLine {
    *   missing if the GeodesicLine did not include the relevant capability.
    * <p>
    * The values of <i>lon2</i> and <i>azi2</i> returned are in the range
-   * [&minus;180&deg;, 180&deg;).
+   * [&minus;180&deg;, 180&deg;].
    * <p>
    * The GeodesicLine object <i>must</i> have been constructed with <i>caps</i>
    * |= {@link GeodesicMask#DISTANCE_IN}; otherwise no parameters are set.
@@ -325,7 +325,7 @@ public class GeodesicLine {
    * |= {@link GeodesicMask#DISTANCE_IN}; otherwise no parameters are set.
    * Requesting a value which the GeodesicLine object is not capable of
    * computing is not an error (no parameters will be set).  The value of
-   * <i>lon2</i> returned is normally in the range [&minus;180&deg;, 180&deg;);
+   * <i>lon2</i> returned is normally in the range [&minus;180&deg;, 180&deg;];
    * however if the <i>outmask</i> includes the
    * {@link GeodesicMask#LONG_UNROLL} flag, the longitude is "unrolled" so that
    * the quantity <i>lon2</i> &minus; <i>lon1</i> indicates how many times and
@@ -347,7 +347,7 @@ public class GeodesicLine {
    *   missing if the GeodesicLine did not include the relevant capability.
    * <p>
    * The values of <i>lon2</i> and <i>azi2</i> returned are in the range
-   * [&minus;180&deg;, 180&deg;).
+   * [&minus;180&deg;, 180&deg;].
    * <p>
    * The GeodesicLine object <i>must</i> have been constructed with <i>caps</i>
    * |= {@link GeodesicMask#DISTANCE_IN}; otherwise no parameters are set.
@@ -368,7 +368,7 @@ public class GeodesicLine {
    * <p>
    * Requesting a value which the GeodesicLine object is not capable of
    * computing is not an error (no parameters will be set).  The value of
-   * <i>lon2</i> returned is in the range [&minus;180&deg;, 180&deg;), unless
+   * <i>lon2</i> returned is in the range [&minus;180&deg;, 180&deg;], unless
    * the <i>outmask</i> includes the {@link GeodesicMask#LONG_UNROLL} flag.
    **********************************************************************/
   public GeodesicData ArcPosition(double a12, int outmask) {
@@ -414,7 +414,7 @@ public class GeodesicLine {
    *   <i>outmask</i> |= {@link GeodesicMask#ALL} for all of the above;
    * <li>
    *   <i>outmask</i> |= {@link GeodesicMask#LONG_UNROLL} to unroll <i>lon2</i>
-   *   (instead of reducing it to the range [&minus;180&deg;, 180&deg;)).
+   *   (instead of reducing it to the range [&minus;180&deg;, 180&deg;]).
    * </ul>
    * <p>
    * Requesting a value which the GeodesicLine object is not capable of
@@ -463,7 +463,8 @@ public class GeodesicLine {
         // GeodesicExact.
         //     erri = the error in the inverse solution (nm)
         //     errd = the error in the direct solution (series only) (nm)
-        //     errda = the error in the direct solution (series + 1 Newton) (nm)
+        //     errda = the error in the direct solution
+        //             (series + 1 Newton) (nm)
         //
         //       f     erri  errd errda
         //     -1/5    12e6 1.2e9  69e6
@@ -503,8 +504,8 @@ public class GeodesicLine {
     }
     // sin(bet2) = cos(alp0) * sin(sig2)
     sbet2 = _calp0 * ssig2;
-    // Alt: cbet2 = hypot(csig2, salp0 * ssig2);
-    cbet2 = GeoMath.hypot(_salp0, _calp0 * csig2);
+    // Alt: cbet2 = Math.hypot(csig2, salp0 * ssig2);
+    cbet2 = Math.hypot(_salp0, _calp0 * csig2);
     if (cbet2 == 0)
       // I.e., salp0 = 0, csig2 = 0.  Break the degeneracy in this case
       cbet2 = csig2 = Geodesic.tiny_;
@@ -517,7 +518,7 @@ public class GeodesicLine {
     if ((outmask & GeodesicMask.LONGITUDE) != 0) {
       // tan(omg2) = sin(alp0) * tan(sig2)
       double somg2 = _salp0 * ssig2, comg2 = csig2, // No need to normalize
-        E = GeoMath.copysign(1, _salp0);            // east or west going?
+        E = Math.copySign(1, _salp0);               // east or west going?
       // omg12 = omg2 - omg1
       double omg12 = ((outmask & GeodesicMask.LONG_UNROLL) != 0)
         ? E * (sig12
@@ -696,7 +697,7 @@ public class GeodesicLine {
    * @return <i>a</i> the equatorial radius of the ellipsoid (meters).  This is
    *   the value inherited from the Geodesic object used in the constructor.
    **********************************************************************/
-  public double MajorRadius()
+  public double EquatorialRadius()
   { return Init() ? _a : Double.NaN; }
 
   /**
@@ -742,4 +743,10 @@ public class GeodesicLine {
    **********************************************************************/
   public double Arc() { return GenDistance(true); }
 
+  /**
+   * @deprecated An old name for {@link #EquatorialRadius()}.
+   * @return <i>a</i> the equatorial radius of the ellipsoid (meters).
+   **********************************************************************/
+  // @Deprecated
+  public double MajorRadius() { return EquatorialRadius(); }
 }

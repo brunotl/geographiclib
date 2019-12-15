@@ -7,7 +7,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 namespace NETGeographicLib
@@ -37,7 +37,7 @@ namespace NETGeographicLib
    *
    * <B>INTERFACE DIFFERENCES:</B><BR>
    * The following functions are implemented as properties:
-   * Init, MajorRadius, Flattening, Latitude, and Height.
+   * Init, EquatorialRadius, Flattening, Latitude, and Height.
    *
    * The Capabilities functions accept and return the "capabilities mask"
    * as a NETGeographicLib::GravityModel::Mask rather than an unsigned.
@@ -219,7 +219,7 @@ namespace NETGeographicLib
          *   This property throws an exception if the GravityCircles has not
          *   been initialized.
          **********************************************************************/
-        property double MajorRadius { double get(); }
+        property double EquatorialRadius { double get(); }
 
         /**
          * @return \e f the flattening of the ellipsoid.  This is the value

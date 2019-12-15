@@ -3,9 +3,9 @@
 *!
 *! Run these tests by configuring with cmake and running "make test".
 *!
-*! Copyright (c) Charles Karney (2015-2016) <charles@karney.com> and
+*! Copyright (c) Charles Karney (2015-2019) <charles@karney.com> and
 *! licensed under the MIT/X11 License.  For more information, see
-*! http://geographiclib.sourceforge.net/
+*! https://geographiclib.sourceforge.io/
 
 *> @cond SKIP
 
@@ -167,6 +167,18 @@
       return
       end
 
+      integer function chknan(x)
+      double precision x
+
+      if (x .ne. x) then
+        chknan = 0
+      else
+        chknan = 1
+      end if
+
+      return
+      end
+
       integer function tstinv()
       double precision tstdat(20, 12)
       common /tstcom/ tstdat
@@ -181,10 +193,10 @@
 * WGS84 values
       a = 6378137d0
       f = 1/298.257223563d0
-      omask = 1+2+4+8
+      omask = 1 + 2 + 4 + 8
       r = 0
 
-      do i = 1,20
+      do 10 i = 1,20
         lat1 = tstdat(i, 1)
         lon1 = tstdat(i, 2)
         azi1 = tstdat(i, 3)
@@ -207,7 +219,7 @@
         r = r + assert(MM12, MM12a, 1d-15)
         r = r + assert(MM21, MM21a, 1d-15)
         r = r + assert(SS12, SS12a, 0.1d0)
-      end do
+ 10   continue
 
       tstinv = r
       return
@@ -227,11 +239,11 @@
 * WGS84 values
       a = 6378137d0
       f = 1/298.257223563d0
-      omask = 1+2+4+8
+      omask = 1 + 2 + 4 + 8
       flags = 2
       r = 0
 
-      do i = 1,20
+      do 10 i = 1,20
         lat1 = tstdat(i, 1)
         lon1 = tstdat(i, 2)
         azi1 = tstdat(i, 3)
@@ -254,7 +266,7 @@
         r = r + assert(MM12, MM12a, 1d-15)
         r = r + assert(MM21, MM21a, 1d-15)
         r = r + assert(SS12, SS12a, 0.1d0)
-      end do
+ 10   continue
 
       tstdir = r
       return
@@ -274,11 +286,11 @@
 * WGS84 values
       a = 6378137d0
       f = 1/298.257223563d0
-      omask = 1+2+4+8
-      flags = 1+2
+      omask = 1 + 2 + 4 + 8
+      flags = 1 + 2
       r = 0
 
-      do i = 1,20
+      do 10 i = 1,20
         lat1 = tstdat(i, 1)
         lon1 = tstdat(i, 2)
         azi1 = tstdat(i, 3)
@@ -301,20 +313,9 @@
         r = r + assert(MM12, MM12a, 1d-15)
         r = r + assert(MM21, MM21a, 1d-15)
         r = r + assert(SS12, SS12a, 0.1d0)
-      end do
+ 10   continue
 
       tstarc = r
-      return
-      end
-
-      integer function notnan(x)
-      double precision x
-      if (x .eq. x) then
-        notnan = 1
-      else
-        notnan = 0
-      end if
-
       return
       end
 
@@ -424,7 +425,7 @@
      +    flags, lat2, lon2, azi2, omask, a12, m12, MM12, MM21, SS12)
       if (lon2 .lt. 0) then
         r = r + assert(lon2, -150d0, 0.5d-5)
-        r = r + assert(azi2, -180d0, 0.5d-5)
+        r = r + assert(abs(azi2), 180d0, 0.5d-5)
       else
         r = r + assert(lon2, 30d0, 0.5d-5)
         r = r + assert(azi2, 0d0, 0.5d-5)
@@ -556,7 +557,7 @@
 * Check fix for inverse ignoring lon12 = nan
       double precision azi1, azi2, s12, a12, m12, MM12, MM21, SS12
       double precision a, f, LatFix
-      integer r, notnan, omask
+      integer r, chknan, omask
       include 'geodesic.inc'
 
 * WGS84 values
@@ -566,9 +567,10 @@
       r = 0
       call invers(a, f, 0d0, 0d0, 1d0, LatFix(91d0),
      +    s12, azi1, azi2, omask, a12, m12, MM12, MM21, SS12)
-      r = r + notnan(azi1)
-      r = r + notnan(azi2)
-      r = r + notnan(s12)
+      r = r + chknan(azi1)
+      r = r + chknan(azi2)
+      r = r + chknan(s12)
+
       tstg14 = r
       return
       end
@@ -689,12 +691,12 @@
       call invers(a, f, 0d0, 0d0, 0d0, 180d0,
      +    s12, azi1, azi2, omask, a12, m12, MM12, MM21, SS12)
       r = r + assert(azi1, 0.00000d0, 0.5d-5)
-      r = r + assert(azi2, -180.00000d0, 0.5d-5)
+      r = r + assert(abs(azi2), 180.00000d0, 0.5d-5)
       r = r + assert(s12, 20003931d0, 0.5d0)
       call invers(a, f, 0d0, 0d0, 1d0, 180d0,
      +    s12, azi1, azi2, omask, a12, m12, MM12, MM21, SS12)
       r = r + assert(azi1, 0.00000d0, 0.5d-5)
-      r = r + assert(azi2, -180.00000d0, 0.5d-5)
+      r = r + assert(abs(azi2), 180.00000d0, 0.5d-5)
       r = r + assert(s12, 19893357d0, 0.5d0)
       a = 6.4d6
       f = 0
@@ -706,12 +708,12 @@
       call invers(a, f, 0d0, 0d0, 0d0, 180d0,
      +    s12, azi1, azi2, omask, a12, m12, MM12, MM21, SS12)
       r = r + assert(azi1, 0.00000d0, 0.5d-5)
-      r = r + assert(azi2, -180.00000d0, 0.5d-5)
+      r = r + assert(abs(azi2), 180.00000d0, 0.5d-5)
       r = r + assert(s12, 20106193d0, 0.5d0)
       call invers(a, f, 0d0, 0d0, 1d0, 180d0,
      +    s12, azi1, azi2, omask, a12, m12, MM12, MM21, SS12)
       r = r + assert(azi1, 0.00000d0, 0.5d-5)
-      r = r + assert(azi2, -180.00000d0, 0.5d-5)
+      r = r + assert(abs(azi2), 180.00000d0, 0.5d-5)
       r = r + assert(s12, 19994492d0, 0.5d0)
       a = 6.4d6
       f = -1/300.0d0
@@ -733,7 +735,7 @@
       call invers(a, f, 0d0, 0d0, 1d0, 180d0,
      +    s12, azi1, azi2, omask, a12, m12, MM12, MM21, SS12)
       r = r + assert(azi1, 0.00000d0, 0.5d-5)
-      r = r + assert(azi2, -180.00000d0, 0.5d-5)
+      r = r + assert(abs(azi2), 180.00000d0, 0.5d-5)
       r = r + assert(s12, 20027270d0, 0.5d0)
 
       tstg33 = r
@@ -745,7 +747,7 @@
 * Geodesic::Inverse, found 2015-09-23.
       double precision azi1, azi2, s12, a12, m12, MM12, MM21, SS12
       double precision a, f
-      integer r, notnan, omask
+      integer r, chknan, omask
       include 'geodesic.inc'
 
 * WGS84 values
@@ -755,14 +757,15 @@
       r = 0
       call invers(a, f, 91d0, 0d0, 0d0, 90d0,
      +    s12, azi1, azi2, omask, a12, m12, MM12, MM21, SS12)
-      r = r + notnan(azi1)
-      r = r + notnan(azi2)
-      r = r + notnan(s12)
+      r = r + chknan(azi1)
+      r = r + chknan(azi2)
+      r = r + chknan(s12)
       call invers(a, f, 91d0, 0d0, 90d0, 9d0,
      +    s12, azi1, azi2, omask, a12, m12, MM12, MM21, SS12)
-      r = r + notnan(azi1)
-      r = r + notnan(azi2)
-      r = r + notnan(s12)
+      r = r + chknan(azi1)
+      r = r + chknan(azi2)
+      r = r + chknan(s12)
+
       tstg55 = r
       return
       end
@@ -781,9 +784,10 @@
       r = 0
       call invers(a, f, 5d0, 0.00000000000001d0, 10d0, 180d0,
      +    s12, azi1, azi2, omask, a12, m12, MM12, MM21, SS12)
-      r = r + assert(azi1, 0.000000000000035d0, 1.5d-14);
-      r = r + assert(azi2, 179.99999999999996d0, 1.5d-14);
-      r = r + assert(s12, 18345191.174332713d0, 2.5d-9);
+      r = r + assert(azi1, 0.000000000000035d0, 1.5d-14)
+      r = r + assert(azi2, 179.99999999999996d0, 1.5d-14)
+      r = r + assert(s12, 18345191.174332713d0, 5d-9)
+
       tstg59 = r
       return
       end
@@ -805,7 +809,7 @@
      +    flags, lat2, lon2, azi2, omask, a12, m12, MM12, MM21, SS12)
       r = r + assert(lat2, 45.30632d0, 0.5d-5)
       r = r + assert(lon2, -180d0, 0.5d-5)
-      r = r + assert(azi2, -180d0, 0.5d-5)
+      r = r + assert(abs(azi2), 180d0, 0.5d-5)
 
       tstg61 = r
       return
@@ -815,6 +819,8 @@
 * Check for backwards from the pole bug reported by Anon on 2016-02-13.
 * This only affected the Java implementation.  It was introduced in Java
 * version 1.44 and fixed in 1.46-SNAPSHOT on 2016-01-17.
+* Also the + sign on azi2 is a check on the normalizing of azimuths
+* (converting -0.0 to +0.0).
       double precision lat2, lon2, azi2, a12, m12, MM12, MM21, SS12
       double precision a, f
       integer r, assert, omask, flags
@@ -830,9 +836,196 @@
      +    flags, lat2, lon2, azi2, omask, a12, m12, MM12, MM21, SS12)
       r = r + assert(lat2, 81.04623d0, 0.5d-5)
       r = r + assert(lon2, -170d0, 0.5d-5)
-      r = r + assert(azi2, 0d0, 0.5d-5)
+      r = r + assert(azi2, 0d0, 0d0)
+      r = r + assert(sign(1d0, azi2), 1d0, 0d0)
 
       tstg73 = r
+      return
+      end
+
+      integer function tstg74()
+* Check fix for inaccurate areas, bug introduced in v1.46, fixed
+* 2015-10-16.
+      double precision azi1, azi2, s12, a12, m12, MM12, MM21, SS12
+      double precision a, f
+      integer r, assert, omask
+      include 'geodesic.inc'
+
+* WGS84 values
+      a = 6378137d0
+      f = 1/298.257223563d0
+      omask = 1 + 2 + 4 + 8
+      r = 0
+      call invers(a, f, 54.1589d0, 15.3872d0, 54.1591d0, 15.3877d0,
+     +    s12, azi1, azi2, omask, a12, m12, MM12, MM21, SS12)
+      r = r + assert(azi1, 55.723110355d0, 5d-9)
+      r = r + assert(azi2, 55.723515675d0, 5d-9)
+      r = r + assert(s12,  39.527686385d0, 5d-9)
+      r = r + assert(a12,   0.000355495d0, 5d-9)
+      r = r + assert(m12,  39.527686385d0, 5d-9)
+      r = r + assert(MM12,  0.999999995d0, 5d-9)
+      r = r + assert(MM21,  0.999999995d0, 5d-9)
+      r = r + assert(SS12, 286698586.30197d0, 5d-4)
+
+      tstg74 = r
+      return
+      end
+
+      integer function tstg76()
+* The distance from Wellington and Salamanca (a classic failure of
+* Vincenty
+      double precision azi1, azi2, s12, a12, m12, MM12, MM21, SS12
+      double precision a, f
+      integer r, assert, omask
+      include 'geodesic.inc'
+
+* WGS84 values
+      a = 6378137d0
+      f = 1/298.257223563d0
+      omask = 0
+      r = 0
+      call invers(a, f,
+     +    -(41+19/60d0), 174+49/60d0, 40+58/60d0, -(5+30/60d0),
+     +    s12, azi1, azi2, omask, a12, m12, MM12, MM21, SS12)
+      r = r + assert(azi1, 160.39137649664d0, 0.5d-11)
+      r = r + assert(azi2,  19.50042925176d0, 0.5d-11)
+      r = r + assert(s12,  19960543.857179d0, 0.5d-6)
+
+      tstg76 = r
+      return
+      end
+
+      integer function tstg78()
+* An example where the NGS calculator fails to converge
+      double precision azi1, azi2, s12, a12, m12, MM12, MM21, SS12
+      double precision a, f
+      integer r, assert, omask
+      include 'geodesic.inc'
+
+* WGS84 values
+      a = 6378137d0
+      f = 1/298.257223563d0
+      omask = 0
+      r = 0
+      call invers(a, f, 27.2d0, 0d0, -27.1d0, 179.5d0,
+     +    s12, azi1, azi2, omask, a12, m12, MM12, MM21, SS12)
+      r = r + assert(azi1,  45.82468716758d0, 0.5d-11)
+      r = r + assert(azi2, 134.22776532670d0, 0.5d-11)
+      r = r + assert(s12,  19974354.765767d0, 0.5d-6)
+
+      tstg78 = r
+      return
+      end
+
+      integer function tstg80()
+* Some tests to add code coverage: computing scale in special cases + zero
+* length geodesic (includes GeodSolve80 - GeodSolve83).
+      double precision azi1, azi2, s12, a12, m12, MM12, MM21, SS12
+      double precision a, f
+      integer r, assert, omask
+      include 'geodesic.inc'
+
+* WGS84 values
+      a = 6378137d0
+      f = 1/298.257223563d0
+      omask = 4
+      r = 0
+
+      call invers(a, f, 0d0, 0d0, 0d0, 90d0,
+     +    s12, azi1, azi2, omask, a12, m12, MM12, MM21, SS12)
+      r = r + assert(MM12, -0.00528427534d0, 0.5d-10)
+      r = r + assert(MM21, -0.00528427534d0, 0.5d-10)
+
+      call invers(a, f, 0d0, 0d0, 1d-6, 1d-6,
+     +    s12, azi1, azi2, omask, a12, m12, MM12, MM21, SS12)
+      r = r + assert(MM12, 1d0, 0.5d-10)
+      r = r + assert(MM21, 1d0, 0.5d-10)
+
+      omask = 15
+      call invers(a, f, 20.001d0, 0d0, 20.001d0, 0d0,
+     +    s12, azi1, azi2, omask, a12, m12, MM12, MM21, SS12)
+      r = r + assert(a12, 0d0, 1d-13)
+      r = r + assert(s12, 0d0, 1d-8)
+      r = r + assert(azi1, 180d0, 1d-13)
+      r = r + assert(azi2, 180d0, 1d-13)
+      r = r + assert(m12, 0d0,  1d-8)
+      r = r + assert(MM12, 1d0, 1d-15)
+      r = r + assert(MM21, 1d0, 1d-15)
+      r = r + assert(SS12, 0d0, 1d-10)
+
+      call invers(a, f, 90d0, 0d0, 90d0, 180d0,
+     +    s12, azi1, azi2, omask, a12, m12, MM12, MM21, SS12)
+      r = r + assert(a12, 0d0, 1d-13)
+      r = r + assert(s12, 0d0, 1d-8)
+      r = r + assert(azi1, 0d0, 1d-13)
+      r = r + assert(azi2, 180d0, 1d-13)
+      r = r + assert(m12, 0d0, 1d-8)
+      r = r + assert(MM12, 1d0, 1d-15)
+      r = r + assert(MM21, 1d0, 1d-15)
+      r = r + assert(SS12, 127516405431022d0, 0.5d0)
+
+      tstg80 = r
+      return
+      end
+
+      integer function tstg84()
+* Tests for python implementation to check fix for range errors with
+* {fmod,sin,cos}(inf) (includes GeodSolve84 - GeodSolve86).
+      double precision lat2, lon2, azi2, a12, m12, MM12, MM21, SS12
+      double precision a, f, nan, inf, LatFix
+      integer r, assert, chknan, omask, flags
+      include 'geodesic.inc'
+
+* WGS84 values
+      a = 6378137d0
+      f = 1/298.257223563d0
+      omask = 0
+      flags = 0
+      inf = 1d0/LatFix(0d0)
+      nan = LatFix(91d0)
+      r = 0
+      call direct(a, f, 0d0, 0d0, 90d0, inf,
+     +    flags, lat2, lon2, azi2, omask, a12, m12, MM12, MM21, SS12)
+      r = r + chknan(lat2)
+      r = r + chknan(lon2)
+      r = r + chknan(azi2)
+      call direct(a, f, 0d0, 0d0, 90d0, nan,
+     +    flags, lat2, lon2, azi2, omask, a12, m12, MM12, MM21, SS12)
+      r = r + chknan(lat2)
+      r = r + chknan(lon2)
+      r = r + chknan(azi2)
+      call direct(a, f, 0d0, 0d0, inf, 1000d0,
+     +    flags, lat2, lon2, azi2, omask, a12, m12, MM12, MM21, SS12)
+      r = r + chknan(lat2)
+      r = r + chknan(lon2)
+      r = r + chknan(azi2)
+      call direct(a, f, 0d0, 0d0, nan, 1000d0,
+     +    flags, lat2, lon2, azi2, omask, a12, m12, MM12, MM21, SS12)
+      r = r + chknan(lat2)
+      r = r + chknan(lon2)
+      r = r + chknan(azi2)
+      call direct(a, f, 0d0, inf, 90d0, 1000d0,
+     +    flags, lat2, lon2, azi2, omask, a12, m12, MM12, MM21, SS12)
+      r = r + assert(lat2, 0d0, 0d0)
+      r = r + chknan(lon2)
+      r = r + assert(azi2, 90d0, 0d0)
+      call direct(a, f, 0d0, nan, 90d0, 1000d0,
+     +    flags, lat2, lon2, azi2, omask, a12, m12, MM12, MM21, SS12)
+      r = r + assert(lat2, 0d0, 0d0)
+      r = r + chknan(lon2)
+      r = r + assert(azi2, 90d0, 0d0)
+      call direct(a, f, inf, 0d0, 90d0, 1000d0,
+     +    flags, lat2, lon2, azi2, omask, a12, m12, MM12, MM21, SS12)
+      r = r + chknan(lat2)
+      r = r + chknan(lon2)
+      r = r + chknan(azi2)
+      call direct(a, f, nan, 0d0, 90d0, 1000d0,
+     +    flags, lat2, lon2, azi2, omask, a12, m12, MM12, MM21, SS12)
+      r = r + chknan(lat2)
+      r = r + chknan(lon2)
+      r = r + chknan(azi2)
+
+      tstg84 = r
       return
       end
 
@@ -976,13 +1169,99 @@
       return
       end
 
+      integer function tstp15()
+* Coverage tests, includes Planimeter15 - Planimeter18 (combinations of
+* reverse and sign).  But flags aren't supported in the Fortran
+* implementation.
+      double precision lat(3), lon(3)
+      data lat / 2d0, 1d0, 3d0 /
+      data lon / 1d0, 2d0, 3d0 /
+      double precision a, f, AA, PP
+      integer r, assert
+      include 'geodesic.inc'
+
+* WGS84 values
+      a = 6378137d0
+      f = 1/298.257223563d0
+      r = 0
+
+      call area(a, f, lat, lon, 3, AA, PP)
+      r = r + assert(AA, 18454562325.45119d0, 1d0)
+* Interchanging lat and lon is equivalent to traversing the polygon
+* backwards.
+      call area(a, f, lon, lat, 3, AA, PP)
+      r = r + assert(AA, -18454562325.45119d0, 1d0)
+
+      tstp15 = r
+      return
+      end
+
+      integer function tstp19()
+* Coverage tests, includes Planimeter19 - Planimeter20 (degenerate
+* polygons).
+      double precision lat(1), lon(1)
+      data lat / 1d0 /
+      data lon / 1d0 /
+      double precision a, f, AA, PP
+      integer r, assert
+      include 'geodesic.inc'
+
+* WGS84 values
+      a = 6378137d0
+      f = 1/298.257223563d0
+      r = 0
+
+      call area(a, f, lat, lon, 1, AA, PP)
+      r = r + assert(AA, 0d0, 0d0)
+      r = r + assert(PP, 0d0, 0d0)
+
+      tstp19 = r
+      return
+      end
+
+      integer function tstp21()
+* Some test to add code coverage: multiple circlings of pole (includes
+* Planimeter21 - Planimeter28).
+      double precision lat(12), lon(12), lonr(12)
+      data lat / 12*45d0 /
+      data lon / 60d0, 180d0, -60d0,
+     +    60d0, 180d0, -60d0,
+     +    60d0, 180d0, -60d0,
+     +    60d0, 180d0, -60d0 /
+      data lonr / -60d0, 180d0, 60d0,
+     +    -60d0, 180d0, 60d0,
+     +    -60d0, 180d0, 60d0,
+     +    -60d0, 180d0, 60d0 /
+      double precision a, f, AA, PP, AA1
+      integer r, assert
+      include 'geodesic.inc'
+
+* WGS84 values
+      a = 6378137d0
+      f = 1/298.257223563d0
+      r = 0
+* Area for one circuit
+      AA1 = 39433884866571.4277d0
+
+      do 10 i = 3,4
+        call area(a, f, lat, lon, 3*i, AA, PP)
+        r = r + assert(AA, AA1*i, 0.5d0)
+        call area(a, f, lat, lonr, 3*i, AA, PP)
+        r = r + assert(AA, -AA1*i, 0.5d0)
+ 10   continue
+
+      tstp21 = r
+      return
+      end
+
       program geodtest
       integer n, i
       integer tstinv, tstdir, tstarc,
      +    tstg0, tstg1, tstg2, tstg5, tstg6, tstg9, tstg10, tstg11,
      +    tstg12, tstg14, tstg15, tstg17, tstg26, tstg28, tstg33,
-     +    tstg55, tstg59, tstg61, tstg73,
-     +    tstp0, tstp5, tstp6, tstp12, tstp13
+     +    tstg55, tstg59, tstg61, tstg73, tstg74, tstg76, tstg78,
+     +    tstg80, tstg84,
+     +    tstp0, tstp5, tstp6, tstp12, tstp13, tstp15, tstp19, tstp21
 
       n = 0
       i = tstinv()
@@ -1095,6 +1374,31 @@
         n = n + 1
         print *, 'tstg73 fail:', i
       end if
+      i = tstg74()
+      if (i .gt. 0) then
+        n = n + 1
+        print *, 'tstg74 fail:', i
+      end if
+      i = tstg76()
+      if (i .gt. 0) then
+        n = n + 1
+        print *, 'tstg76 fail:', i
+      end if
+      i = tstg78()
+      if (i .gt. 0) then
+        n = n + 1
+        print *, 'tstg78 fail:', i
+      end if
+      i = tstg80()
+      if (i .gt. 0) then
+        n = n + 1
+        print *, 'tstg80 fail:', i
+      end if
+      i = tstg84()
+      if (i .gt. 0) then
+        n = n + 1
+        print *, 'tstg84 fail:', i
+      end if
       i = tstp0()
       if (i .gt. 0) then
         n = n + 1
@@ -1119,6 +1423,21 @@
       if (i .gt. 0) then
         n = n + 1
         print *, 'tstp13 fail:', i
+      end if
+      i = tstp15()
+      if (i .gt. 0) then
+        n = n + 1
+        print *, 'tstp15 fail:', i
+      end if
+      i = tstp19()
+      if (i .gt. 0) then
+        n = n + 1
+        print *, 'tstp19 fail:', i
+      end if
+      i = tstp21()
+      if (i .gt. 0) then
+        n = n + 1
+        print *, 'tstp21 fail:', i
       end if
 
       if (n .gt. 0) then

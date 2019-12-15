@@ -2,9 +2,9 @@
  * \file AzimuthalEquidistant.hpp
  * \brief Header for GeographicLib::AzimuthalEquidistant class
  *
- * Copyright (c) Charles Karney (2009-2015) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2009-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #if !defined(GEOGRAPHICLIB_AZIMUTHALEQUIDISTANT_HPP)
@@ -89,7 +89,7 @@ namespace GeographicLib {
      *
      * \e lat0 should be in the range [&minus;90&deg;, 90&deg;].  \e lat will
      * be in the range [&minus;90&deg;, 90&deg;] and \e lon will be in the
-     * range [&minus;180&deg;, 180&deg;).  The scale of the projection is 1 in
+     * range [&minus;180&deg;, 180&deg;].  The scale of the projection is 1 in
      * the "radial" direction, \e azi clockwise from true north, and is 1/\e rk
      * in the direction perpendicular to this.  A call to Reverse followed by a
      * call to Forward will return the original (\e x, \e y) (to roundoff) only
@@ -123,13 +123,19 @@ namespace GeographicLib {
      * @return \e a the equatorial radius of the ellipsoid (meters).  This is
      *   the value inherited from the Geodesic object used in the constructor.
      **********************************************************************/
-    Math::real MajorRadius() const { return _earth.MajorRadius(); }
+    Math::real EquatorialRadius() const { return _earth.EquatorialRadius(); }
 
     /**
      * @return \e f the flattening of the ellipsoid.  This is the value
      *   inherited from the Geodesic object used in the constructor.
      **********************************************************************/
     Math::real Flattening() const { return _earth.Flattening(); }
+
+    /**
+      * \deprecated An old name for EquatorialRadius().
+      **********************************************************************/
+    // GEOGRAPHICLIB_DEPRECATED("Use EquatorialRadius()")
+    Math::real MajorRadius() const { return EquatorialRadius(); }
     ///@}
 
   };

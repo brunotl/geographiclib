@@ -225,7 +225,7 @@ public class GeodesicTest {
     assertEquals(dir.lat2, 90, 0.5e-5);
     if (dir.lon2 < 0) {
       assertEquals(dir.lon2, -150, 0.5e-5);
-      assertEquals(dir.azi2, -180, 0.5e-5);
+      assertEquals(Math.abs(dir.azi2), 180, 0.5e-5);
     } else {
       assertEquals(dir.lon2, 30, 0.5e-5);
       assertEquals(dir.azi2, 0, 0.5e-5);
@@ -243,8 +243,8 @@ public class GeodesicTest {
     inv = Geodesic.WGS84.Inverse(89.262080389218, 0,
                                  -89.262080389218, 179.992207982775375662);
     assertEquals(inv.s12, 20003925.854, 0.5e-3);
-    inv = Geodesic.WGS84.Inverse(89.333123580033, 0,
-                                 -89.333123580032997687, 179.99295812360148422);
+    inv = Geodesic.WGS84.Inverse(89.333123580033, 0, -89.333123580032997687,
+                                 179.99295812360148422);
     assertEquals(inv.s12, 20003926.881, 0.5e-3);
   }
 
@@ -378,11 +378,11 @@ public class GeodesicTest {
     assertEquals(inv.s12, 19980862, 0.5);
     inv = Geodesic.WGS84.Inverse(0, 0, 0, 180);
     assertEquals(inv.azi1, 0.00000, 0.5e-5);
-    assertEquals(inv.azi2, -180.00000, 0.5e-5);
+    assertEquals(Math.abs(inv.azi2), 180.00000, 0.5e-5);
     assertEquals(inv.s12, 20003931, 0.5);
     inv = Geodesic.WGS84.Inverse(0, 0, 1, 180);
     assertEquals(inv.azi1, 0.00000, 0.5e-5);
-    assertEquals(inv.azi2, -180.00000, 0.5e-5);
+    assertEquals(Math.abs(inv.azi2), 180.00000, 0.5e-5);
     assertEquals(inv.s12, 19893357, 0.5);
     Geodesic geod = new Geodesic(6.4e6, 0);
     inv = geod.Inverse(0, 0, 0, 179);
@@ -391,11 +391,11 @@ public class GeodesicTest {
     assertEquals(inv.s12, 19994492, 0.5);
     inv = geod.Inverse(0, 0, 0, 180);
     assertEquals(inv.azi1, 0.00000, 0.5e-5);
-    assertEquals(inv.azi2, -180.00000, 0.5e-5);
+    assertEquals(Math.abs(inv.azi2), 180.00000, 0.5e-5);
     assertEquals(inv.s12, 20106193, 0.5);
     inv = geod.Inverse(0, 0, 1, 180);
     assertEquals(inv.azi1, 0.00000, 0.5e-5);
-    assertEquals(inv.azi2, -180.00000, 0.5e-5);
+    assertEquals(Math.abs(inv.azi2), 180.00000, 0.5e-5);
     assertEquals(inv.s12, 19994492, 0.5);
     geod = new Geodesic(6.4e6, -1/300.0);
     inv = geod.Inverse(0, 0, 0, 179);
@@ -412,7 +412,7 @@ public class GeodesicTest {
     assertEquals(inv.s12, 20082617, 0.5);
     inv = geod.Inverse(0, 0, 1, 180);
     assertEquals(inv.azi1, 0.00000, 0.5e-5);
-    assertEquals(inv.azi2, -180.00000, 0.5e-5);
+    assertEquals(Math.abs(inv.azi2), 180.00000, 0.5e-5);
     assertEquals(inv.s12, 20027270, 0.5);
   }
 
@@ -436,7 +436,7 @@ public class GeodesicTest {
     GeodesicData inv = Geodesic.WGS84.Inverse(5, 0.00000000000001, 10, 180);
     assertEquals(inv.azi1, 0.000000000000035, 1.5e-14);
     assertEquals(inv.azi2, 179.99999999999996, 1.5e-14);
-    assertEquals(inv.s12, 18345191.174332713, 4e-9);
+    assertEquals(inv.s12, 18345191.174332713, 5e-9);
   }
 
   @Test
@@ -447,13 +447,13 @@ public class GeodesicTest {
                             GeodesicMask.STANDARD | GeodesicMask.LONG_UNROLL);
     assertEquals(dir.lat2, 45.30632, 0.5e-5);
     assertEquals(dir.lon2, -180, 0.5e-5);
-    assertEquals(dir.azi2, -180, 0.5e-5);
+    assertEquals(Math.abs(dir.azi2), 180, 0.5e-5);
     GeodesicLine line = Geodesic.WGS84.InverseLine(45, 0, 80,
                                                    -0.000000000000000003);
-    dir = line.Position(1e7);
+    dir = line.Position(1e7, GeodesicMask.STANDARD | GeodesicMask.LONG_UNROLL);
     assertEquals(dir.lat2, 45.30632, 0.5e-5);
     assertEquals(dir.lon2, -180, 0.5e-5);
-    assertEquals(dir.azi2, -180, 0.5e-5);
+    assertEquals(Math.abs(dir.azi2), 180, 0.5e-5);
   }
 
   @Test
@@ -467,10 +467,10 @@ public class GeodesicTest {
       line.Position(1e7, GeodesicMask.ALL | GeodesicMask.LONG_UNROLL);
     assertEquals(dir.lat1, 30.00000  , 0.5e-5);
     assertEquals(dir.lon1, -0.00000  , 0.5e-5);
-    assertEquals(dir.azi1, -180.00000, 0.5e-5);
+    assertEquals(Math.abs(dir.azi1), 180.00000, 0.5e-5);
     assertEquals(dir.lat2, -60.23169 , 0.5e-5);
     assertEquals(dir.lon2, -0.00000  , 0.5e-5);
-    assertEquals(dir.azi2, -180.00000, 0.5e-5);
+    assertEquals(Math.abs(dir.azi2), 180.00000, 0.5e-5);
     assertEquals(dir.s12 , 10000000  , 0.5);
     assertEquals(dir.a12 , 90.06544  , 0.5e-5);
     assertEquals(dir.m12 , 6363636   , 0.5);
@@ -480,7 +480,7 @@ public class GeodesicTest {
     dir = line.Position(2e7, GeodesicMask.ALL | GeodesicMask.LONG_UNROLL);
     assertEquals(dir.lat1, 30.00000  , 0.5e-5);
     assertEquals(dir.lon1, -0.00000  , 0.5e-5);
-    assertEquals(dir.azi1, -180.00000, 0.5e-5);
+    assertEquals(Math.abs(dir.azi1), 180.00000, 0.5e-5);
     assertEquals(dir.lat2, -30.03547 , 0.5e-5);
     assertEquals(dir.lon2, -180.00000, 0.5e-5);
     assertEquals(dir.azi2, -0.00000  , 0.5e-5);
@@ -527,10 +527,128 @@ public class GeodesicTest {
     // Check for backwards from the pole bug reported by Anon on 2016-02-13.
     // This only affected the Java implementation.  It was introduced in Java
     // version 1.44 and fixed in 1.46-SNAPSHOT on 2016-01-17.
+    // Also the + sign on azi2 is a check on the normalizing of azimuths
+    // (converting -0.0 to +0.0).
     GeodesicData dir = Geodesic.WGS84.Direct(90, 10, 180, -1e6);
     assertEquals(dir.lat2, 81.04623, 0.5e-5);
     assertEquals(dir.lon2, -170, 0.5e-5);
     assertEquals(dir.azi2, 0, 0.5e-5);
+    assertTrue(Math.copySign(1, dir.azi2) > 0);
+  }
+
+  @Test
+  public void GeodSolve74() {
+    // Check fix for inaccurate areas, bug introduced in v1.46, fixed
+    // 2015-10-16.
+    GeodesicData inv = Geodesic.WGS84.Inverse(54.1589, 15.3872,
+                                              54.1591, 15.3877,
+                                              GeodesicMask.ALL);
+    assertEquals(inv.azi1, 55.723110355, 5e-9);
+    assertEquals(inv.azi2, 55.723515675, 5e-9);
+    assertEquals(inv.s12,  39.527686385, 5e-9);
+    assertEquals(inv.a12,   0.000355495, 5e-9);
+    assertEquals(inv.m12,  39.527686385, 5e-9);
+    assertEquals(inv.M12,   0.999999995, 5e-9);
+    assertEquals(inv.M21,   0.999999995, 5e-9);
+    assertEquals(inv.S12, 286698586.30197, 5e-4);
+  }
+
+  @Test
+  public void GeodSolve76() {
+    // The distance from Wellington and Salamanca (a classic failure of
+    // Vincenty)
+    GeodesicData inv = Geodesic.WGS84.Inverse(-(41+19/60.0), 174+49/60.0,
+                                              40+58/60.0, -(5+30/60.0));
+    assertEquals(inv.azi1, 160.39137649664, 0.5e-11);
+    assertEquals(inv.azi2,  19.50042925176, 0.5e-11);
+    assertEquals(inv.s12,  19960543.857179, 0.5e-6);
+  }
+
+  @Test
+  public void GeodSolve78() {
+    // An example where the NGS calculator fails to converge
+    GeodesicData inv = Geodesic.WGS84.Inverse(27.2, 0.0, -27.1, 179.5);
+    assertEquals(inv.azi1,  45.82468716758, 0.5e-11);
+    assertEquals(inv.azi2, 134.22776532670, 0.5e-11);
+    assertEquals(inv.s12,  19974354.765767, 0.5e-6);
+  }
+
+  @Test
+  public void GeodSolve80() {
+    // Some tests to add code coverage: computing scale in special cases + zero
+    // length geodesic (includes GeodSolve80 - GeodSolve83).
+    GeodesicData inv = Geodesic.WGS84.Inverse(0, 0, 0, 90,
+                                              GeodesicMask.GEODESICSCALE);
+    assertEquals(inv.M12, -0.00528427534, 0.5e-10);
+    assertEquals(inv.M21, -0.00528427534, 0.5e-10);
+
+    inv = Geodesic.WGS84.Inverse(0, 0, 1e-6, 1e-6, GeodesicMask.GEODESICSCALE);
+    assertEquals(inv.M12, 1, 0.5e-10);
+    assertEquals(inv.M21, 1, 0.5e-10);
+
+    inv = Geodesic.WGS84.Inverse(20.001, 0, 20.001, 0, GeodesicMask.ALL);
+    assertEquals(inv.a12, 0, 1e-13);
+    assertEquals(inv.s12, 0, 1e-8);
+    assertEquals(inv.azi1, 180, 1e-13);
+    assertEquals(inv.azi2, 180, 1e-13);
+    assertEquals(inv.m12, 0,  1e-8);
+    assertEquals(inv.M12, 1, 1e-15);
+    assertEquals(inv.M21, 1, 1e-15);
+    assertEquals(inv.S12, 0, 1e-10);
+
+    inv = Geodesic.WGS84.Inverse(90, 0, 90, 180, GeodesicMask.ALL);
+    assertEquals(inv.a12, 0, 1e-13);
+    assertEquals(inv.s12, 0, 1e-8);
+    assertEquals(inv.azi1, 0, 1e-13);
+    assertEquals(inv.azi2, 180, 1e-13);
+    assertEquals(inv.m12, 0, 1e-8);
+    assertEquals(inv.M12, 1, 1e-15);
+    assertEquals(inv.M21, 1, 1e-15);
+    assertEquals(inv.S12, 127516405431022.0, 0.5);
+
+    // An incapable line which can't take distance as input
+    GeodesicLine line = Geodesic.WGS84.Line(1, 2, 90, GeodesicMask.LATITUDE);
+    GeodesicData dir = line.Position(1000, GeodesicMask.NONE);
+    assertTrue(isNaN(dir.a12));
+  }
+
+  @Test
+  public void GeodSolve84() {
+    // Tests for python implementation to check fix for range errors with
+    // {fmod,sin,cos}(inf) (includes GeodSolve84 - GeodSolve91).
+    GeodesicData dir;
+    dir = Geodesic.WGS84.Direct(0, 0, 90, Double.POSITIVE_INFINITY);
+    assertTrue(isNaN(dir.lat2));
+    assertTrue(isNaN(dir.lon2));
+    assertTrue(isNaN(dir.azi2));
+    dir = Geodesic.WGS84.Direct(0, 0, 90, Double.NaN);
+    assertTrue(isNaN(dir.lat2));
+    assertTrue(isNaN(dir.lon2));
+    assertTrue(isNaN(dir.azi2));
+    dir = Geodesic.WGS84.Direct(0, 0, Double.POSITIVE_INFINITY, 1000);
+    assertTrue(isNaN(dir.lat2));
+    assertTrue(isNaN(dir.lon2));
+    assertTrue(isNaN(dir.azi2));
+    dir = Geodesic.WGS84.Direct(0, 0, Double.NaN, 1000);
+    assertTrue(isNaN(dir.lat2));
+    assertTrue(isNaN(dir.lon2));
+    assertTrue(isNaN(dir.azi2));
+    dir = Geodesic.WGS84.Direct(0, Double.POSITIVE_INFINITY, 90, 1000);
+    assertTrue(dir.lat2 == 0);
+    assertTrue(isNaN(dir.lon2));
+    assertTrue(dir.azi2 == 90);
+    dir = Geodesic.WGS84.Direct(0, Double.NaN, 90, 1000);
+    assertTrue(dir.lat2 == 0);
+    assertTrue(isNaN(dir.lon2));
+    assertTrue(dir.azi2 == 90);
+    dir = Geodesic.WGS84.Direct(Double.POSITIVE_INFINITY, 0, 90, 1000);
+    assertTrue(isNaN(dir.lat2));
+    assertTrue(isNaN(dir.lon2));
+    assertTrue(isNaN(dir.azi2));
+    dir = Geodesic.WGS84.Direct(Double.NaN, 0, 90, 1000);
+    assertTrue(isNaN(dir.lat2));
+    assertTrue(isNaN(dir.lon2));
+    assertTrue(isNaN(dir.azi2));
   }
 
   @Test
@@ -609,4 +727,141 @@ public class GeodesicTest {
     assertEquals(a.area, 32415230256.0, 1);
   }
 
+  @Test
+  public void Planimeter15() {
+    // Coverage tests, includes Planimeter15 - Planimeter18 (combinations of
+    // reverse and sign) + calls to testpoint, testedge.
+    PolygonResult a;
+    double lat[] = {2, 1, 3}, lon[] = {1, 2, 3};
+    double r = 18454562325.45119,
+      a0 = 510065621724088.5093;  // ellipsoid area
+    polygon.Clear();
+    polygon.AddPoint(lat[0], lon[0]);
+    polygon.AddPoint(lat[1], lon[1]);
+    a = polygon.TestPoint(lat[2], lon[2], false, true);
+    assertEquals(a.area, r, 0.5);
+    a = polygon.TestPoint(lat[2], lon[2], false, false);
+    assertEquals(a.area, r, 0.5);
+    a = polygon.TestPoint(lat[2], lon[2], true, true);
+    assertEquals(a.area, -r, 0.5);
+    a = polygon.TestPoint(lat[2], lon[2], true, false);
+    assertEquals(a.area, a0-r, 0.5);
+    GeodesicData inv = Geodesic.WGS84.Inverse(lat[1], lon[1], lat[2], lon[2]);
+    a = polygon.TestEdge(inv.azi1, inv.s12, false, true);
+    assertEquals(a.area, r, 0.5);
+    a = polygon.TestEdge(inv.azi1, inv.s12, false, false);
+    assertEquals(a.area, r, 0.5);
+    a = polygon.TestEdge(inv.azi1, inv.s12, true, true);
+    assertEquals(a.area, -r, 0.5);
+    a = polygon.TestEdge(inv.azi1, inv.s12, true, false);
+    assertEquals(a.area, a0-r, 0.5);
+    polygon.AddPoint(lat[2], lon[2]);
+    a = polygon.Compute(false, true);
+    assertEquals(a.area, r, 0.5);
+    a = polygon.Compute(false, false);
+    assertEquals(a.area, r, 0.5);
+    a = polygon.Compute(true, true);
+    assertEquals(a.area, -r, 0.5);
+    a = polygon.Compute(true, false);
+    assertEquals(a.area, a0-r, 0.5);
+  }
+
+  @Test
+  public void Planimeter19() {
+    // Coverage tests, includes Planimeter19 - Planimeter20 (degenerate
+    // polygons) + extra cases.
+    PolygonResult a;
+    polygon.Clear();
+    a = polygon.Compute(false, true);
+    assertTrue(a.area == 0);
+    assertTrue(a.perimeter == 0);
+    a = polygon.TestPoint(1, 1, false, true);
+    assertTrue(a.area == 0);
+    assertTrue(a.perimeter == 0);
+    a = polygon.TestEdge(90, 1000, false, true);
+    assertTrue(isNaN(a.area));
+    assertTrue(isNaN(a.perimeter));
+    polygon.AddPoint(1, 1);
+    a = polygon.Compute(false, true);
+    assertTrue(a.area == 0);
+    assertTrue(a.perimeter == 0);
+    polyline.Clear();
+    a = polyline.Compute(false, true);
+    assertTrue(a.perimeter == 0);
+    a = polyline.TestPoint(1, 1, false, true);
+    assertTrue(a.perimeter == 0);
+    a = polyline.TestEdge(90, 1000, false, true);
+    assertTrue(isNaN(a.perimeter));
+    polyline.AddPoint(1, 1);
+    a = polyline.Compute(false, true);
+    assertTrue(a.perimeter == 0);
+    polygon.AddPoint(1, 1);
+    a = polyline.TestEdge(90, 1000, false, true);
+    assertEquals(a.perimeter, 1000, 1e-10);
+    a = polyline.TestPoint(2, 2, false, true);
+    assertEquals(a.perimeter, 156876.149, 0.5e-3);
+  }
+
+  @Test
+  public void Planimeter21() {
+    // Some test to add code coverage: multiple circlings of pole (includes
+    // Planimeter21 - Planimeter28) + invocations via testpoint and testedge.
+    PolygonResult a;
+    double lat = 45,
+      azi = 39.2144607176828184218, s = 8420705.40957178156285,
+      r = 39433884866571.4277,    // Area for one circuit
+      a0 = 510065621724088.5093;  // Ellipsoid area
+    int i;
+    polygon.Clear();
+    polygon.AddPoint(lat,  60);
+    polygon.AddPoint(lat, 180);
+    polygon.AddPoint(lat, -60);
+    polygon.AddPoint(lat,  60);
+    polygon.AddPoint(lat, 180);
+    polygon.AddPoint(lat, -60);
+    for (i = 3; i <= 4; ++i) {
+      polygon.AddPoint(lat,  60);
+      polygon.AddPoint(lat, 180);
+      a = polygon.TestPoint(lat, -60, false, true);
+      assertEquals(a.area,  i*r, 0.5);
+      a = polygon.TestPoint(lat, -60, false, false);
+      assertEquals(a.area,  i*r, 0.5);
+      a = polygon.TestPoint(lat, -60, true, true);
+      assertEquals(a.area, -i*r, 0.5);
+      a = polygon.TestPoint(lat, -60, true, false);
+      assertEquals(a.area, -i*r + a0, 0.5);
+      a = polygon.TestEdge(azi, s, false, true);
+      assertEquals(a.area,  i*r, 0.5);
+      a = polygon.TestEdge(azi, s, false, false);
+      assertEquals(a.area,  i*r, 0.5);
+      a = polygon.TestEdge(azi, s, true, true);
+      assertEquals(a.area, -i*r, 0.5);
+      a = polygon.TestEdge(azi, s, true, false);
+      assertEquals(a.area, -i*r + a0, 0.5);
+      polygon.AddPoint(lat, -60);
+      a = polygon.Compute(false, true);
+      assertEquals(a.area,  i*r, 0.5);
+      a = polygon.Compute(false, false);
+      assertEquals(a.area,  i*r, 0.5);
+      a = polygon.Compute(true, true);
+      assertEquals(a.area, -i*r, 0.5);
+      a = polygon.Compute(true, false);
+      assertEquals(a.area, -i*r + a0, 0.5);
+    }
+  }
+
+  @Test
+  public void Planimeter29() {
+    // Check fix to transitdirect vs transit zero handling inconsistency
+    PolygonResult a;
+    polygon.Clear();
+    polygon.AddPoint(0, 0);
+    polygon.AddEdge( 90, 1000);
+    polygon.AddEdge(  0, 1000);
+    polygon.AddEdge(-90, 1000);
+    a = polygon.Compute(false, true);
+    // The area should be 1e6.  Prior to the fix it was 1e6 - A/2, where
+    // A = ellipsoid area.
+    assertEquals(a.area, 1000000.0, 0.01);
+  }
 }

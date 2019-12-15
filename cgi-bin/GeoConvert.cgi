@@ -3,9 +3,9 @@
 # GeoConvert.cgi
 # cgi script for geographic coordinate conversion
 #
-# Copyright (c) Charles Karney (2011) <charles@karney.com> and licensed
-# under the MIT/X11 License.  For more information, see
-# http://geographiclib.sourceforge.net/
+# Copyright (c) Charles Karney (2011-2018) <charles@karney.com> and
+# licensed under the MIT/X11 License.  For more information, see
+# https://geographiclib.sourceforge.io/
 
 . ./utils.sh
 OPTION=`lookupkey "$QUERY_STRING" option`
@@ -34,17 +34,17 @@ set -o pipefail
 if test "$INPUT"; then
     LOCG=`echo $INPUT | $EXECDIR/$COMMAND | head -1`
     if test $? -eq 0; then
-	GEOH=`echo $INPUT | $EXECDIR/$COMMAND -p 1 | head -1`
-	LOCG=`geohack $GEOH $LOCG Blue`
-	LOCD=\(`echo $INPUT | $EXECDIR/$COMMAND -d | head -1`\)
-	case $ZONE in
-	    -3 ) ;;
-	    -2 ) COMMAND="$COMMAND -t";;
-	    -1 ) COMMAND="$COMMAND -s";;
-	    * ) COMMAND="$COMMAND -z $ZONE"
-	esac
-	LOCU=`echo $INPUT | $EXECDIR/$COMMAND -u | head -1`
-	LOCM=`echo $INPUT | $EXECDIR/$COMMAND -m | head -1`
+        GEOH=`echo $INPUT | $EXECDIR/$COMMAND -p 1 | head -1`
+        LOCG=`geohack $GEOH $LOCG Blue`
+        LOCD=\(`echo $INPUT | $EXECDIR/$COMMAND -d | head -1`\)
+        case $ZONE in
+            -3 ) ;;
+            -2 ) COMMAND="$COMMAND -t";;
+            -1 ) COMMAND="$COMMAND -s";;
+            * ) COMMAND="$COMMAND -z $ZONE"
+        esac
+        LOCU=`echo $INPUT | $EXECDIR/$COMMAND -u | head -1`
+        LOCM=`echo $INPUT | $EXECDIR/$COMMAND -m | head -1`
     fi
     # echo `date +"%F %T"` "$COMMAND: $INPUT" >> ../persistent/utilities.log
 fi
@@ -57,30 +57,35 @@ cat <<EOF
     <title>
       Online geographic coordinate converter
     </title>
-    <meta name="description" content="Online geographic coordinate converter" />
+    <meta name="description"
+          content="Online geographic coordinate converter" />
     <meta name="author" content="Charles F. F. Karney" />
     <meta name="keywords"
-	  content="geographic coordinate conversions,
-		   geographic coordinates,
-		   latitude and longitude,
-		   degrees minutes seconds,
-		   universal transverse Mercator, UTM,
-		   easting northing and zone,
-		   universal polar sterographic, UPS,
-		   military grid reference system, MGRS,
-		   online calculator,
-		   WGS84 ellipsoid,
-		   GeographicLib" />
+          content="geographic coordinate conversions,
+                   geographic coordinates,
+                   latitude and longitude,
+                   degrees minutes seconds,
+                   universal transverse Mercator, UTM,
+                   easting northing and zone,
+                   universal polar sterographic, UPS,
+                   military grid reference system, MGRS,
+                   online calculator,
+                   WGS84 ellipsoid,
+                   GeographicLib" />
   </head>
   <body>
     <h3>
       Online geographic coordinate conversions using the
-      <a href="http://geographiclib.sourceforge.net/html/GeoConvert.1.html">
-	GeoConvert</a> utility
+      <a href="https://geographiclib.sourceforge.io/html/GeoConvert.1.html">
+        GeoConvert</a> utility
     </h3>
     <form action="/cgi-bin/GeoConvert" method="get">
       <p>
-        Location (ex. &laquo;<tt>33.33 44.4</tt>&raquo;, &laquo;<tt>33d19'47"N 44d23.9'E</tt>&raquo;, &laquo;<tt>38SMB4488</tt>&raquo;, &laquo;<tt>38n 444000 3688000</tt>&raquo;):<br>
+        Location
+        (ex. &laquo;<tt>33.33 44.4</tt>&raquo;,
+        &laquo;<tt>33d19'47"N 44d23.9'E</tt>&raquo;,
+        &laquo;<tt>38SMB4488</tt>&raquo;,
+        &laquo;<tt>38n 444000 3688000</tt>&raquo;):<br>
         &nbsp;&nbsp;&nbsp;
         <input type=text name="input" size=40 value="$INPUTENC">
       </p>
@@ -165,7 +170,7 @@ cat <<EOF
     </form>
     <hr>
     <p>
-      <a href="http://geographiclib.sourceforge.net/html/GeoConvert.1.html">
+      <a href="https://geographiclib.sourceforge.io/html/GeoConvert.1.html">
         GeoConvert (version $VERSION)</a>
       converts between geographic (latitude and longitude) coordinates,
       <a href="https://en.wikipedia.org/wiki/Universal_Transverse_Mercator_coordinate_system">
@@ -174,8 +179,8 @@ cat <<EOF
         universal polar stereographic (UPS)</a> coordinates, and the
       <a href="https://en.wikipedia.org/wiki/Military_grid_reference_system">
         military grid reference system (MGRS)</a>.
-      Examples of legal geographic locations are (these all refer to the
-      same place, Cape Morris Jesup on the northern tip of Greenland):
+      Examples of legal geographic locations are (these all refer to roughly
+      the same place, Cape Morris Jesup on the northern tip of Greenland):
       <pre>
     Latitude and longitude:       MGRS:
         83.627 -32.664                24XWT783908
@@ -187,42 +192,43 @@ cat <<EOF
         32:40W+0:0:6 83:38-0:0.4      n 1617772 1403805</pre>
       <b>Notes:</b>
       <ul>
-	<li>
-	  The letter in following the zone number in the UTM position is
-	  a hemisphere designator (n or s) and <em>not</em> the MGRS
-	  latitude band letter.  "north" or "south" can also be used,
-	  e.g., 25north.
-	<li>
-	  MGRS coordinates are taken to refer to <em>grid squares</em>
-	  (<em>not</em> to the intersections of grid lines).  Thus in UTM
-	  zone 38n, the square area with easting in [444 km, 445 km) and
-	  northing in [3688 km, 3689 km) corresponds to the MGRS square
-	  38SMB4488 (at 1 km precision).
-	  <ul>
-	    <li>
-	      When an MGRS coordinate is read, it is treated as the
-	      <em>center</em> of the grid square.
-	    <li>
-	      The MGRS easting and northing are obtained
-	      by <em>truncation</em> to the requested precision
-	      (<em>not</em> rounding).
-	  </ul>
-	<li>
-	  Usually <em>Output zone</em> should be <em>Match input or
-	  standard</em>.  If the latitude and longitude are given, the
-	  standard UPS and UTM zone rules are applied; otherwise the
-	  UPS/UTM selection and the UTM zone match the input.  The other
-	  choices let you override this selection.
+        <li>
+          The letter in following the zone number in the UTM position is
+          a hemisphere designator (n or s) and <em>not</em> the MGRS
+          latitude band letter.  "north" or "south" can also be used,
+          e.g., 25north.
+        <li>
+          MGRS coordinates are taken to refer to <em>grid squares</em>
+          (<em>not</em> to the intersections of grid lines).  Thus in UTM
+          zone 38n, the square area with easting in [444 km, 445 km) and
+          northing in [3688 km, 3689 km) corresponds to the MGRS square
+          38SMB4488 (at 1 km precision).
+          <ul>
+            <li>
+              When an MGRS coordinate is read, a representative point
+              within the grid square, namely, the <em>center</em>, is
+              returned.
+            <li>
+              The MGRS easting and northing are obtained
+              by <em>truncation</em> to the requested precision
+              (<em>not</em> rounding).
+          </ul>
+        <li>
+          Usually <em>Output zone</em> should be <em>Match input or
+          standard</em>.  If the latitude and longitude are given, the
+          standard UPS and UTM zone rules are applied; otherwise the
+          UPS/UTM selection and the UTM zone match the input.  The other
+          choices let you override this selection.
       </ul>
     </p>
     <p>
-      <a href="http://geographiclib.sourceforge.net/html/GeoConvert.1.html">
+      <a href="https://geographiclib.sourceforge.io/html/GeoConvert.1.html">
         GeoConvert</a>,
       which is a simple wrapper of the
-      <a href="http://geographiclib.sourceforge.net/html/classGeographicLib_1_1GeoCoords.html">
+      <a href="https://geographiclib.sourceforge.io/html/classGeographicLib_1_1GeoCoords.html">
         GeographicLib::GeoCoords</a> class,
       is one of the utilities provided
-      with <a href="http://geographiclib.sourceforge.net/">
+      with <a href="https://geographiclib.sourceforge.io/">
         GeographicLib</a>.
       This web interface illustrates a subset of its capabilities.  If
       you wish to use GeoConvert directly,
@@ -233,8 +239,8 @@ cat <<EOF
     <hr>
     <address>Charles Karney
       <a href="mailto:charles@karney.com">&lt;charles@karney.com&gt;</a>
-      (2015-05-18)</address>
-    <a href="http://geographiclib.sourceforge.net">
+      (2019-12-10)</address>
+    <a href="https://geographiclib.sourceforge.io">
       GeographicLib home
     </a>
   </body>

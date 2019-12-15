@@ -6,7 +6,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 #pragma once
 
@@ -47,7 +47,7 @@ namespace NETGeographicLib
    * \include example-GeoCoords.vb
    *
    * <B>INTERFACE DIFFERENCES:</B><BR>
-   * The following functions are implemented as properties: MajorRadius,
+   * The following functions are implemented as properties: EquatorialRadius,
    * Flattening, Latitude, Longitude, Easting, Northing, Convergence,
    * Scale, Northp, Hemisphere, Zone, AltZone, AltEasting, AltNorthing,
    * AltConvergence, and AltScale.
@@ -462,7 +462,7 @@ namespace NETGeographicLib
          * (The WGS84 value is returned because the UTM and UPS projections are
          * based on this ellipsoid.)
          **********************************************************************/
-        property double MajorRadius { double get(); }
+        property double EquatorialRadius { double get(); }
 
         /**
          * @return \e f the flattening of the WGS84 ellipsoid.

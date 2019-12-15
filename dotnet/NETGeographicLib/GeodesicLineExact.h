@@ -7,7 +7,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 #include "NETGeographicLib.h"
 
@@ -36,7 +36,7 @@ namespace NETGeographicLib
    *
    * The following functions are implemented as properties:
    * Latitude, Longitude, Azimuth, EquatorialAzimuth, EquatorialArc,
-   * MajorRadius, Distance, Arc, and Flattening.
+   * EquatorialRadius, Distance, Arc, and Flattening.
    *
    * The constructors, GenPosition, and Capabilities functions accept the
    * "capabilities mask" as a NETGeographicLib::Mask rather than an
@@ -596,7 +596,7 @@ namespace NETGeographicLib
          *   the value inherited from the GeodesicExact object used in the
          *   constructor.
          **********************************************************************/
-        property double MajorRadius { double get(); }
+        property double EquatorialRadius { double get(); }
 
         /**
          * @return \e f the flattening of the ellipsoid.  This is the value

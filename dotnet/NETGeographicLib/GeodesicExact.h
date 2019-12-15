@@ -7,7 +7,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 #include "NETGeographicLib.h"
 
@@ -76,7 +76,7 @@ namespace NETGeographicLib
    * <B>INTERFACE DIFFERENCES:</B><BR>
    * A default constructor is provided that assumes WGS84 parameters.
    *
-   * The MajorRadius, Flattening, and EllipsoidArea functions are
+   * The EquatorialRadius, Flattening, and EllipsoidArea functions are
    * implemented as properties.
    *
    * The GenDirect, GenInverse, and Line functions accept the
@@ -753,7 +753,7 @@ namespace NETGeographicLib
          * @return \e a the equatorial radius of the ellipsoid (meters).  This is
          *   the value used in the constructor.
          **********************************************************************/
-        property double MajorRadius { double get(); }
+        property double EquatorialRadius { double get(); }
 
         /**
          * @return \e f the  flattening of the ellipsoid.  This is the

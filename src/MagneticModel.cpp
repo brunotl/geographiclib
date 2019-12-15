@@ -2,9 +2,9 @@
  * \file MagneticModel.cpp
  * \brief Implementation for GeographicLib::MagneticModel class
  *
- * Copyright (c) Charles Karney (2011-2015) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2011-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #include <GeographicLib/MagneticModel.hpp>
@@ -22,7 +22,7 @@
 #endif
 
 #if !defined(GEOGRAPHICLIB_MAGNETIC_DEFAULT_NAME)
-#  define GEOGRAPHICLIB_MAGNETIC_DEFAULT_NAME "wmm2015"
+#  define GEOGRAPHICLIB_MAGNETIC_DEFAULT_NAME "wmm2020"
 #endif
 
 #if defined(_MSC_VER)
@@ -35,7 +35,7 @@ namespace GeographicLib {
   using namespace std;
 
   MagneticModel::MagneticModel(const std::string& name,const std::string& path,
-                               const Geocentric& earth)
+                               const Geocentric& earth, int Nmax, int Mmax)
     : _name(name)
     , _dir(path)
     , _description("NONE")
@@ -49,11 +49,19 @@ namespace GeographicLib {
     , _hmax(Math::NaN())
     , _Nmodels(1)
     , _Nconstants(0)
+    , _nmx(-1)
+    , _mmx(-1)
     , _norm(SphericalHarmonic::SCHMIDT)
     , _earth(earth)
   {
     if (_dir.empty())
       _dir = DefaultMagneticPath();
+    bool truncate = Nmax >= 0 || Mmax >= 0;
+    if (truncate) {
+      if (Nmax >= 0 && Mmax < 0) Mmax = Nmax;
+      if (Nmax < 0) Nmax = numeric_limits<int>::max();
+      if (Mmax < 0) Mmax = numeric_limits<int>::max();
+    }
     ReadMetadata(_name);
     _G.resize(_Nmodels + 1 + _Nconstants);
     _H.resize(_Nmodels + 1 + _Nconstants);
@@ -71,10 +79,14 @@ namespace GeographicLib {
         throw GeographicErr("ID mismatch: " + _id + " vs " + id);
       for (int i = 0; i < _Nmodels + 1 + _Nconstants; ++i) {
         int N, M;
-        SphericalEngine::coeff::readcoeffs(coeffstr, N, M, _G[i], _H[i]);
+        if (truncate) { N = Nmax; M = Mmax; }
+        SphericalEngine::coeff::readcoeffs(coeffstr, N, M, _G[i], _H[i],
+                                           truncate);
         if (!(M < 0 || _G[i][0] == 0))
           throw GeographicErr("A degree 0 term is not permitted");
         _harm.push_back(SphericalHarmonic(_G[i], _H[i], N, N, M, _a, _norm));
+        _nmx = max(_nmx, _harm.back().Coefficients().nmx());
+        _mmx = max(_mmx, _harm.back().Coefficients().mmx());
       }
       int pos = int(coeffstr.tellg());
       coeffstr.seekg(0, ios::end);
@@ -96,7 +108,7 @@ namespace GeographicLib {
     string::size_type n = line.find_first_of(spaces, 5);
     if (n != string::npos)
       n -= 5;
-    string version = line.substr(5, n);
+    string version(line, 5, n);
     if (!(version == "1" || version == "2"))
       throw GeographicErr("Unknown version in " + _filename + ": " + version);
     string key, val;
@@ -111,26 +123,26 @@ namespace GeographicLib {
       else if (key == "ReleaseDate")
         _date = val;
       else if (key == "Radius")
-        _a = Utility::num<real>(val);
+        _a = Utility::val<real>(val);
       else if (key == "Type") {
         if (!(val == "Linear" || val == "linear"))
           throw GeographicErr("Only linear models are supported");
       } else if (key == "Epoch")
-        _t0 = Utility::num<real>(val);
+        _t0 = Utility::val<real>(val);
       else if (key == "DeltaEpoch")
-        _dt0 = Utility::num<real>(val);
+        _dt0 = Utility::val<real>(val);
       else if (key == "NumModels")
-        _Nmodels = Utility::num<int>(val);
+        _Nmodels = Utility::val<int>(val);
       else if (key == "NumConstants")
-        _Nconstants = Utility::num<int>(val);
+        _Nconstants = Utility::val<int>(val);
       else if (key == "MinTime")
-        _tmin = Utility::num<real>(val);
+        _tmin = Utility::val<real>(val);
       else if (key == "MaxTime")
-        _tmax = Utility::num<real>(val);
+        _tmax = Utility::val<real>(val);
       else if (key == "MinHeight")
-        _hmin = Utility::num<real>(val);
+        _hmin = Utility::val<real>(val);
       else if (key == "MaxHeight")
-        _hmax = Utility::num<real>(val);
+        _hmax = Utility::val<real>(val);
       else if (key == "Normalization") {
         if (val == "FULL" || val == "Full" || val == "full")
           _norm = SphericalHarmonic::FULL;
@@ -236,13 +248,13 @@ namespace GeographicLib {
                                       real& Ht, real& Ft,
                                       real& Dt, real& It) {
     H = Math::hypot(Bx, By);
-    Ht = H ? (Bx * Bxt + By * Byt) / H : Math::hypot(Bxt, Byt);
-    D = H ? Math::atan2d(Bx, By) : Math::atan2d(Bxt, Byt);
-    Dt = (H ? (By * Bxt - Bx * Byt) / Math::sq(H) : 0) / Math::degree();
+    Ht = H != 0 ? (Bx * Bxt + By * Byt) / H : Math::hypot(Bxt, Byt);
+    D = H != 0 ? Math::atan2d(Bx, By) : Math::atan2d(Bxt, Byt);
+    Dt = (H != 0 ? (By * Bxt - Bx * Byt) / Math::sq(H) : 0) / Math::degree();
     F = Math::hypot(H, Bz);
-    Ft = F ? (H * Ht + Bz * Bzt) / F : Math::hypot(Ht, Bzt);
-    I = F ? Math::atan2d(-Bz, H) : Math::atan2d(-Bzt, Ht);
-    It = (F ? (Bz * Ht - H * Bzt) / Math::sq(F) : 0) / Math::degree();
+    Ft = F != 0 ? (H * Ht + Bz * Bzt) / F : Math::hypot(Ht, Bzt);
+    I = F != 0 ? Math::atan2d(-Bz, H) : Math::atan2d(-Bzt, Ht);
+    It = (F != 0 ? (Bz * Ht - H * Bzt) / Math::sq(F) : 0) / Math::degree();
   }
 
   std::string MagneticModel::DefaultMagneticPath() {

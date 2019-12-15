@@ -1,22 +1,22 @@
 /**
  * <h1>Geodesic routines from GeographicLib implemented in Java</h1>
  * @author Charles F. F. Karney (charles@karney.com)
- * @version 1.46
+ * @version 1.50
  *
  * <p>
  * The documentation for other versions is available at
- * <tt>http://geographiclib.sourceforge.net/m.nn/java</tt> for versions numbers
+ * <tt>https://geographiclib.sourceforge.io/m.nn/java</tt> for versions numbers
  * <tt>m.nn</tt> &ge; 1.31.
  * <p>
  * Licensed under the
  * <a href="http://www.opensource.org/licenses/MIT">MIT/X11 License</a>; see
- * <a href="http://geographiclib.sourceforge.net/html/LICENSE.txt">
+ * <a href="https://geographiclib.sourceforge.io/html/LICENSE.txt">
  * LICENSE.txt</a>.
  *
  * <h2>Abstract</h2>
  * <p>
  * GeographicLib-Java is a Java implementation of the geodesic algorithms from
- * <a href="http://geographiclib.sourceforge.net">GeographicLib</a>.  This is a
+ * <a href="https://geographiclib.sourceforge.io">GeographicLib</a>.  This is a
  * self-contained library which makes it easy to do geodesic computations for
  * an ellipsoid of revolution in a Java program.  It requires Java version 1.2
  * or later.
@@ -29,15 +29,15 @@
  * GeographicLib-Java is part of GeographicLib which available for download at
  * <ul>
  * <li>
- *   <a href="https://sourceforge.net/projects/geographiclib/files/distrib/GeographicLib-1.46.tar.gz">
- *   GeographicLib-1.46.tar.gz</a>
+ *   <a href="https://sourceforge.net/projects/geographiclib/files/distrib/GeographicLib-1.50.tar.gz">
+ *   GeographicLib-1.50.tar.gz</a>
  * <li>
- *   <a href="https://sourceforge.net/projects/geographiclib/files/distrib/GeographicLib-1.46.zip">
- *   GeographicLib-1.46.zip</a>
+ *   <a href="https://sourceforge.net/projects/geographiclib/files/distrib/GeographicLib-1.50.zip">
+ *   GeographicLib-1.50.zip</a>
  * </ul>
  * <p>
  * as either a compressed tar file (tar.gz) or a zip file.  After unpacking
- * the source, the Java library can be found in GeographicLib-1.46/java.  (This
+ * the source, the Java library can be found in GeographicLib-1.50/java.  (This
  * library is completely independent from the rest of GeodegraphicLib.)  The
  * library consists of the files in the src/main/java/net/sf/geographiclib
  * subdirectory.
@@ -50,7 +50,7 @@
  *   <dependency>
  *     <groupId>net.sf.geographiclib</groupId>
  *     <artifactId>GeographicLib-Java</artifactId>
- *     <version>1.46</version>
+ *     <version>1.50</version>
  *   </dependency> }</pre>
  * in your {@code pom.xml}.
  *
@@ -106,6 +106,10 @@
  * cd inverse/src/main/java
  * javac -cp .:../../../../src/main/java Inverse.java
  * echo -30 0 29.5 179.5 | java -cp .:../../../../src/main/java Inverse </pre>
+ * On Windows, change this to <pre>
+ * cd inverse\src\main\java
+ * javac -cp .;../../../../src/main/java Inverse.java
+ * echo -30 0 29.5 179.5 | java -cp .;../../../../src/main/java Inverse </pre>
  *
  * <h3>Using maven to package GeographicLib</h3>
  * Use <a href="http://maven.apache.org/">maven</a> to create a jar file by
@@ -115,13 +119,13 @@
  * some additional packages to your local repository.)  Then compile and run
  * Inverse.java with <pre>
  * cd inverse/src/main/java
- * javac -cp .:../../../../target/GeographicLib-Java-1.46.jar Inverse.java
+ * javac -cp .:../../../../target/GeographicLib-Java-1.50.jar Inverse.java
  * echo -30 0 29.5 179.5 |
- *   java -cp .:../../../../target/GeographicLib-Java-1.46.jar Inverse </pre>
+ *   java -cp .:../../../../target/GeographicLib-Java-1.50.jar Inverse </pre>
  *
  * <h3>Using maven to build and run {@code Inverse.java}</h3>
  * The sample code includes a {@code pom.xml} which specifies
- * GeographicLib-Jave as a dependency.  You can build and install this
+ * GeographicLib-Java as a dependency.  You can build and install this
  * dependency by running (in the main java directory) <pre>
  * mvn install </pre>
  * Alternatively, you can let maven download it from Maven Central.  You can
@@ -170,87 +174,87 @@
  * The documentation is generated using javadoc when
  * {@code mvn package -P release} is run (the top of the documentation tree is
  * {@code target/apidocs/index.html}).  This is also available on the web at
- * <a href="http://geographiclib.sourceforge.net/html/java/index.html">
- * http://geographiclib.sourceforge.net/html/java/index.html</a>.
+ * <a href="https://geographiclib.sourceforge.io/html/java/index.html">
+ * https://geographiclib.sourceforge.io/html/java/index.html</a>.
  *
  * <h2>External links</h2>
  * <ul>
  * <li>
  *   These algorithms are derived in C. F. F. Karney,
- *   <a href="https://dx.doi.org/10.1007/s00190-012-0578-z">
+ *   <a href="https://doi.org/10.1007/s00190-012-0578-z">
  *   Algorithms for geodesics</a>,
  *   J. Geodesy <b>87</b>, 43&ndash;55 (2013)
- *   (<a href="http://geographiclib.sourceforge.net/geod-addenda.html">addenda</a>).
+ *   (<a href="https://geographiclib.sourceforge.io/geod-addenda.html">addenda</a>).
  * <li>
  *   A longer paper on geodesics: C. F. F. Karney,
- *    <a href="http://arxiv.org/abs/1102.1215v1">Geodesics
- *    on an ellipsoid of revolution</a>,
- *    Feb. 2011
- *    (<a href="http://geographiclib.sourceforge.net/geod-addenda.html#geod-errata">
- *    errata</a>).
+ *   <a href="https://arxiv.org/abs/1102.1215v1">Geodesics
+ *   on an ellipsoid of revolution</a>,
+ *   Feb. 2011
+ *   (<a href="https://geographiclib.sourceforge.io/geod-addenda.html#geod-errata">
+ *   errata</a>).
  * <li>
- *   <a href="http://geographiclib.sourceforge.net">
+ *   <a href="https://geographiclib.sourceforge.io">
  *   The GeographicLib web site</a>.
  * <li>
  *   <a href="https://sourceforge.net/projects/geographiclib/">
  *     Main project page</a>
  * <li>
- *   <a href="http://sourceforge.net/p/geographiclib/code/ci/release/tree/">
+ *   <a href="https://sourceforge.net/p/geographiclib/code/ci/release/tree/">
  *     git repository</a>
  * <li>
  *   Implementations in various languages:
  *   <ul>
  *     <li>
  *       C++ (complete library):
- *       <a href="http://geographiclib.sourceforge.net/html/">
+ *       <a href="https://geographiclib.sourceforge.io/html/">
  *         documentation</a>,
  *       <a href="https://sourceforge.net/projects/geographiclib/files/distrib">
  *         download</a>
  *     <li>
  *       C (geodesic routines):
- *       <a href="http://geographiclib.sourceforge.net/html/C/">
+ *       <a href="https://geographiclib.sourceforge.io/html/C/">
  *         documentation</a>, also included with recent versions of
  *       <a href="https://github.com/OSGeo/proj.4/wiki">
  *         proj.4</a>
  *     <li>
  *       Fortran (geodesic routines):
- *       <a href="http://geographiclib.sourceforge.net/html/Fortran/">
+ *       <a href="https://geographiclib.sourceforge.io/html/Fortran/">
  *         documentation</a>
  *     <li>
  *       Java (geodesic routines):
  *       <a href="http://repo1.maven.org/maven2/net/sf/geographiclib/GeographicLib-Java/">
  *         Maven Central package</a>,
- *       <a href="http://geographiclib.sourceforge.net/html/java/">
+ *       <a href="https://geographiclib.sourceforge.io/html/java/">
  *         documentation</a>
  *     <li>
  *       JavaScript (geodesic routines):
  *       <a href="https://www.npmjs.com/package/geographiclib">
  *         npm package</a>,
- *       <a href="http://geographiclib.sourceforge.net/html/js/">
+ *       <a href="https://geographiclib.sourceforge.io/html/js/">
  *         documentation</a>
  *     <li>
  *       Python (geodesic routines):
  *       <a href="http://pypi.python.org/pypi/geographiclib">
  *         PyPI package</a>,
- *       <a href="http://geographiclib.sourceforge.net/html/python/">
+ *       <a href="https://geographiclib.sourceforge.io/html/python/">
  *         documentation</a>
  *     <li>
  *       Matlab/Octave (geodesic and some other routines):
- *       <a href="http://www.mathworks.com/matlabcentral/fileexchange/50605">
+ *       <a href="https://www.mathworks.com/matlabcentral/fileexchange/50605">
  *         Matlab Central package</a>,
- *       <a href="http://www.mathworks.com/matlabcentral/fileexchange/50605/content/Contents.m">
+ *       <a href="https://viewer.mathworks.com/?viewer=plain_code&url=https%3A%2F%2Fwww.mathworks.com%2Fmatlabcentral%2Fmlc-downloads%2Fdownloads%2Fsubmissions%2F50605%2Fversions%2F15%2Fcontents%2FContents.m">
  *         documentation</a>
  *     <li>
  *       C# (.NET wrapper for complete C++ library):
- *       <a href="http://geographiclib.sourceforge.net/html/NET/">
+ *       <a href="https://geographiclib.sourceforge.io/html/NET/">
  *         documentation</a>.
  *   </ul>
  * <li>
  *   The section in the GeographicLib documentation on geodesics:
- *   <a href="http://geographiclib.sourceforge.net/html/geodesic.html">
+ *   <a href="https://geographiclib.sourceforge.io/html/geodesic.html">
  *   Geodesics on an ellipsoid of revolution</a>
  * <li>
- *   <a href="http://geographiclib.sourceforge.net/geodesic-papers/biblio.html">
+ *   <a href="https://geographiclib.sourceforge.io/geodesic-papers/biblio.html">
  *   A geodesic bibliography</a>
  * <li>
  *   The wikipedia page,
@@ -261,7 +265,49 @@
  * <h2>Change log</h2>
  * <ul>
  * <li>
- *   <a href="http://geographiclib.sourceforge.net/1.46/java">Version 1.46</a>
+ *   <a href="https://geographiclib.sourceforge.io/1.47/java">Version 1.50</a>
+ *   (released 2019-09-24)
+ * <ul>
+ * <li>
+ *   {@link net.sf.geographiclib.PolygonArea} can now handle arbitrarily
+ *   complex polygons.  In the case of self-intersecting polygons the area is
+ *   accumulated "algebraically", e.g., the areas of the 2 loops in a figure-8
+ *   polygon will partially cancel.
+ * <li>
+ *   Fix two bugs in the computation of areas when some vertices are specified
+ *   by an added edge.
+ * <li>
+ *   Require Java 1.6 or later and so remove epsilon, min, hypot, log1p,
+ *   copysign, cbrt from GeoMath.
+ * <li>
+ *   GeoMath.cbrt, GeoMath.atanh, and GeoMath.asinh preserve the sign of
+ *   &minus;0.
+ * </ul>
+ * <li>
+ *   <a href="https://geographiclib.sourceforge.io/1.47/java">Version 1.49</a>
+ *   (released 2017-10-05)
+ * <ul>
+ * <li>
+ *   Fix code formatting and add two tests.
+ * </ul>
+ * <li>
+ *   <a href="https://geographiclib.sourceforge.io/1.47/java">Version 1.48</a>
+ *   (released 2017-04-09)
+ * <ul>
+ * <li>
+ *   Change default range for longitude and azimuth to
+ *   (&minus;180&deg;, 180&deg;] (instead of [&minus;180&deg;, 180&deg;)).
+ * </ul>
+ * <li>
+ *   <a href="https://geographiclib.sourceforge.io/1.47/java">Version 1.47</a>
+ *   (released 2017-02-15)
+ * <ul>
+ * <li>
+ *   Improve accuracy of area calculation (fixing a flaw introduced in
+ *   version 1.46).
+ * </ul>
+ * <li>
+ *   <a href="https://geographiclib.sourceforge.io/1.46/java">Version 1.46</a>
  *   (released 2016-02-15)
  * <ul>
  * <li>
@@ -280,7 +326,7 @@
  *   GeoMath.AngDiff now returns a Pair.
  * </ul>
  * <li>
- *   <a href="http://geographiclib.sourceforge.net/1.45/java">Version 1.45</a>
+ *   <a href="https://geographiclib.sourceforge.io/1.45/java">Version 1.45</a>
  *   (released 2015-09-30)
  * <ul>
  * <li>
@@ -295,7 +341,7 @@
  *   1998-12).
  * </ul>
  * <li>
- *   <a href="http://geographiclib.sourceforge.net/1.44/java">Version 1.44</a>
+ *   <a href="https://geographiclib.sourceforge.io/1.44/java">Version 1.44</a>
  *   (released 2015-08-14)
  * <ul>
  * <li>

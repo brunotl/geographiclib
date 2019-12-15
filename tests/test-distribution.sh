@@ -30,6 +30,7 @@
 # instf - installed files, autoconf direct from git repository
 
 set -e
+umask 0022
 
 # The following files contain version information:
 #   pom.xml
@@ -37,35 +38,47 @@ set -e
 #   NEWS
 #   configure.ac (AC_INIT, GEOGRAPHICLIB_VERSION_* LT_*)
 #   tests/test-distribution.sh
-#   doc/GeographicLib.dox.in
-#   doc/NETGeographicLib.dox
+#   doc/GeographicLib.dox.in (3 places)
+#   doc/NETGeographicLib.dox (a few places)
 
 # Need updating if underlying library changes
 
 # python
 #   python/setup.py
 #   python/geographiclib/__init__.py
-#   doc/index.py
-#   README.rst
+#   python/doc/index.rst (date + update change log)
+#   python/README.rst
 # use: cd python; pychecker geographiclib/*.py
 
 # MATLAB
-#   matlab/geographiclib/Contents.m version + date
-#   matlab/geographiclib-blurb.txt version + date
+#   matlab/geographiclib/Contents.m version (multiple places) + date
+#   matlab/geographiclib-blurb.txt version (multiple places) + date
+#   update version number "%2F15%2F" in documentation link in index.html,
+#     GeographicLib.dox.in, geodesic-{c,for}.dox,
+#     java/src/main/java/net/sf/geographiclib/package-info.java,
+#     js/GeographicLib.md, python/doc/index.rst
+#   mathworks has switched to an uglier URL.  Only update if there are
+#   changes.
 # use MATLAB's analyze code
 
 # C
 #   legacy/C/geodesic.h comment + GEODESIC_VERSION_*
-#   doc/geodesic-c.dox
+#   doc/geodesic-c.dox (date + update change log)
+# PROJ integration
+#   geodesic.[hc], geodtest.c (renamed to geodtest.cpp)
+#   plus man/man1/geod.1 man/man3/geodesic.3
 
 # Fortran
 #   legacy/Fortran/geodesic.for comment + geover
-#   doc/geodesic-for.dox
+#   doc/geodesic-for.dox (date + update change log)
 
 # Java
 #   java/pom.xml java/*/pom.xml
-#   java/src/main/java/net/sf/geographiclib/package-info.java
-#   (remember to remove SNAPSHOT from version number of lib)
+#   java/src/main/java/net/sf/geographiclib/package-info.java (date +
+#   update change log)
+#   (remember to remove SNAPSHOT from version number of lib in test programs)
+# probably should deploy a SNAPSHOT version of the lib to grease the
+# wheels
 
 # maxima
 #   maxima/geodesic.mac
@@ -74,26 +87,27 @@ set -e
 #   js/src/Math.js
 #   js/package.json
 #   js/README.md
-#   js/GeographicLib.md
+#   js/GeographicLib.md (date + update change log)
 # use: cd js; jshint src
 
 DATE=`date +%F`
-VERSION=1.46
+VERSION=1.50.1
 BRANCH=devel
 TEMP=/scratch/geographiclib-dist
 if test `hostname` = petrel.petrel.org; then
     DEVELSOURCE=$HOME/geographiclib
-    WINDEVELSOURCE=/u/geographiclib
+    WINDEVELSOURCE=/w/geographiclib
     WINDOWSBUILD=/var/tmp
 else
     DEVELSOURCE=/u/geographiclib
-    WINDEVELSOURCE=/u/geographiclib
+    WINDEVELSOURCE=/w/geographiclib
     WINDOWSBUILD=/u/temp
 fi
-WINDOWSBUILDWIN=u:/temp
+WINDOWSBUILDWIN=w:/temp
 GITSOURCE=file://$DEVELSOURCE
 WEBDIST=/home/ckarney/web/geographiclib-web
 NUMCPUS=4
+HAVEINTEL=
 
 test -d $TEMP || mkdir $TEMP
 rm -rf $TEMP/*
@@ -118,8 +132,8 @@ make doc
 )
 (
     cd ../python
-    python2 -m unittest geographiclib.test.test_geodesic
-    python3 -m unittest geographiclib.test.test_geodesic
+    python2 -m unittest -v geographiclib.test.test_geodesic
+    python3 -m unittest -v geographiclib.test.test_geodesic
 )
 (
     cd ../matlab/geographiclib
@@ -150,32 +164,39 @@ unzip -qq -d $WINDOWSBUILD GeographicLib-$VERSION.zip
 cat > $WINDOWSBUILD/GeographicLib-$VERSION/mvn-build <<'EOF'
 #! /bin/sh -exv
 unset GEOGRAPHICLIB_DATA
-for v in 2015 2013 2012 2010; do
+# for v in 2019 2017 2015 2013 2012 2010; do
+for v in 2019 2017 2015; do
   for a in 64 32; do
-    rm -rf v:/data/scratch/geog-mvn-$v-$a
+    echo ========== maven $v-$a ==========
+    rm -rf c:/scratch/geog-mvn-$v-$a
     mvn -Dcmake.compiler=vc$v -Dcmake.arch=$a \
-      -Dcmake.project.bin.directory=v:/data/scratch/geog-mvn-$v-$a install
+      -Dcmake.project.bin.directory=c:/scratch/geog-mvn-$v-$a install
   done
 done
 EOF
 chmod +x $WINDOWSBUILD/GeographicLib-$VERSION/mvn-build
 cp $TEMP/gita/geographiclib/pom.xml $WINDOWSBUILD/GeographicLib-$VERSION/
 
-for ver in 10 11 12 14; do
+# for ver in 10 11 12 14 15 16; do
+for ver in 14 15 16; do
     for arch in win32 x64; do
 	pkg=vc$ver-$arch
 	gen="Visual Studio $ver"
 	installer=
-	test "$ver" = 12 && installer=y
+	# N.B. update CPACK_NSIS_INSTALL_ROOT in CMakeLists.txt and
+	# update documentation examples if VS version for binary
+	# installer changes.
+	test "$ver" = 14 && installer=y
 	mkdir $WINDOWSBUILD/GeographicLib-$VERSION/BUILD-$pkg
 	(
 	    echo "#! /bin/sh -exv"
+	    echo echo ========== cmake $pkg ==========
 	    echo 'b=geog-`pwd | sed s%.*/%%`'
-	    echo 'rm -rf v:/data/scratch/$b u:/pkg-$pkg/GeographicLib-$VERSION/*'
-	    echo 'mkdir -p v:/data/scratch/$b'
-	    echo 'cd v:/data/scratch/$b'
+	    echo rm -rf c:/scratch/\$b w:/pkg-$pkg/GeographicLib-$VERSION/\*
 	    echo 'unset GEOGRAPHICLIB_DATA'
-	    echo cmake -G \"$gen\" -A $arch -D GEOGRAPHICLIB_LIB_TYPE=BOTH -D CMAKE_INSTALL_PREFIX=u:/pkg-$pkg/GeographicLib-$VERSION -D PACKAGE_DEBUG_LIBS=ON -D BUILD_NETGEOGRAPHICLIB=ON $WINDOWSBUILDWIN/GeographicLib-$VERSION
+	    echo 'mkdir -p c:/scratch/$b'
+	    echo 'cd c:/scratch/$b'
+	    echo cmake -G \"$gen\" -A $arch -D GEOGRAPHICLIB_LIB_TYPE=BOTH -D CMAKE_INSTALL_PREFIX=w:/pkg-$pkg/GeographicLib-$VERSION -D PACKAGE_DEBUG_LIBS=ON -D BUILD_NETGEOGRAPHICLIB=ON -D CONVERT_WARNINGS_TO_ERRORS=ON $WINDOWSBUILDWIN/GeographicLib-$VERSION
 	    echo cmake --build . --config Debug   --target ALL_BUILD
 	    echo cmake --build . --config Debug   --target RUN_TESTS
 	    echo cmake --build . --config Debug   --target INSTALL
@@ -187,10 +208,31 @@ for ver in 10 11 12 14; do
 	    echo cmake --build . --config Release --target PACKAGE
 	    test "$installer" &&
 		echo cp GeographicLib-$VERSION-*.exe $WINDEVELSOURCE/ || true
+	    echo 'b=geogc-`pwd | sed s%.*/%%`'
+	    echo rm -rf c:/scratch/\$b
+	    echo 'mkdir -p c:/scratch/$b'
+	    echo 'cd c:/scratch/$b'
+	    echo cmake -G \"$gen\" -A $arch -D CONVERT_WARNINGS_TO_ERRORS=ON $WINDOWSBUILDWIN/GeographicLib-$VERSION/legacy/C
+	    echo cmake --build . --config Debug   --target ALL_BUILD
+	    echo cmake --build . --config Debug   --target RUN_TESTS
+	    echo cmake --build . --config Release --target ALL_BUILD
+	    echo cmake --build . --config Release --target RUN_TESTS
 	) > $WINDOWSBUILD/GeographicLib-$VERSION/BUILD-$pkg/build
 	chmod +x $WINDOWSBUILD/GeographicLib-$VERSION/BUILD-$pkg/build
     done
 done
+cat > $WINDOWSBUILD/GeographicLib-$VERSION/test-all <<'EOF'
+#! /bin/sh
+(
+    # Queue vs2015 build first for the binary installers
+    for d in BUILD-vc14* BUILD-vc*; do
+	test -f $d/build.done && continue
+	(cd $d; ./build; touch build.done)
+    done
+    ./mvn-build
+) >& build.log
+EOF
+chmod +x $WINDOWSBUILD/GeographicLib-$VERSION/test-all
 
 cd $TEMP/gitr/geographiclib
 git checkout release
@@ -221,6 +263,16 @@ cd BUILD-config
 ../configure --prefix=$TEMP/instb
 make -j$NUMCPUS
 make install
+cd ..
+
+if test "$HAVEINTEL"; then
+    mkdir BUILD-config-intel
+    cd BUILD-config-intel
+    env FC=ifort CC=icc CXX=icpc ../configure
+    make -j$NUMCPUS
+    cd ..
+fi
+
 mv $TEMP/instb/share/doc/{geographiclib,GeographicLib}
 cd $TEMP/instb
 find . -type f | sort -u > ../files.b
@@ -228,7 +280,7 @@ find . -type f | sort -u > ../files.b
 cd $TEMP/relc/GeographicLib-$VERSION
 mkdir BUILD
 cd BUILD
-cmake -D GEOGRAPHICLIB_LIB_TYPE=BOTH -D GEOGRAPHICLIB_DOCUMENTATION=ON -D CMAKE_INSTALL_PREFIX=$TEMP/instc ..
+cmake -D GEOGRAPHICLIB_LIB_TYPE=BOTH -D GEOGRAPHICLIB_DOCUMENTATION=ON -D USE_BOOST_FOR_EXAMPLES=ON -D CONVERT_WARNINGS_TO_ERRORS=ON -D CMAKE_INSTALL_PREFIX=$TEMP/instc ..
 make -j$NUMCPUS all
 make test
 make -j$NUMCPUS exampleprograms
@@ -240,10 +292,21 @@ make install
 
 mkdir ../BUILD-system
 cd ../BUILD-system
-cmake -D GEOGRAPHICLIB_LIB_TYPE=BOTH ..
+cmake -D GEOGRAPHICLIB_LIB_TYPE=BOTH -D CONVERT_WARNINGS_TO_ERRORS=ON ..
 make -j$NUMCPUS all
 make test
 cd ..
+
+if test "$HAVEINTEL"; then
+    mkdir ../BUILD-intel
+    cd ../BUILD-intel
+    env FC=ifort CC=icc CXX=icpc cmake -D GEOGRAPHICLIB_LIB_TYPE=BOTH -D CONVERT_WARNINGS_TO_ERRORS=ON ..
+    make -j$NUMCPUS all
+    make test
+    make -j$NUMCPUS exampleprograms
+    cd ..
+fi
+
 # mvn -Dcmake.project.bin.directory=$TEMP/mvn install
 
 cd $TEMP/gita/geographiclib/tests/sandbox
@@ -269,9 +332,37 @@ for l in C Fortran; do
     (
 	mkdir $TEMP/legacy/$l/BUILD
 	cd $TEMP/legacy/$l/BUILD
-	cmake ..
+	cmake -D CONVERT_WARNINGS_TO_ERRORS=ON ..
 	make -j$NUMCPUS all
 	make test
+	test $l = Fortran && continue
+	if test "$HAVEINTEL"; then
+	    mkdir $TEMP/legacy/$l/BUILD-intel
+	    cd $TEMP/legacy/$l/BUILD-intel
+	    env FC=ifort CC=icc CXX=icpc \
+		cmake -D CONVERT_WARNINGS_TO_ERRORS=ON ..
+	    make -j$NUMCPUS all
+	    make test
+	fi
+    )
+done
+
+cd $TEMP/gita/geographiclib
+(
+    cd BUILD
+    make -j$NUMCPUS testprograms
+)
+cp $DEVELSOURCE/include/mpreal.h include/
+for p in 1 3 4 5; do
+    mkdir BUILD-$p
+    (
+	cd BUILD-$p
+	cmake -D USE_BOOST_FOR_EXAMPLES=ON -D GEOGRAPHICLIB_PRECISION=$p ..
+	make -j$NUMCPUS all
+	if test $p -ne 1; then
+	    make test
+	fi
+	make -j$NUMCPUS testprograms
     )
 done
 
@@ -309,7 +400,7 @@ int main() {
   using namespace GeographicLib;
   double
     // These are the constants for Pennsylvania South, EPSG:3364
-    // http://www.spatialreference.org/ref/epsg/3364/
+    // https://www.spatialreference.org/ref/epsg/3364/
     a = Constants::WGS84_a(),   // major radius
     f = 1/298.257222101,        // inverse flattening (GRS80)
     lat1 = DMS::Decode(40,58),  // standard parallel 1
@@ -361,22 +452,22 @@ test "$CONFIG_VERSIONA" = "$VERSION" || echo autoconf version string mismatch
 cd $TEMP/relx/GeographicLib-$VERSION
 (
     echo Files with trailing spaces:
-    find . -type f | egrep -v 'config\.guess|Makefile\.in|\.m4|\.png|\.pdf' |
+    find . -type f | egrep -v 'config\.guess|Makefile\.in|\.m4|\.png|\.gif|\.pdf' |
 	while read f; do
 	    tr -d '\r' < $f | grep ' $' > /dev/null && echo $f || true
 	done
     echo
     echo Files with tabs:
     find . -type f |
-	egrep -v '[Mm]akefile|\.html|\.vcproj|\.sln|\.m4|\.png|\.pdf|\.xml' |
-	egrep -v '\.sh|depcomp|install-sh|/config\.|configure|compile|missing' |
+	egrep -v '[Mm]akefile|\.html|\.vcproj|\.sln|\.m4|\.png|\.gif|\.pdf|\.xml' |
+	egrep -v '\.sh|depcomp|install-sh|/config\.|configure$|compile|missing' |
 	egrep -v 'js/samples/geod-.*\.html' |
 	xargs grep -l  '	' || true
     echo
     echo Files with multiple newlines:
     find . -type f |
 	egrep -v \
-	   '/Makefile\.in|\.1\.html|\.png|\.pdf|/ltmain|/config|\.m4|Settings' |
+	   '/Makefile\.in|\.1\.html|\.png|\.gif|\.pdf|/ltmain|/config|\.m4|Settings' |
 	egrep -v '(Resources|Settings)\.Designer\.cs' |
 	while read f; do
 	    tr 'X\n' 'xX' < $f | grep XXX > /dev/null && echo $f || true
@@ -384,17 +475,20 @@ cd $TEMP/relx/GeographicLib-$VERSION
     echo
     echo Files with no newline at end:
     find . -type f |
-	egrep -v '\.png|\.pdf' |
-	while read f;do
+	egrep -v '\.png|\.gif|\.pdf' |
+	while read f; do
 	    n=`tail -1 $f | wc -l`; test $n -eq 0 && echo $f || true
 	done
     echo
     echo Files with extra newlines at end:
     find . -type f |
-	egrep -v '/configure|/ltmain.sh|\.png|\.pdf|\.1\.html' |
-	while read f;do
+	egrep -v '/configure|/ltmain.sh|\.png|\.gif|\.pdf|\.1\.html' |
+	while read f; do
 	    n=`tail -1 $f | wc -w`; test $n -eq 0 && echo $f || true
 	done
+    echo
+    echo JS files with bad comment ends:
+    find js -type f -name '*.js' | xargs grep -l '\*\*/' || true
     echo
 ) > $TEMP/badfiles.txt
 cat $TEMP/badfiles.txt
@@ -418,24 +512,35 @@ make -C $DEVELSOURCE -f makefile-admin distrib-files
 # install built version
 sudo make -C $TEMP/relc/GeographicLib-$VERSION/BUILD-system install
 
-# python release
+# python release -- authentication via ~/.pypirc
+# New method in
+# https://packaging.python.org/tutorials/packaging-projects/#uploading-your-project-to-pypi
 cd $TEMP/gita/geographiclib/python
-python setup.py sdist --formats gztar,zip upload
+python3 setup.py sdist bdist_wheel
+python3 -m twine upload dist/*
+# installs in /usr/local/lib/python3.7/site-packages/geographiclib
+cd; sudo python3 -m pip install --upgrade geographiclib
 
-# java release
+# java release -- authentication via ~/.m2/settings.xml; this gets signed too
+# (multiple ~4 times!).
 cd $TEMP/gita/geographiclib/java
 mvn clean deploy -P release
 
 # javascript release
-npm publish $TEMP/gita/geographiclib/BUILD/js/geographiclib
+# authenticate via .npmrc; _auth value is
+#   echo -n cffk:PASSWORD | openssl base64
+# decode with
+#   echo AUTHSTRING | openssl base64 -d
+cd $TEMP/gita/geographiclib/BUILD/js && npm publish geographiclib
 make -C $DEVELSOURCE -f makefile-admin distrib-js
 make -C $DEVELSOURCE -f makefile-admin install-js
-# also update devel branch of node-geographiclib from
+# also update devel branch of node-geographiclib from ??
+# git@github.com:yurijmikhalevich/node-geographiclib.git
 $TEMP/gita/geographiclib/BUILD/js/geographiclib
 
 # matlab toolbox
 chmod 644 $DEVELSOURCE/geographiclib_toolbox_$VERSION.*
-mv $DEVELSOURCE/geographiclib_*_$VERSION.* $DEVELSOURCE/matlab-distrib
+mv $DEVELSOURCE/geographiclib_toolbox_$VERSION.* $DEVELSOURCE/matlab-distrib
 
 # commit and tag release branch
 cd $TEMP/gitr/geographiclib
@@ -457,7 +562,12 @@ git push --tags
 # post release notices
 # set default download files
 # make -f makefile-admin distrib-{cgi,html}
-# update home brew (commit message = geographiclib $VERSION)
+# update home brew
+#   dir = /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core
+#   branch = geographiclib/$VERSION
+#   file = Formula/geographiclib.rb
+#   brew upgrade geographiclib
+#   commit message = geographiclib $VERSION
 # upload matlab packages
 # update binaries for cgi applications
 # trigger build on build-open

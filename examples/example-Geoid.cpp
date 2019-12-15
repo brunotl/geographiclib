@@ -1,4 +1,6 @@
 // Example of using the GeographicLib::Geoid class
+// This requires that the egm96-5 geoid model be installed; see
+// https://geographiclib.sourceforge.io/html/geoid.html#geoidinst
 
 #include <iostream>
 #include <exception>
@@ -22,5 +24,4 @@ int main() {
     cerr << "Caught exception: " << e.what() << "\n";
     return 1;
   }
-  return 0;
 }

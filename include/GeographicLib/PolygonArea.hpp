@@ -2,9 +2,9 @@
  * \file PolygonArea.hpp
  * \brief Header for GeographicLib::PolygonAreaT class
  *
- * Copyright (c) Charles Karney (2010-2016) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2010-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #if !defined(GEOGRAPHICLIB_POLYGONAREA_HPP)
@@ -23,14 +23,18 @@ namespace GeographicLib {
    * This computes the area of a polygon whose edges are geodesics using the
    * method given in Section 6 of
    * - C. F. F. Karney,
-   *   <a href="https://dx.doi.org/10.1007/s00190-012-0578-z">
+   *   <a href="https://doi.org/10.1007/s00190-012-0578-z">
    *   Algorithms for geodesics</a>,
    *   J. Geodesy <b>87</b>, 43--55 (2013);
-   *   DOI: <a href="https://dx.doi.org/10.1007/s00190-012-0578-z">
+   *   DOI: <a href="https://doi.org/10.1007/s00190-012-0578-z">
    *   10.1007/s00190-012-0578-z</a>;
    *   addenda:
-   *   <a href="http://geographiclib.sourceforge.net/geod-addenda.html">
+   *   <a href="https://geographiclib.sourceforge.io/geod-addenda.html">
    *   geod-addenda.html</a>.
+   *
+   * Arbitrarily complex polygons are allowed.  In the case self-intersecting
+   * of polygons the area is accumulated "algebraically", e.g., the areas of
+   * the 2 loops in a figure-8 polygon will partially cancel.
    *
    * This class lets you add vertices and edges one at a time to the polygon.
    * The sequence must start with a vertex and thereafter vertices and edges
@@ -73,39 +77,34 @@ namespace GeographicLib {
     int _crossings;
     Accumulator<> _areasum, _perimetersum;
     real _lat0, _lon0, _lat1, _lon1;
-    static inline int transit(real lon1, real lon2) {
+    static int transit(real lon1, real lon2) {
       // Return 1 or -1 if crossing prime meridian in east or west direction.
       // Otherwise return zero.
       // Compute lon12 the same way as Geodesic::Inverse.
       lon1 = Math::AngNormalize(lon1);
       lon2 = Math::AngNormalize(lon2);
       real lon12 = Math::AngDiff(lon1, lon2);
+      // Treat 0 as negative in these tests.  This balances +/- 180 being
+      // treated as positive, i.e., +180.
       int cross =
-        lon1 < 0 && lon2 >= 0 && lon12 > 0 ? 1 :
-        (lon2 < 0 && lon1 >= 0 && lon12 < 0 ? -1 : 0);
+        lon1 <= 0 && lon2 > 0 && lon12 > 0 ? 1 :
+        (lon2 <= 0 && lon1 > 0 && lon12 < 0 ? -1 : 0);
       return cross;
     }
     // an alternate version of transit to deal with longitudes in the direct
     // problem.
-    static inline int transitdirect(real lon1, real lon2) {
-      // We want to compute exactly
-      //   int(floor(lon2 / 360)) - int(floor(lon1 / 360))
-      // Since we only need the parity of the result we can use std::remquo;
-      // but this is buggy with g++ 4.8.3 (glibc version < 2.22), see
-      //   https://sourceware.org/bugzilla/show_bug.cgi?id=17569
-      // and requires C++11.  So instead we do
-#if GEOGRAPHICLIB_CXX11_MATH && GEOGRAPHICLIB_PRECISION != 4
-      using std::remainder;
-      lon1 = remainder(lon1, real(720)); lon2 = remainder(lon2, real(720));
-      return ( (lon2 >= 0 && lon2 < 360 ? 0 : 1) -
-               (lon1 >= 0 && lon1 < 360 ? 0 : 1) );
-#else
-      using std::fmod;
-      lon1 = fmod(lon1, real(720)); lon2 = fmod(lon2, real(720));
-      return ( ((lon2 >= 0 && lon2 < 360) || lon2 < -360 ? 0 : 1) -
-               ((lon1 >= 0 && lon1 < 360) || lon1 < -360 ? 0 : 1) );
-#endif
+    static int transitdirect(real lon1, real lon2) {
+      // Compute exactly the parity of
+      //   int(ceil(lon2 / 360)) - int(ceil(lon1 / 360))
+      lon1 = Math::remainder(lon1, real(720));
+      lon2 = Math::remainder(lon2, real(720));
+      return ( (lon2 <= 0 && lon2 > -360 ? 1 : 0) -
+               (lon1 <= 0 && lon1 > -360 ? 1 : 0) );
     }
+    void Remainder(Accumulator<>& a) const { a.remainder(_area0); }
+    void Remainder(real& a) const { a = Math::remainder(a, _area0); }
+    template <typename T>
+    void AreaReduce(T& area, int crossings, bool reverse, bool sign) const;
   public:
 
     /**
@@ -237,7 +236,7 @@ namespace GeographicLib {
      *   the value inherited from the Geodesic object used in the constructor.
      **********************************************************************/
 
-    Math::real MajorRadius() const { return _earth.MajorRadius(); }
+    Math::real EquatorialRadius() const { return _earth.EquatorialRadius(); }
 
     /**
      * @return \e f the flattening of the ellipsoid.  This is the value
@@ -252,10 +251,16 @@ namespace GeographicLib {
      * @param[out] lon the longitude of the point (degrees).
      *
      * If no points have been added, then NaNs are returned.  Otherwise, \e lon
-     * will be in the range [&minus;180&deg;, 180&deg;).
+     * will be in the range [&minus;180&deg;, 180&deg;].
      **********************************************************************/
     void CurrentPoint(real& lat, real& lon) const
     { lat = _lat1; lon = _lon1; }
+
+    /**
+      * \deprecated An old name for EquatorialRadius().
+      **********************************************************************/
+    // GEOGRAPHICLIB_DEPRECATED("Use EquatorialRadius()")
+    Math::real MajorRadius() const { return EquatorialRadius(); }
     ///@}
   };
 

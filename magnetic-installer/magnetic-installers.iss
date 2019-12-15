@@ -6,16 +6,12 @@
 #define NAME "DUMMY"
 #endif
 
-#ifndef PREFIX
-#define PREFIX "DUMMY"
-#endif
-
 #ifndef MAGNETICDIR
 #define MAGNETICDIR "DUMMY"
 #endif
 
 #define Project "GeographicLib"
-#define URL "http://geographiclib.sourceforge.net"
+#define URL "https://geographiclib.sourceforge.io"
 #define Version "1.0"
 
 [Setup]

@@ -3,7 +3,7 @@
 // machine using OpenMP.
 //
 // For the format of gtx files, see
-// http://vdatum.noaa.gov/dev/gtx_info.html#dev_gtx_binary
+// https://vdatum.noaa.gov/docs/gtx_info.html#dev_gtx_binary
 //
 // data is binary big-endian:
 //   south latitude edge (degrees double)
@@ -37,7 +37,7 @@
 using namespace std;
 using namespace GeographicLib;
 
-int main(int argc, char* argv[]) {
+int main(int argc, const char* const argv[]) {
   // Hardwired for 3 args:
   // 1 = the gravity model (e.g., egm2008)
   // 2 = intervals per degree
@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
     int ndigits = Utility::set_digits();
     string model(argv[1]);
     // Number of intervals per degree
-    int ndeg = Utility::num<int>(string(argv[2]));
+    int ndeg = Utility::val<int>(string(argv[2]));
     string filename(argv[3]);
     GravityModel g(model);
     int
@@ -108,5 +108,4 @@ int main(int argc, char* argv[]) {
     cerr << "Caught unknown exception\n";
     return 1;
   }
-  return 0;
 }

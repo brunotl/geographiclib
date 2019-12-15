@@ -2,9 +2,9 @@
  * \file PolygonArea.cpp
  * \brief Implementation for GeographicLib::PolygonAreaT class
  *
- * Copyright (c) Charles Karney (2010-2015) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2010-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #include <GeographicLib/PolygonArea.hpp>
@@ -22,7 +22,8 @@ namespace GeographicLib {
       _lon0 = _lon1 = lon;
     } else {
       real s12, S12, t;
-      _earth.GenInverse(_lat1, _lon1, lat, lon, _mask, s12, t, t, t, t, t, S12);
+      _earth.GenInverse(_lat1, _lon1, lat, lon, _mask,
+                        s12, t, t, t, t, t, S12);
       _perimetersum += s12;
       if (!_polyline) {
         _areasum += S12;
@@ -52,7 +53,8 @@ namespace GeographicLib {
 
   template <class GeodType>
   unsigned PolygonAreaT<GeodType>::Compute(bool reverse, bool sign,
-                                           real& perimeter, real& area) const {
+                                           real& perimeter, real& area) const
+  {
     real s12, S12, t;
     if (_num < 2) {
       perimeter = 0;
@@ -70,24 +72,7 @@ namespace GeographicLib {
     Accumulator<> tempsum(_areasum);
     tempsum += S12;
     int crossings = _crossings + transit(_lon1, _lon0);
-    if (crossings & 1)
-      tempsum += (tempsum < 0 ? 1 : -1) * _area0/2;
-    // area is with the clockwise sense.  If !reverse convert to
-    // counter-clockwise convention.
-    if (!reverse)
-      tempsum *= -1;
-    // If sign put area in (-area0/2, area0/2], else put area in [0, area0)
-    if (sign) {
-      if (tempsum > _area0/2)
-        tempsum -= _area0;
-      else if (tempsum <= -_area0/2)
-        tempsum += _area0;
-    } else {
-      if (tempsum >= _area0)
-        tempsum -= _area0;
-      else if (tempsum < 0)
-        tempsum += _area0;
-    }
+    AreaReduce(tempsum, crossings, reverse, sign);
     area = 0 + tempsum();
     return _num;
   }
@@ -123,24 +108,7 @@ namespace GeographicLib {
     if (_polyline)
       return num;
 
-    if (crossings & 1)
-      tempsum += (tempsum < 0 ? 1 : -1) * _area0/2;
-    // area is with the clockwise sense.  If !reverse convert to
-    // counter-clockwise convention.
-    if (!reverse)
-      tempsum *= -1;
-    // If sign put area in (-area0/2, area0/2], else put area in [0, area0)
-    if (sign) {
-      if (tempsum > _area0/2)
-        tempsum -= _area0;
-      else if (tempsum <= -_area0/2)
-        tempsum += _area0;
-    } else {
-      if (tempsum >= _area0)
-        tempsum -= _area0;
-      else if (tempsum < 0)
-        tempsum += _area0;
-    }
+    AreaReduce(tempsum, crossings, reverse, sign);
     area = 0 + tempsum;
     return num;
   }
@@ -148,7 +116,8 @@ namespace GeographicLib {
   template <class GeodType>
   unsigned PolygonAreaT<GeodType>::TestEdge(real azi, real s,
                                             bool reverse, bool sign,
-                                            real& perimeter, real& area) const {
+                                            real& perimeter, real& area) const
+  {
     if (_num == 0) {            // we don't have a starting point!
       perimeter = Math::NaN();
       if (!_polyline)
@@ -169,32 +138,39 @@ namespace GeographicLib {
       tempsum += S12;
       crossings += transitdirect(_lon1, lon);
       lon = Math::AngNormalize(lon);
-      _earth.GenInverse(lat, lon, _lat0, _lon0, _mask, s12, t, t, t, t, t, S12);
+      _earth.GenInverse(lat, lon, _lat0, _lon0, _mask,
+                        s12, t, t, t, t, t, S12);
       perimeter += s12;
       tempsum += S12;
       crossings += transit(lon, _lon0);
     }
 
-    if (crossings & 1)
-      tempsum += (tempsum < 0 ? 1 : -1) * _area0/2;
-    // area is with the clockwise sense.  If !reverse convert to
-    // counter-clockwise convention.
-    if (!reverse)
-      tempsum *= -1;
-    // If sign put area in (-area0/2, area0/2], else put area in [0, area0)
-    if (sign) {
-      if (tempsum > _area0/2)
-        tempsum -= _area0;
-      else if (tempsum <= -_area0/2)
-        tempsum += _area0;
-    } else {
-      if (tempsum >= _area0)
-        tempsum -= _area0;
-      else if (tempsum < 0)
-        tempsum += _area0;
-    }
+    AreaReduce(tempsum, crossings, reverse, sign);
     area = 0 + tempsum;
     return num;
+  }
+
+  template <class GeodType>
+  template <typename T>
+  void PolygonAreaT<GeodType>::AreaReduce(T& area, int crossings, bool reverse,
+                                      bool sign) const {
+    Remainder(area);
+    if (crossings & 1) area += (area < 0 ? 1 : -1) * _area0/2;
+    // area is with the clockwise sense.  If !reverse convert to
+    // counter-clockwise convention.
+    if (!reverse) area *= -1;
+    // If sign put area in (-_area0/2, _area0/2], else put area in [0, _area0)
+    if (sign) {
+      if (area > _area0/2)
+        area -= _area0;
+      else if (area <= -_area0/2)
+        area += _area0;
+    } else {
+      if (area >= _area0)
+        area -= _area0;
+      else if (area < 0)
+        area += _area0;
+    }
   }
 
   template class GEOGRAPHICLIB_EXPORT PolygonAreaT<Geodesic>;

@@ -1,9 +1,9 @@
 /**
  * Implementation of the net.sf.geographiclib.Accumulator class
  *
- * Copyright (c) Charles Karney (2013) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2013-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 package net.sf.geographiclib;
 
@@ -15,12 +15,12 @@ package net.sf.geographiclib;
  * about 32 decimal places.
  * <p>
  * The implementation follows J. R. Shewchuk,
- * <a href="https://dx.doi.org/10.1007/PL00009321"> Adaptive Precision
+ * <a href="https://doi.org/10.1007/PL00009321"> Adaptive Precision
  * Floating-Point Arithmetic and Fast Robust Geometric Predicates</a>,
  * Discrete &amp; Computational Geometry 18(3) 305&ndash;363 (1997).
  * <p>
- * In the documentation of the member functions, <i>sum</i> stands for the value
- * currently held in the accumulator.
+ * In the documentation of the member functions, <i>sum</i> stands for the
+ * value currently held in the accumulator.
  ***********************************************************************/
 public  class Accumulator {
   // _s + _t accumulators for the sum.
@@ -110,4 +110,15 @@ public  class Accumulator {
    * Set <i>sum</i> = &minus;<i>sum</i>.
    **********************************************************************/
   public void Negate() { _s = -_s; _t = -_t; }
+  /**
+   * Take the remainder.
+   * <p>
+   * @param y the modulus
+   * <p>
+   * Put <i>sum</i> in the rangle [&minus;<i>y</i>, <i>y</i>].
+   **********************************************************************/
+  public void Remainder(double y) {
+    _s = GeoMath.remainder(_s, y);
+    Add(0.0);                   // renormalize
+  }
 }

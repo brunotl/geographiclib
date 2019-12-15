@@ -1,18 +1,18 @@
 ## Geodesic routines from GeographicLib
 
-This documentation applies to version 1.46.
+This documentation applies to version 1.50.
 
 The documentation for other versions is available
-at <tt>http://geographiclib.sourceforge.net/m.nn/js</tt> for versions
+at <tt>https://geographiclib.sourceforge.io/m.nn/js</tt> for versions
 numbers <tt>m.nn</tt> &ge; 1.45.
 
 Licensed under the MIT/X11 License; see
-[LICENSE.txt](http://geographiclib.sourceforge.net/html/LICENSE.txt).
+[LICENSE.txt](https://geographiclib.sourceforge.io/html/LICENSE.txt).
 
 ### Installation
 
 This library is a JavaScript implementation of the geodesic routines
-from [GeographicLib](http://geographiclib.sourceforge.net).  This solves the
+from [GeographicLib](https://geographiclib.sourceforge.io).  This solves the
 direct and inverse geodesic problems for an ellipsoid of revolution.
 
 The library can be used in [node](https://nodejs.org) by first
@@ -26,7 +26,7 @@ $ node
 ```
 The npm package includes a test suite.  Run this by
 ```bash
-$ cd node_modules/geograliblib
+$ cd node_modules/geographiclib
 $ npm test
 ```
 
@@ -34,7 +34,7 @@ Alternatively, you can use it in client-side JavaScript, by including in
 your HTML page
 ```html
 <script type="text/javascript"
-        src="http://geographiclib.sourceforge.net/scripts/geographiclib.js">
+        src="https://geographiclib.sourceforge.io/scripts/geographiclib.js">
 </script>
 ```
 Both of these prescriptions define a {@link GeographicLib} namespace.
@@ -58,9 +58,9 @@ console.log("The position is (" +
 // This prints "The position is (32.11195529, -63.95925278)."
 ```
 Two examples of this library in use are
-* [A geodesic calculator](http://geographiclib.sourceforge.net/scripts/geod-calc.html)
+* [A geodesic calculator](https://geographiclib.sourceforge.io/scripts/geod-calc.html)
 * [Displaying geodesics on Google
-  Maps](http://geographiclib.sourceforge.net/scripts/geod-google.html)
+  Maps](https://geographiclib.sourceforge.io/scripts/geod-google.html)
 
 ### More information
 * {@tutorial 1-geodesics}
@@ -68,46 +68,70 @@ Two examples of this library in use are
 * {@tutorial 3-examples}
 
 ### Implementations in various languages
-* {@link http://sourceforge.net/p/geographiclib/code/ci/release/tree/
+* {@link https://sourceforge.net/p/geographiclib/code/ci/release/tree/
     git repository}
 * C++ (complete library):
-  {@link http://geographiclib.sourceforge.net/html/index.html
+  {@link https://geographiclib.sourceforge.io/html/index.html
     documentation},
   {@link https://sourceforge.net/projects/geographiclib/files/distrib
     download};
 * C (geodesic routines):
-  {@link http://geographiclib.sourceforge.net/html/C/index.html
+  {@link https://geographiclib.sourceforge.io/html/C/index.html
     documentation}, also included with recent versions of
   {@link https://github.com/OSGeo/proj.4/wiki
     proj.4};
 * Fortran (geodesic routines):
-  {@link http://geographiclib.sourceforge.net/html/Fortran/index.html
+  {@link https://geographiclib.sourceforge.io/html/Fortran/index.html
     documentation};
 * Java (geodesic routines):
   {@link http://repo1.maven.org/maven2/net/sf/geographiclib/GeographicLib-Java/
     Maven Central package},
-  {@link http://geographiclib.sourceforge.net/html/java/index.html
+  {@link https://geographiclib.sourceforge.io/html/java/index.html
     documentation};
 * JavaScript (geodesic routines):
   {@link https://www.npmjs.com/package/geographiclib
     npm package},
-  {@link http://geographiclib.sourceforge.net/html/js/index.html
+  {@link https://geographiclib.sourceforge.io/html/js/index.html
     documentation};
 * Python (geodesic routines):
   {@link http://pypi.python.org/pypi/geographiclib
     PyPI package},
-  {@link http://geographiclib.sourceforge.net/html/python/index.html
+  {@link https://geographiclib.sourceforge.io/html/python/index.html
     documentation};
 * Matlab/Octave (geodesic and some other routines):
-  {@link http://www.mathworks.com/matlabcentral/fileexchange/50605
+  {@link https://www.mathworks.com/matlabcentral/fileexchange/50605
     Matlab Central package},
-  {@link http://www.mathworks.com/matlabcentral/fileexchange/50605/content/Contents.m
+  {@link https://viewer.mathworks.com/?viewer=plain_code&url=https%3A%2F%2Fwww.mathworks.com%2Fmatlabcentral%2Fmlc-downloads%2Fdownloads%2Fsubmissions%2F50605%2Fversions%2F15%2Fcontents%2FContents.m
     documentation};
 * C# (.NET wrapper for complete C++ library):
-  {@link http://geographiclib.sourceforge.net/html/NET/index.html
+  {@link https://geographiclib.sourceforge.io/html/NET/index.html
     documentation}.
 
 ### Change log
+
+* Version 1.50 (released 2019-09-24)
+  * PolygonArea can now handle arbitrarily complex polygons.  In the
+    case of self-intersecting polygons the area is accumulated
+    "algebraically", e.g., the areas of the 2 loops in a figure-8
+    polygon will partially cancel.
+  * Fix two bugs in the computation of areas when some vertices are specified
+    by an added edge.
+  * Fix bug in computing unsigned area.
+  * When parsing DMS strings ignore various non-breaking spaces.
+  * Fall back to system versions of hypot, cbrt, log1p, atanh if they
+    are available.
+  * Math.cbrt, Math.atanh, and Math.asinh preserve the sign of &minus;0.
+
+* Version 1.49 (released 2017-10-05)
+  * Use explicit test for nonzero real numbers.
+
+* Version 1.48 (released 2017-04-09)
+  * Change default range for longitude and azimuth to
+    (&minus;180&deg;, 180&deg;] (instead of [&minus;180&deg;, 180&deg;)).
+
+* Version 1.47 (released 2017-02-15)
+  * Improve accuracy of area calculation (fixing a flaw introduced in
+    version 1.46).
 
 * Version 1.46 (released 2016-02-15)
   * Fix bugs in PolygonArea.TestEdge (problem found by threepointone).

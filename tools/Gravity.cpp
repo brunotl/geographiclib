@@ -2,9 +2,9 @@
  * \file Gravity.cpp
  * \brief Command line utility for evaluating gravity fields
  *
- * Copyright (c) Charles Karney (2011-2015) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2011-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  *
  * See the <a href="Gravity.1.html">man page</a> for usage information.
  **********************************************************************/
@@ -26,7 +26,7 @@
 
 #include "Gravity.usage"
 
-int main(int argc, char* argv[]) {
+int main(int argc, const char* const argv[]) {
   try {
     using namespace GeographicLib;
     typedef Math::real real;
@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
     char lsep = ';';
     real lat = 0, h = 0;
     bool circle = false;
-    int prec = -1;
+    int prec = -1, Nmax = -1, Mmax = -1;
     enum {
       GRAVITY = 0,
       DISTURBANCE = 1,
@@ -54,6 +54,32 @@ int main(int argc, char* argv[]) {
       } else if (arg == "-d") {
         if (++m == argc) return usage(1, true);
         dir = argv[m];
+      } else if (arg == "-N") {
+        if (++m == argc) return usage(1, true);
+        try {
+          Nmax = Utility::val<int>(std::string(argv[m]));
+          if (Nmax < 0) {
+            std::cerr << "Maximum degree " << argv[m] << " is negative\n";
+            return 1;
+          }
+        }
+        catch (const std::exception&) {
+          std::cerr << "Precision " << argv[m] << " is not a number\n";
+          return 1;
+        }
+      } else if (arg == "-M") {
+        if (++m == argc) return usage(1, true);
+        try {
+          Mmax = Utility::val<int>(std::string(argv[m]));
+          if (Mmax < 0) {
+            std::cerr << "Maximum order " << argv[m] << " is negative\n";
+            return 1;
+          }
+        }
+        catch (const std::exception&) {
+          std::cerr << "Precision " << argv[m] << " is not a number\n";
+          return 1;
+        }
       } else if (arg == "-G")
         mode = GRAVITY;
       else if (arg == "-D")
@@ -72,7 +98,7 @@ int main(int argc, char* argv[]) {
             throw GeographicErr("Bad hemisphere letter on latitude");
           if (!(abs(lat) <= 90))
             throw GeographicErr("Latitude not in [-90d, 90d]");
-          h = Utility::num<real>(std::string(argv[++m]));
+          h = Utility::val<real>(std::string(argv[++m]));
           circle = true;
         }
         catch (const std::exception& e) {
@@ -85,7 +111,7 @@ int main(int argc, char* argv[]) {
       else if (arg == "-p") {
         if (++m == argc) return usage(1, true);
         try {
-          prec = Utility::num<int>(std::string(argv[m]));
+          prec = Utility::val<int>(std::string(argv[m]));
         }
         catch (const std::exception&) {
           std::cerr << "Precision " << argv[m] << " is not a number\n";
@@ -180,7 +206,7 @@ int main(int argc, char* argv[]) {
     }
     int retval = 0;
     try {
-      const GravityModel g(model, dir);
+      const GravityModel g(model, dir, Nmax, Mmax);
       if (circle) {
         if (!Math::isfinite(h))
           throw GeographicErr("Bad height");
@@ -254,9 +280,9 @@ int main(int argc, char* argv[]) {
                 g.Disturbance(lat, lon, h, deltax, deltay, deltaz);
               }
               // Convert to mGals
-              *output << Utility::str(deltax * 1e5, prec) << " "
-                      << Utility::str(deltay * 1e5, prec) << " "
-                      << Utility::str(deltaz * 1e5, prec)
+              *output << Utility::str(deltax * 100000, prec) << " "
+                      << Utility::str(deltay * 100000, prec) << " "
+                      << Utility::str(deltaz * 100000, prec)
                       << eol;
             }
             break;
@@ -267,7 +293,7 @@ int main(int argc, char* argv[]) {
                 c.SphericalAnomaly(lon, Dg01, xi, eta);
               else
                 g.SphericalAnomaly(lat, lon, h, Dg01, xi, eta);
-              Dg01 *= 1e5;      // Convert to mGals
+              Dg01 *= 100000;   // Convert to mGals
               xi *= 3600;       // Convert to arcsecs
               eta *= 3600;
               *output << Utility::str(Dg01, prec) << " "

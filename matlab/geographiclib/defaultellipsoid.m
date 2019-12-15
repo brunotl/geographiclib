@@ -9,8 +9,13 @@ function ellipsoid = defaultellipsoid
 %
 %   See also ECC2FLAT, FLAT2ECC.
 
-  a = 6378137;
-  f = 1/298.257223563;
-  e = flat2ecc(f);
-  ellipsoid = [a, e];
+  persistent ell
+  if isempty(ell)
+    a = 6378137;
+    f = 1/298.257223563;
+    e = flat2ecc(f);
+    ell = [a, e];
+  end
+  narginchk(0, 0)
+  ellipsoid = ell;
 end

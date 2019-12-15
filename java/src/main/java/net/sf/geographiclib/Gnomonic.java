@@ -1,9 +1,9 @@
 /**
  * Implementation of the net.sf.geographiclib.Gnomonic class
  *
- * Copyright (c) BMW Car IT GmbH (2014-2016) <sebastian.mattheis@bmw-carit.de>
+ * Copyright (c) BMW Car IT GmbH (2014-2019) <sebastian.mattheis@bmw-carit.de>
  * and licensed under the MIT/X11 License. For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 package net.sf.geographiclib;
 
@@ -19,11 +19,11 @@ package net.sf.geographiclib;
  * ellipsoid. This projection is derived in Section 8 of
  * <ul>
  * <li>
- * C. F. F. Karney, <a href="http://dx.doi.org/10.1007/s00190-012-0578-z">
+ * C. F. F. Karney, <a href="https://doi.org/10.1007/s00190-012-0578-z">
  * Algorithms for geodesics</a>, J. Geodesy <b>87</b>, 43&ndash;55 (2013);
- * DOI: <a href="http://dx.doi.org/10.1007/s00190-012-0578-z">
+ * DOI: <a href="https://doi.org/10.1007/s00190-012-0578-z">
  * 10.1007/s00190-012-0578-z</a>; addenda:
- * <a href="http://geographiclib.sourceforge.net/geod-addenda.html">
+ * <a href="https://geographiclib.sourceforge.io/geod-addenda.html">
  * geod-addenda.html</a>.
  * </li>
  * </ul>
@@ -56,7 +56,8 @@ package net.sf.geographiclib;
  * maximum deviation (as a true distance) of the corresponding gnomonic line
  * segment (i.e., with the same end points) from the geodesic is<br>
  * <br>
- * (<i>K</i>(<i>T</i>) - <i>K</i>(<i>C</i>)) <i>l</i><sup>2</sup> <i>t</i> / 32.
+ * (<i>K</i>(<i>T</i>) &minus; <i>K</i>(<i>C</i>))
+ * <i>l</i><sup>2</sup> <i>t</i> / 32.
  * <br>
  * <br>
  * where <i>K</i> is the Gaussian curvature.
@@ -130,7 +131,7 @@ package net.sf.geographiclib;
  */
 
 public class Gnomonic {
-  private static final double eps_ = 0.01 * Math.sqrt(GeoMath.epsilon);
+  private static final double eps_ = 0.01 * Math.sqrt(Math.ulp(1.0));
   private static final int numit_ = 10;
   private Geodesic _earth;
   private double _a, _f;
@@ -143,7 +144,7 @@ public class Gnomonic {
    */
   public Gnomonic(Geodesic earth) {
     _earth = earth;
-    _a = _earth.MajorRadius();
+    _a = _earth.EquatorialRadius();
     _f = _earth.Flattening();
   }
 
@@ -172,8 +173,9 @@ public class Gnomonic {
   public GnomonicData Forward(double lat0, double lon0, double lat, double lon)
   {
     GeodesicData inv =
-      _earth.Inverse(lat0, lon0, lat, lon, GeodesicMask.AZIMUTH
-                     | GeodesicMask.GEODESICSCALE | GeodesicMask.REDUCEDLENGTH);
+      _earth.Inverse(lat0, lon0, lat, lon,
+                     GeodesicMask.AZIMUTH | GeodesicMask.GEODESICSCALE |
+                     GeodesicMask.REDUCEDLENGTH);
     GnomonicData fwd =
       new GnomonicData(lat0, lon0, lat, lon, Double.NaN, Double.NaN,
                        inv.azi2, inv.M12);
@@ -202,7 +204,7 @@ public class Gnomonic {
    * <i>lat0</i> should be in the range [&minus;90&deg;, 90&deg;] and
    * <i>lon0</i> should be in the range [&minus;540&deg;, 540&deg;).
    * <i>lat</i> will be in the range [&minus;90&deg;, 90&deg;] and <i>lon</i>
-   * will be in the range [&minus;180&deg;, 180&deg;). The scale of the
+   * will be in the range [&minus;180&deg;, 180&deg;]. The scale of the
    * projection is 1/<i>rk<sup>2</sup></i> in the "radial" direction,
    * <i>azi</i> clockwise from true north, and is 1/<i>rk</i> in the direction
    * perpendicular to this. Even though all inputs should return a valid
@@ -268,11 +270,18 @@ public class Gnomonic {
    * @return <i>a</i> the equatorial radius of the ellipsoid (meters).  This is
    *   the value inherited from the Geodesic object used in the constructor.
    **********************************************************************/
-  public double MajorRadius() { return _a; }
+  public double EquatorialRadius() { return _a; }
 
   /**
    * @return <i>f</i> the  flattening of the ellipsoid.  This is
    *   the value inherited from the Geodesic object used in the constructor.
    **********************************************************************/
   public double Flattening() { return _f; }
+
+  /**
+   * @deprecated An old name for {@link #EquatorialRadius()}.
+   * @return <i>a</i> the equatorial radius of the ellipsoid (meters).
+   **********************************************************************/
+  // @Deprecated
+  public double MajorRadius() { return EquatorialRadius(); }
 }

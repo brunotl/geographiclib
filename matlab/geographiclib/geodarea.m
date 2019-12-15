@@ -13,11 +13,13 @@ function [A, P, N] = geodarea(lats, lons, ellipsoid)
 %   polygons can be specified by separating the vertices by NaNs in the
 %   vectors.  Thus a series of quadrilaterals can be specified as two 5 x K
 %   arrays where the 5th row is NaN.  The output, A, is in meters^2.
-%   Counter-clockwise traversal counts as a positive area.  Only simple
-%   polygons (which do not intersect themselves) are supported.  Also
-%   returned are the perimeters of the polygons in P (meters) and the
-%   numbers of vertices in N.  geoddoc gives the restrictions on the
-%   allowed ranges of the arguments.
+%   Counter-clockwise traversal counts as a positive area.  Arbitrarily
+%   complex polygons are allowed.  In the case of self-intersecting
+%   polygons the area is accumulated "algebraically", e.g., the areas of
+%   the 2 loops in a figure-8 polygon will partially cancel.  Also returned
+%   are the perimeters of the polygons in P (meters) and the numbers of
+%   vertices in N.  geoddoc gives the restrictions on the allowed ranges of
+%   the arguments.
 %
 %   GEODAREA loosely duplicates the functionality of the areaint function
 %   in the MATLAB mapping toolbox.  The major difference is that the
@@ -27,13 +29,13 @@ function [A, P, N] = geodarea(lats, lons, ellipsoid)
 %
 %     C. F. F. Karney, Algorithms for geodesics,
 %     J. Geodesy 87, 43-55 (2013);
-%     https://dx.doi.org/10.1007/s00190-012-0578-z
-%     Addenda: http://geographiclib.sourceforge.net/geod-addenda.html
+%     https://doi.org/10.1007/s00190-012-0578-z
+%     Addenda: https://geographiclib.sourceforge.io/geod-addenda.html
 %
 %   See also GEODDOC, GEODDISTANCE, GEODRECKON, POLYGONAREA,
-%     DEFAULTELLIPSOID.
+%     DEFAULTELLIPSOID, FLAT2ECC.
 
-% Copyright (c) Charles Karney (2012-2015) <charles@karney.com>.
+% Copyright (c) Charles Karney (2012-2019) <charles@karney.com>.
 
   narginchk(2, 3)
   if nargin < 3, ellipsoid = defaultellipsoid; end
@@ -80,6 +82,8 @@ function [A, P, N] = geodarea(lats, lons, ellipsoid)
     N(k) = m1(k) - m0(k) + 1;
     P(k) = accumulator(s12(m0(k):m1(k)));
     [As, At] = accumulator(S12(m0(k):m1(k)));
+    As = remx(As, area0);
+    [As, At] = accumulator(0, As, At);
     crossings = sum(cross(m0(k):m1(k)));
     if mod(crossings, 2) ~= 0
       [As, At] = accumulator( ((As < 0) * 2 - 1) * area0 / 2, As, At);
@@ -92,6 +96,7 @@ function [A, P, N] = geodarea(lats, lons, ellipsoid)
     end
     A(k) = As;
   end
+  A = 0 + A;
 end
 
 function cross = transit(lon1, lon2)
@@ -104,8 +109,8 @@ function cross = transit(lon1, lon2)
   lon2 = AngNormalize(lon2);
   lon12 = AngDiff(lon1, lon2);
   cross = zeros(length(lon1), 1);
-  cross(lon1 < 0 & lon2 >= 0 & lon12 > 0) = 1;
-  cross(lon2 < 0 & lon1 >= 0 & lon12 < 0) = -1;
+  cross(lon1 <= 0 & lon2 > 0 & lon12 > 0) =  1;
+  cross(lon2 <= 0 & lon1 > 0 & lon12 < 0) = -1;
 
 end
 

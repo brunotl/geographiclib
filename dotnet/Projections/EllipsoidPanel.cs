@@ -6,7 +6,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 using System;
 using System.Collections.Generic;
@@ -27,7 +27,7 @@ namespace Projections
         {
             InitializeComponent();
             m_ell = new Ellipsoid();
-            m_majorRadiusTextBox.Text = m_ell.MajorRadius.ToString();
+            m_majorRadiusTextBox.Text = m_ell.EquatorialRadius.ToString();
             m_flatteningTextBox.Text = m_ell.Flattening.ToString();
 
             m_minorRadiusTextBox.Text = m_ell.MinorRadius.ToString();

@@ -7,7 +7,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 namespace NETGeographicLib {
@@ -59,7 +59,7 @@ namespace NETGeographicLib {
    * \include example-Rhumb.vb
    *
    * <B>INTERFACE DIFFERENCES:</B><BR>
-   * The MajorRadius and Flattening functions are implemented as properties.
+   * The EquatorialRadius and Flattening functions are implemented as properties.
    **********************************************************************/
 
   public ref class Rhumb {
@@ -325,7 +325,7 @@ namespace NETGeographicLib {
      * @return the equatorial radius of the ellipsoid (meters).  This is
      *   the value used in the constructor.
      **********************************************************************/
-    property double MajorRadius { double get(); }
+    property double EquatorialRadius { double get(); }
 
     /**
      * @return f the  flattening of the ellipsoid.  This is the
@@ -531,7 +531,7 @@ namespace NETGeographicLib {
      * @return the equatorial radius of the ellipsoid (meters).  This is
      *   the value inherited from the Rhumb object used in the constructor.
      **********************************************************************/
-    property double MajorRadius { double get(); }
+    property double EquatorialRadius { double get(); }
 
     /**
      * @return the flattening of the ellipsoid.  This is the value

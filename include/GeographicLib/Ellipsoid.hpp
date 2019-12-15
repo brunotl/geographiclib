@@ -2,9 +2,9 @@
  * \file Ellipsoid.hpp
  * \brief Header for GeographicLib::Ellipsoid class
  *
- * Copyright (c) Charles Karney (2012-2015) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2012-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #if !defined(GEOGRAPHICLIB_ELLIPSOID_HPP)
@@ -77,7 +77,7 @@ namespace GeographicLib {
      * @return \e a the equatorial radius of the ellipsoid (meters).  This is
      *   the value used in the constructor.
      **********************************************************************/
-    Math::real MajorRadius() const { return _a; }
+    Math::real EquatorialRadius() const { return _a; }
 
     /**
      * @return \e b the polar semi-axis (meters).
@@ -105,6 +105,12 @@ namespace GeographicLib {
      **********************************************************************/
     Math::real Volume() const
     { return (4 * Math::pi()) * Math::sq(_a) * _b / 3; }
+
+    /**
+      * \deprecated An old name for EquatorialRadius().
+      **********************************************************************/
+    // GEOGRAPHICLIB_DEPRECATED("Use EquatorialRadius()")
+    Math::real MajorRadius() const { return EquatorialRadius(); }
     ///@}
 
     /** \name %Ellipsoid shape
@@ -167,7 +173,7 @@ namespace GeographicLib {
      * @param[in] phi the geographic latitude (degrees).
      * @return &beta; the parametric latitude (degrees).
      *
-     * The geographic latitude, &phi;, is the angle beween the equatorial
+     * The geographic latitude, &phi;, is the angle between the equatorial
      * plane and a vector normal to the surface of the ellipsoid.
      *
      * The parametric latitude (also called the reduced latitude), &beta;,
@@ -199,7 +205,7 @@ namespace GeographicLib {
      * @param[in] phi the geographic latitude (degrees).
      * @return &theta; the geocentric latitude (degrees).
      *
-     * The geocentric latitude, &theta;, is the angle beween the equatorial
+     * The geocentric latitude, &theta;, is the angle between the equatorial
      * plane and a line between the center of the ellipsoid and a point on the
      * ellipsoid.  For a sphere &theta; = &phi;.
      *
@@ -505,8 +511,10 @@ namespace GeographicLib {
      * <i>e''</i> <sup>2</sup> should lie in (&minus;1, 1).
      * The returned value \e f lies in (&minus;&infin;, 1).
      **********************************************************************/
-    static Math::real ThirdEccentricitySqToFlattening(real epp2)
-    { return 2 * epp2 / (sqrt((1 - epp2) * (1 + epp2)) + 1 + epp2); }
+    static Math::real ThirdEccentricitySqToFlattening(real epp2) {
+      using std::sqrt;
+      return 2 * epp2 / (sqrt((1 - epp2) * (1 + epp2)) + 1 + epp2);
+    }
 
     /**
      * @param[in] f = (\e a &minus; \e b) / \e a, the flattening.

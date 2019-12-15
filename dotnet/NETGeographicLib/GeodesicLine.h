@@ -7,7 +7,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 #include "NETGeographicLib.h"
 
@@ -30,7 +30,7 @@ namespace NETGeographicLib
    *
    * The calculations are accurate to better than 15 nm (15 nanometers).  See
    * Sec. 9 of
-   * <a href="http://arxiv.org/abs/1102.1215v1">arXiv:1102.1215v1</a> for
+   * <a href="https://arxiv.org/abs/1102.1215v1">arXiv:1102.1215v1</a> for
    * details.  The algorithms used by this class are based on series expansions
    * using the flattening \e f as a small parameter.  These are only accurate
    * for |<i>f</i>| &lt; 0.02; however reasonably accurate results will be
@@ -39,12 +39,12 @@ namespace NETGeographicLib
    *
    * The algorithms are described in
    * - C. F. F. Karney,
-   *   <a href="https://dx.doi.org/10.1007/s00190-012-0578-z">
+   *   <a href="https://doi.org/10.1007/s00190-012-0578-z">
    *   Algorithms for geodesics</a>,
    *   J. Geodesy <b>87</b>, 43--55 (2013);
-   *   DOI: <a href="https://dx.doi.org/10.1007/s00190-012-0578-z">
+   *   DOI: <a href="https://doi.org/10.1007/s00190-012-0578-z">
    *   10.1007/s00190-012-0578-z</a>;
-   *   addenda: <a href="http://geographiclib.sourceforge.net/geod-addenda.html">
+   *   addenda: <a href="https://geographiclib.sourceforge.io/geod-addenda.html">
    *   geod-addenda.html</a>.
    * .
    * For more information on geodesics see \ref geodesic.
@@ -61,7 +61,7 @@ namespace NETGeographicLib
    *
    * The following functions are implemented as properties:
    * Latitude, Longitude, Azimuth, EquatorialAzimuth, EquatorialArc,
-   * MajorRadius, Distance, Arc, and Flattening.
+   * EquatorialRadius, Distance, Arc, and Flattening.
    *
    * The constructors, Capabilities, and GenPosition functions accept the
    * "capabilities mask" as a NETGeographicLib::Mask rather than an
@@ -602,7 +602,7 @@ namespace NETGeographicLib
          * @return \e a the equatorial radius of the ellipsoid (meters).  This is
          *   the value inherited from the Geodesic object used in the constructor.
          **********************************************************************/
-        property double MajorRadius { double get(); }
+        property double EquatorialRadius { double get(); }
 
         /**
          * @return \e f the flattening of the ellipsoid.  This is the value

@@ -6,7 +6,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 #include "stdafx.h"
 #include "GeographicLib/Geoid.hpp"
@@ -190,7 +190,7 @@ double Geoid::CacheNorth::get() { return m_pGeoid->CacheNorth(); }
 double Geoid::CacheSouth::get() { return m_pGeoid->CacheSouth(); }
 
 //*****************************************************************************
-double Geoid::MajorRadius::get() { return m_pGeoid->MajorRadius(); }
+double Geoid::EquatorialRadius::get() { return m_pGeoid->EquatorialRadius(); }
 
 //*****************************************************************************
 double Geoid::Flattening::get() { return m_pGeoid->Flattening(); }

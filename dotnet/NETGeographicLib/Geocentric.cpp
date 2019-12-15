@@ -6,7 +6,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 #include "stdafx.h"
 #include "GeographicLib/Geocentric.hpp"
@@ -143,8 +143,8 @@ System::IntPtr^ Geocentric::GetUnmanaged()
 }
 
 //*****************************************************************************
-double Geocentric::MajorRadius::get()
-{ return m_pGeocentric->MajorRadius(); }
+double Geocentric::EquatorialRadius::get()
+{ return m_pGeocentric->EquatorialRadius(); }
 
 //*****************************************************************************
 double Geocentric::Flattening::get()

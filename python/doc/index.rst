@@ -11,17 +11,17 @@ Author: Charles F. F. Karney (charles@karney.com)
 Version: |version|
 
 The documentation for other versions is available at
-``http://geographiclib.sourceforge.net/m.nn/python/`` for versions numbers
+``https://geographiclib.sourceforge.io/m.nn/python/`` for versions numbers
 ``m.nn`` ≥ 1.46.
 
 Licensed under the MIT/X11 License; see
-`LICENSE.txt <http://geographiclib.sourceforge.net/html/LICENSE.txt>`_.
+`LICENSE.txt <https://geographiclib.sourceforge.io/html/LICENSE.txt>`_.
 
 Introduction
 ============
 
 This is a python implementation of the geodesic routines in
-`GeographicLib <http://geographiclib.sourceforge.net>`_.
+`GeographicLib <https://geographiclib.sourceforge.io>`_.
 
 Although it is maintained in conjunction with the larger C++ library,
 this python package can be used independently.
@@ -29,9 +29,9 @@ this python package can be used independently.
 Installation
 ------------
 
-The full `Geographic <http://geographiclib.sourceforge.net>`_ package
+The full `Geographic <https://geographiclib.sourceforge.io>`_ package
 can be downloaded from
-`sourceforge <http://sourceforge.net/projects/geographiclib/files/distrib>`_.
+`sourceforge <https://sourceforge.net/projects/geographiclib/files/distrib>`_.
 However the python implementation is available as a stand-alone package.
 To install this, run
 
@@ -45,8 +45,8 @@ and install it with
 
 .. code-block:: sh
 
-  tar xpfz geographiclib-1.46.tar.gz
-  cd geographiclib-1.46
+  tar xpfz geographiclib-1.50.tar.gz
+  cd geographiclib-1.50
   python setup.py install
 
 It's a good idea to run the unit tests to verify that the installation
@@ -89,14 +89,41 @@ GeographicLib in various languages
   `PyPI package <http://pypi.python.org/pypi/geographiclib>`_,
   `documentation <../python/index.html>`__
 * Matlab/Octave (geodesic and some other routines):
-  `Matlab Central package <http://www.mathworks.com/matlabcentral/fileexchange/50605>`_,
+  `Matlab Central package <https://www.mathworks.com/matlabcentral/fileexchange/50605>`_,
   `documentation
-  <http://www.mathworks.com/matlabcentral/fileexchange/50605/content/Contents.m>`__
+  <https://viewer.mathworks.com/?viewer=plain_code&url=https%3A%2F%2Fwww.mathworks.com%2Fmatlabcentral%2Fmlc-downloads%2Fdownloads%2Fsubmissions%2F50605%2Fversions%2F15%2Fcontents%2FContents.m>`__
 * C# (.NET wrapper for complete C++ library):
   `documentation <../NET/index.html>`__
 
 Change log
 ----------
+
+* Version 1.50 (released 2019-09-24)
+
+  * PolygonArea can now handle arbitrarily complex polygons.  In the
+    case of self-intersecting polygons the area is accumulated
+    "algebraically", e.g., the areas of the 2 loops in a figure-8
+    polygon will partially cancel.
+  * Fixed bug in counting pole encirclings when adding edges to a
+    polygon.
+  * Work around problems caused by sin(inf) and fmod(inf) raising
+    exceptions.
+  * Math.cbrt, Math.atanh, and Math.asinh now preserve the sign of −0.
+
+* Version 1.49 (released 2017-10-05)
+
+  * Fix code formatting; add tests.
+
+* Version 1.48 (released 2017-04-09)
+
+  * Change default range for longitude and azimuth to (−180°, 180°]
+    (instead of [−180°, 180°)).
+
+* Version 1.47 (released 2017-02-15)
+
+  * Fix the packaging, incorporating the patches in version 1.46.3.
+  * Improve accuracy of area calculation (fixing a flaw introduced in
+    version 1.46)
 
 * Version 1.46 (released 2016-02-15)
 

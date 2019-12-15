@@ -2,9 +2,9 @@
  * \file GeodSolve.cpp
  * \brief Command line utility for geodesic calculations
  *
- * Copyright (c) Charles Karney (2009-2016) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2009-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  *
  * See the <a href="GeodSolve.1.html">man page</a> for usage information.
  **********************************************************************/
@@ -61,12 +61,13 @@ std::string DistanceStrings(real s12, real a12,
   return s;
 }
 
-real ReadDistance(const std::string& s, bool arcmode) {
+real ReadDistance(const std::string& s, bool arcmode, bool fraction = false) {
   using namespace GeographicLib;
-  return arcmode ? DMS::DecodeAngle(s) : Utility::num<real>(s);
+  return fraction ? Utility::fract<real>(s) :
+    (arcmode ? DMS::DecodeAngle(s) : Utility::val<real>(s));
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, const char* const argv[]) {
   try {
     using namespace GeographicLib;
     enum { NONE = 0, LINE, DIRECT, INVERSE };
@@ -141,7 +142,7 @@ int main(int argc, char* argv[]) {
       } else if (arg == "-e") {
         if (m + 2 >= argc) return usage(1, true);
         try {
-          a = Utility::num<real>(std::string(argv[m + 1]));
+          a = Utility::val<real>(std::string(argv[m + 1]));
           f = Utility::fract<real>(std::string(argv[m + 2]));
         }
         catch (const std::exception& e) {
@@ -166,7 +167,7 @@ int main(int argc, char* argv[]) {
       else if (arg == "-p") {
         if (++m == argc) return usage(1, true);
         try {
-          prec = Utility::num<int>(std::string(argv[m]));
+          prec = Utility::val<int>(std::string(argv[m]));
         }
         catch (const std::exception&) {
           std::cerr << "Precision " << argv[m] << " is not a number\n";
@@ -339,7 +340,7 @@ int main(int argc, char* argv[]) {
             if (str >> strc)
               throw GeographicErr("Extraneous input: " + strc);
             // In fraction mode input is read as a distance
-            s12 = ReadDistance(ss12, !fraction && arcmode) * mult;
+            s12 = ReadDistance(ss12, !fraction && arcmode, fraction) * mult;
             a12 = exact ?
               le.GenPosition(arcmode, s12, outmask,
                              lat2, lon2, azi2, s12, m12, M12, M21, S12) :

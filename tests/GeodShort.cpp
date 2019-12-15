@@ -21,16 +21,6 @@
 using namespace GeographicLib;
 using namespace std;
 
-// a class to produce random reals in [0,1)
-template<typename T> class rand_num {
-  function<T()> _rand;
-public:
-  rand_num(unsigned seed)     // constructor takes a seed
-    : _rand(bind(generate_canonical<T, numeric_limits<T>::digits, mt19937>,
-                 mt19937(seed))) {}
-  T operator()() { return _rand(); } // a random number
-};
-
 class GeodShort {
 private:
   typedef Math::real real;
@@ -256,7 +246,7 @@ int main(int argc, char* argv[]) {
     typedef Math::real real;
     real
       f = Utility::fract<real>(string(argv[1])),
-      sig = Utility::num<real>(string(argv[2]));
+      sig = Utility::val<real>(string(argv[2]));
     Geodesic g(1, f);
     GeodesicExact ge(1, f);
     GeodShort s(1, f);
@@ -268,20 +258,21 @@ int main(int argc, char* argv[]) {
         ge.Inverse(0, 0, 90, 0, m);
       else
         g.Inverse(0, 0, 90, 0, m);
-      norm = max(m, Math::pi()/2 * g.MajorRadius());
-      consist = min(m, Math::pi()/2 * g.MajorRadius()) /
+      norm = max(m, Math::pi()/2 * g.EquatorialRadius());
+      consist = min(m, Math::pi()/2 * g.EquatorialRadius()) /
         (Math::pi()/2);
     }
-    unsigned seed = time(0);
-    rand_num<real> U(seed);
+    unsigned seed = random_device()(); // Set seed from random_device
+    mt19937 r(seed);                   // Initialize URNG
+    uniform_real_distribution<double> U;
     cout << norm << " " << consist << " "
          << f << " " << sig << " " << seed << endl;
     real maxerr1 = -1, maxerr2 = -1, maxerr3 = -1;
     for (unsigned k = 0; k < 10000000; ++k) {
       real
-        lat1 = 90*U(),
+        lat1 = 90*real(U(r)),
         lon1 = 0,
-        azi1 = 180*U(),
+        azi1 = 180*real(U(r)),
         lat2, lon2, s12, azi2;
       if (exact)
         ge.ArcDirect(lat1, lon1, azi1, sig, lat2, lon2, azi2, s12);

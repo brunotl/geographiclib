@@ -22,7 +22,7 @@ azimuths &alpha;<sub>1</sub> and &alpha;<sub>2</sub> at the two end
 points.  In this figure, we have &lambda;<sub>12</sub> =
 &lambda;<sub>2</sub> &minus; &lambda;<sub>1</sub>.
 <center>
-<img src="http://upload.wikimedia.org/wikipedia/commons/c/cb/Geodesic_problem_on_an_ellipsoid.svg" width="250">
+<img src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Geodesic_problem_on_an_ellipsoid.svg" width="250">
 </center>
 A geodesic can be extended indefinitely by requiring that any
 sufficiently small segment is a shortest path; geodesics are also the
@@ -128,7 +128,7 @@ and are based on Bessel (1825) and Helmert (1880); the algorithm for
 areas is based on Danielsen (1989).  These improve on the work of
 Vincenty (1975) in the following respects:
 * The results are accurate to round-off for terrestrial ellipsoids (the
-  error in the distance is less then 15 nanometers, compared to 0.1 mm
+  error in the distance is less than 15 nanometers, compared to 0.1 mm
   for Vincenty).
 * The solution of the inverse problem is always found.  (Vincenty's
   method fails to converge for nearly antipodal points.)
@@ -139,12 +139,12 @@ Vincenty (1975) in the following respects:
 ### <a name="references"></a>References
 
 * F. W. Bessel,
-  {@link http://arxiv.org/abs/0908.1824 The calculation of longitude and
+  {@link https://arxiv.org/abs/0908.1824 The calculation of longitude and
   latitude from geodesic measurements (1825)},
   Astron. Nachr. **331**(8), 852&ndash;861 (2010),
   translated by C. F. F. Karney and R. E. Deakin.
 * F. R. Helmert,
-  {@link https://dx.doi.org/10.5281/zenodo.32050
+  {@link https://doi.org/10.5281/zenodo.32050
   Mathematical and Physical Theories of Higher Geodesy, Vol 1},
   (Teubner, Leipzig, 1880), Chaps. 5&ndash;7.
 * T. Vincenty,
@@ -153,19 +153,19 @@ Vincenty (1975) in the following respects:
   application of nested equations},
   Survey Review **23**(176), 88&ndash;93 (1975).
 * J. Danielsen,
-  {@link https://dx.doi.org/10.1179/003962689791474267 The area under
+  {@link https://doi.org/10.1179/003962689791474267 The area under
   the geodesic}, Survey Review **30**(232), 61&ndash;66 (1989).
 * C. F. F. Karney,
-  {@link https://dx.doi.org/10.1007/s00190-012-0578-z
+  {@link https://doi.org/10.1007/s00190-012-0578-z
   Algorithms for geodesics}, J. Geodesy **87**(1) 43&ndash;55 (2013);
-  {@link http://geographiclib.sourceforge.net/geod-addenda.html addenda}.
+  {@link https://geographiclib.sourceforge.io/geod-addenda.html addenda}.
 * C. F. F. Karney,
-  {@http://arxiv.org/abs/1102.1215v1
+  {@https://arxiv.org/abs/1102.1215v1
   Geodesics on an ellipsoid of revolution},
   Feb. 2011;
-  {@link http://geographiclib.sourceforge.net/geod-addenda.html#geod-errata
+  {@link https://geographiclib.sourceforge.io/geod-addenda.html#geod-errata
   errata}.
-* {@link http://geographiclib.sourceforge.net/geodesic-papers/biblio.html
+* {@link https://geographiclib.sourceforge.io/geodesic-papers/biblio.html
   A geodesic bibliography}.
 * The wikipedia page,
   {@link https://en.wikipedia.org/wiki/Geodesics_on_an_ellipsoid

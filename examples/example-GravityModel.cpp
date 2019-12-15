@@ -1,4 +1,6 @@
 // Example of using the GeographicLib::GravityModel class
+// This requires that the egm96 gravity model be installed; see
+// https://geographiclib.sourceforge.io/html/gravity.html#gravityinst
 
 #include <iostream>
 #include <exception>
@@ -19,5 +21,4 @@ int main() {
     cerr << "Caught exception: " << e.what() << "\n";
     return 1;
   }
-  return 0;
 }

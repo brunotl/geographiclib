@@ -7,7 +7,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 namespace NETGeographicLib
@@ -21,12 +21,12 @@ namespace NETGeographicLib
    * %Gnomonic projection centered at an arbitrary position \e C on the
    * ellipsoid.  This projection is derived in Section 8 of
    * - C. F. F. Karney,
-   *   <a href="https://dx.doi.org/10.1007/s00190-012-0578-z">
+   *   <a href="https://doi.org/10.1007/s00190-012-0578-z">
    *   Algorithms for geodesics</a>,
    *   J. Geodesy <b>87</b>, 43--55 (2013);
-   *   DOI: <a href="https://dx.doi.org/10.1007/s00190-012-0578-z">
+   *   DOI: <a href="https://doi.org/10.1007/s00190-012-0578-z">
    *   10.1007/s00190-012-0578-z</a>;
-   *   addenda: <a href="http://geographiclib.sourceforge.net/geod-addenda.html">
+   *   addenda: <a href="https://geographiclib.sourceforge.io/geod-addenda.html">
    *   geod-addenda.html</a>.
    * .
    * The projection of \e P is defined as follows: compute the geodesic line
@@ -99,7 +99,7 @@ namespace NETGeographicLib
    * <B>INTERFACE DIFFERENCES:</B><BR>
    * A default constructor has been provided that assumes WGS84 parameters.
    *
-   * The MajorRadius and Flattening functions are implemented as properties.
+   * The EquatorialRadius and Flattening functions are implemented as properties.
    **********************************************************************/
     public ref class Gnomonic
     {
@@ -206,7 +206,7 @@ namespace NETGeographicLib
          * @return \e a the equatorial radius of the ellipsoid (meters).  This is
          *   the value inherited from the Geodesic object used in the constructor.
          **********************************************************************/
-        property double MajorRadius { double get(); }
+        property double EquatorialRadius { double get(); }
 
         /**
          * @return \e f the flattening of the ellipsoid.  This is the value

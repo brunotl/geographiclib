@@ -2,9 +2,9 @@
  * \file MagneticModel.hpp
  * \brief Header for GeographicLib::MagneticModel class
  *
- * Copyright (c) Charles Karney (2011-2015) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2011-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #if !defined(GEOGRAPHICLIB_MAGNETICMODEL_HPP)
@@ -40,18 +40,30 @@ namespace GeographicLib {
    * - General information:
    *   - http://geomag.org/models/index.html
    * - WMM2010:
-   *   - http://ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml
-   *   - http://ngdc.noaa.gov/geomag/WMM/data/WMM2010/WMM2010COF.zip
-   * - WMM2015:
-   *   - http://ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml
-   *   - http://ngdc.noaa.gov/geomag/WMM/data/WMM2015/WMM2015COF.zip
+   *   - https://ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml
+   *   - https://ngdc.noaa.gov/geomag/WMM/data/WMM2010/WMM2010COF.zip
+   * - WMM2015 (deprecated):
+   *   - https://ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml
+   *   - https://ngdc.noaa.gov/geomag/WMM/data/WMM2015/WMM2015COF.zip
+   * - WMM2015V2:
+   *   - https://ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml
+   *   - https://ngdc.noaa.gov/geomag/WMM/data/WMM2015/WMM2015v2COF.zip
+   * - WMM2020:
+   *   - https://ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml
+   *   - https://ngdc.noaa.gov/geomag/WMM/data/WMM2020/WMM2020COF.zip
    * - IGRF11:
-   *   - http://ngdc.noaa.gov/IAGA/vmod/igrf.html
-   *   - http://ngdc.noaa.gov/IAGA/vmod/igrf11coeffs.txt
-   *   - http://ngdc.noaa.gov/IAGA/vmod/geomag70_linux.tar.gz
+   *   - https://ngdc.noaa.gov/IAGA/vmod/igrf.html
+   *   - https://ngdc.noaa.gov/IAGA/vmod/igrf11coeffs.txt
+   *   - https://ngdc.noaa.gov/IAGA/vmod/geomag70_linux.tar.gz
    * - EMM2010:
-   *   - http://ngdc.noaa.gov/geomag/EMM/index.html
-   *   - http://ngdc.noaa.gov/geomag/EMM/data/geomag/EMM2010_Sph_Windows_Linux.zip
+   *   - https://ngdc.noaa.gov/geomag/EMM/index.html
+   *   - https://ngdc.noaa.gov/geomag/EMM/data/geomag/EMM2010_Sph_Windows_Linux.zip
+   * - EMM2015:
+   *   - https://ngdc.noaa.gov/geomag/EMM/index.html
+   *   - https://www.ngdc.noaa.gov/geomag/EMM/data/geomag/EMM2015_Sph_Linux.zip
+   * - EMM2017:
+   *   - https://ngdc.noaa.gov/geomag/EMM/index.html
+   *   - https://www.ngdc.noaa.gov/geomag/EMM/data/geomag/EMM2017_Sph_Linux.zip
    *
    * Example of use:
    * \include example-MagneticModel.cpp
@@ -66,7 +78,7 @@ namespace GeographicLib {
     static const int idlength_ = 8;
     std::string _name, _dir, _description, _date, _filename, _id;
     real _t0, _dt0, _tmin, _tmax, _a, _hmin, _hmax;
-    int _Nmodels, _Nconstants;
+    int _Nmodels, _Nconstants, _nmx, _mmx;
     SphericalHarmonic::normalization _norm;
     Geocentric _earth;
     std::vector< std::vector<real> > _G;
@@ -90,8 +102,12 @@ namespace GeographicLib {
      * @param[in] path (optional) directory for data file.
      * @param[in] earth (optional) Geocentric object for converting
      *   coordinates; default Geocentric::WGS84().
+     * @param[in] Nmax (optional) if non-negative, truncate the degree of the
+     *   model this value.
+     * @param[in] Mmax (optional) if non-negative, truncate the order of the
+     *   model this value.
      * @exception GeographicErr if the data file cannot be found, is
-     *   unreadable, or is corrupt.
+     *   unreadable, or is corrupt, or if \e Mmax > \e Nmax.
      * @exception std::bad_alloc if the memory necessary for storing the model
      *   can't be allocated.
      *
@@ -109,10 +125,15 @@ namespace GeographicLib {
      * The final earth argument to the constructor specifies an ellipsoid to
      * allow geodetic coordinates to the transformed into the spherical
      * coordinates used in the spherical harmonic sum.
+     *
+     * If \e Nmax &ge; 0 and \e Mmax < 0, then \e Mmax is set to \e Nmax.
+     * After the model is loaded, the maximum degree and order of the model can
+     * be found by the Degree() and Order() methods.
      **********************************************************************/
     explicit MagneticModel(const std::string& name,
                            const std::string& path = "",
-                           const Geocentric& earth = Geocentric::WGS84());
+                           const Geocentric& earth = Geocentric::WGS84(),
+                           int Nmax = -1, int Mmax = -1);
     ///@}
 
     /** \name Compute the magnetic field
@@ -126,7 +147,8 @@ namespace GeographicLib {
      * @param[in] lon longitude of the point (degrees).
      * @param[in] h the height of the point above the ellipsoid (meters).
      * @param[out] Bx the easterly component of the magnetic field (nanotesla).
-     * @param[out] By the northerly component of the magnetic field (nanotesla).
+     * @param[out] By the northerly component of the magnetic field
+     *   (nanotesla).
      * @param[out] Bz the vertical (up) component of the magnetic field
      *   (nanotesla).
      **********************************************************************/
@@ -145,7 +167,8 @@ namespace GeographicLib {
      * @param[in] lon longitude of the point (degrees).
      * @param[in] h the height of the point above the ellipsoid (meters).
      * @param[out] Bx the easterly component of the magnetic field (nanotesla).
-     * @param[out] By the northerly component of the magnetic field (nanotesla).
+     * @param[out] By the northerly component of the magnetic field
+     *   (nanotesla).
      * @param[out] Bz the vertical (up) component of the magnetic field
      *   (nanotesla).
      * @param[out] Bxt the rate of change of \e Bx (nT/yr).
@@ -305,13 +328,29 @@ namespace GeographicLib {
      *   the value of \e a inherited from the Geocentric object used in the
      *   constructor.
      **********************************************************************/
-    Math::real MajorRadius() const { return _earth.MajorRadius(); }
+    Math::real EquatorialRadius() const { return _earth.EquatorialRadius(); }
 
     /**
      * @return \e f the flattening of the ellipsoid.  This is the value
      *   inherited from the Geocentric object used in the constructor.
      **********************************************************************/
     Math::real Flattening() const { return _earth.Flattening(); }
+
+    /**
+     * @return \e Nmax the maximum degree of the components of the model.
+     **********************************************************************/
+    int Degree() const { return _nmx; }
+
+    /**
+     * @return \e Mmax the maximum order of the components of the model.
+     **********************************************************************/
+    int Order() const { return _mmx; }
+
+    /**
+      * \deprecated An old name for EquatorialRadius().
+      **********************************************************************/
+    // GEOGRAPHICLIB_DEPRECATED("Use EquatorialRadius()")
+    Math::real MajorRadius() const { return EquatorialRadius(); }
     ///@}
 
     /**
@@ -330,7 +369,7 @@ namespace GeographicLib {
      * @return the default name for the magnetic model.
      *
      * This is the value of the environment variable
-     * GEOGRAPHICLIB_MAGNETIC_NAME, if set; otherwise, it is "wmm2015".  The
+     * GEOGRAPHICLIB_MAGNETIC_NAME, if set; otherwise, it is "wmm2020".  The
      * MagneticModel class does not use this function; it is just provided as a
      * convenience for a calling program when constructing a MagneticModel
      * object.

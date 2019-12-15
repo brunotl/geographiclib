@@ -10,7 +10,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 using System;
 using System.Collections.Generic;
@@ -49,7 +49,7 @@ namespace Projections
             {
                 MessageBox.Show(xcpt.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            m_majorRadiusTextBox.Text = m_geodesic.MajorRadius.ToString();
+            m_majorRadiusTextBox.Text = m_geodesic.EquatorialRadius.ToString();
             m_flatteningTextBox.Text = m_geodesic.Flattening.ToString();
             m_lat0TextBox.Text = m_lon0TextBox.Text = "0";
             m_projectionComboBox.SelectedIndex = 0;

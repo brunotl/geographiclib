@@ -47,9 +47,11 @@ If the B<-s> option is given, then the interpretation used is the one
 that results in a positive area; i.e., the area is positive and less
 than the total area of the ellipsoid.
 
-Only simple (i.e., non-self-intersecting) polygons are supported for the
-area computation.  Polygons may include one or both poles.  There is no
-need to close the polygon.
+Arbitrarily complex polygons are allowed.  In the case of
+self-intersecting polygons the area is accumulated "algebraically",
+e.g., the areas of the 2 loops in a figure-8 polygon will partially
+cancel.  Polygons may include one or both poles.  There is no need to
+close the polygon.
 
 =head1 OPTIONS
 
@@ -200,13 +202,13 @@ covered by the data (assuming the edges of the image are geodesics).
 GeoConvert(1), GeodSolve(1).
 
 An online version of this utility is availbable at
-L<http://geographiclib.sourceforge.net/cgi-bin/Planimeter>.
+L<https://geographiclib.sourceforge.io/cgi-bin/Planimeter>.
 
 The algorithm for the area of geodesic polygon is
 given in Section 6 of C. F. F. Karney, I<Algorithms for geodesics>,
 J. Geodesy 87, 43-55 (2013);
-DOI L<https://dx.doi.org/10.1007/s00190-012-0578-z>;
-addenda: L<http://geographiclib.sourceforge.net/geod-addenda.html>.
+DOI L<https://doi.org/10.1007/s00190-012-0578-z>;
+addenda: L<https://geographiclib.sourceforge.io/geod-addenda.html>.
 
 =head1 AUTHOR
 
@@ -215,4 +217,4 @@ B<Planimeter> was written by Charles Karney.
 =head1 HISTORY
 
 B<Planimeter> was added to GeographicLib,
-L<http://geographiclib.sourceforge.net>, in version 1.4.
+L<https://geographiclib.sourceforge.io>, in version 1.4.

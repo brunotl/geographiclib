@@ -2,9 +2,9 @@
 #
 # Download gravity models for use by GeographicLib::GravityModel.
 #
-# Copyright (c) Charles Karney (2011) <charles@karney.com> and licensed
-# under the MIT/X11 License.  For more information, see
-# http://geographiclib.sourceforge.net/
+# Copyright (c) Charles Karney (2011-2019) <charles@karney.com> and
+# licensed under the MIT/X11 License.  For more information, see
+# https://geographiclib.sourceforge.io/
 
 DEFAULTDIR="@GEOGRAPHICLIB_DATA@"
 SUBDIR=gravity
@@ -15,7 +15,7 @@ TOOL=Gravity
 EXT=egm.cof
 usage() {
     cat <<EOF
-usage: $0 [-p parentdir] [-d] [-h] $MODEL...
+usage: $0 [-p parentdir] [-f] [-d] [-h] $MODEL...
 
 This program downloads and installs the datasets used by the
 GeographicLib::$CLASS class and the $TOOL tool to compute
@@ -46,6 +46,8 @@ write access to this directory.
 
 Normally only datasets which are not already in parentdir are
 downloaded.  You can force the download and reinstallation with -f.
+The -f flag also let you download new models (not yet in the set
+defined by "all").
 
 If -d is provided, the temporary directory which holds the downloads,
 \$TMPDIR/$NAME-XXXXXXXX or ${TMPDIR:-/tmp}/$NAME-XXXXXXXX,
@@ -53,7 +55,7 @@ will be saved.  -h prints this help.
 
 For more information on the $NAME datasets, visit
 
-  http://geographiclib.sourceforge.net/html/$NAME.html
+  https://geographiclib.sourceforge.io/html/$NAME.html
 
 EOF
 }
@@ -133,8 +135,12 @@ while test $# -gt 0; do
 		echo egm96; echo wgs84
 		;;
 	    * )
-		echo Unknown $MODEL $1 1>&2
-		exit 1
+		if test -n "$FORCE"; then
+		    echo $1
+		else
+		    echo Unknown $MODEL $1 1>&2
+		    exit 1
+		fi
 		;;
 	esac
     fi
@@ -151,7 +157,7 @@ while read file; do
     fi
     echo download $file.tar.bz2 ...
     echo $file >> $TEMP/download
-    URL="http://downloads.sourceforge.net/project/geographiclib/$SUBDIR-distrib/$file.tar.bz2?use_mirror=autoselect"
+    URL="https://downloads.sourceforge.net/project/geographiclib/$SUBDIR-distrib/$file.tar.bz2?use_mirror=autoselect"
     ARCHIVE=$TEMP/$file.tar.bz2
     wget -O$ARCHIVE $URL
     echo unpack $file.tar.bz2 ...

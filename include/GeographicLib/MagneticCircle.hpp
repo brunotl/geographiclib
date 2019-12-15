@@ -2,9 +2,9 @@
  * \file MagneticCircle.hpp
  * \brief Header for GeographicLib::MagneticCircle class
  *
- * Copyright (c) Charles Karney (2011-2015) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2011-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #if !defined(GEOGRAPHICLIB_MAGNETICCIRCLE_HPP)
@@ -106,7 +106,8 @@ namespace GeographicLib {
      *
      * @param[in] lon longitude of the point (degrees).
      * @param[out] Bx the easterly component of the magnetic field (nanotesla).
-     * @param[out] By the northerly component of the magnetic field (nanotesla).
+     * @param[out] By the northerly component of the magnetic field
+     *   (nanotesla).
      * @param[out] Bz the vertical (up) component of the magnetic field
      *   (nanotesla).
      **********************************************************************/
@@ -121,7 +122,8 @@ namespace GeographicLib {
      *
      * @param[in] lon longitude of the point (degrees).
      * @param[out] Bx the easterly component of the magnetic field (nanotesla).
-     * @param[out] By the northerly component of the magnetic field (nanotesla).
+     * @param[out] By the northerly component of the magnetic field
+     *   (nanotesla).
      * @param[out] Bz the vertical (up) component of the magnetic field
      *   (nanotesla).
      * @param[out] Bxt the rate of change of \e Bx (nT/yr).
@@ -146,7 +148,7 @@ namespace GeographicLib {
      *   the value inherited from the MagneticModel object used in the
      *   constructor.
      **********************************************************************/
-    Math::real MajorRadius() const
+    Math::real EquatorialRadius() const
     { return Init() ? _a : Math::NaN(); }
     /**
      * @return \e f the flattening of the ellipsoid.  This is the value
@@ -170,6 +172,11 @@ namespace GeographicLib {
     Math::real Time() const
     { return Init() ? _t : Math::NaN(); }
 
+    /**
+      * \deprecated An old name for EquatorialRadius().
+      **********************************************************************/
+    // GEOGRAPHICLIB_DEPRECATED("Use EquatorialRadius()")
+    Math::real MajorRadius() const { return EquatorialRadius(); }
     ///@}
   };
 

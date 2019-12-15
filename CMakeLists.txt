@@ -2,8 +2,8 @@ project (GeographicLib)
 
 # Version information
 set (PROJECT_VERSION_MAJOR 1)
-set (PROJECT_VERSION_MINOR 46)
-set (PROJECT_VERSION_PATCH 0)
+set (PROJECT_VERSION_MINOR 50)
+set (PROJECT_VERSION_PATCH 1)
 set (PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
 if (PROJECT_VERSION_PATCH GREATER 0)
   set (PROJECT_VERSION "${PROJECT_VERSION}.${PROJECT_VERSION_PATCH}")
@@ -42,12 +42,12 @@ endif ()
 
 # The library version tracks the numbering given by libtool in the
 # autoconf set up.
-set (LIBVERSION_API 17)
-set (LIBVERSION_BUILD 17.0.0)
+set (LIBVERSION_API 19)
+set (LIBVERSION_BUILD 19.0.1)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
-cmake_minimum_required (VERSION 2.8.4) # This version was released 2011-02-16
+cmake_minimum_required (VERSION 3.1.0) # This version was released 2014-12-15
 
 # User-settable variables
 
@@ -61,51 +61,13 @@ cmake_minimum_required (VERSION 2.8.4) # This version was released 2011-02-16
 # CMAKE_INSTALL_PREFIX being used when it's ON.
 
 if (WIN32)
-  option (COMMON_INSTALL_PATH "Use a common installation path for packages" OFF)
+  option (COMMON_INSTALL_PATH "Use a common installation path for packages"
+    OFF)
 else ()
   option (COMMON_INSTALL_PATH "Use a common installation path for packages" ON)
 endif ()
 
-# The use of PACKAGE_PATH and INSTALL_PATH is now DEPRECATED.
-# (2) PACKAGE_PATH and INSTALL_PATH govern the find_package search
-# path and the installation directory.  (find_package is not used by
-# GeographicLib since it doesn't depend on other packages.  However
-# PACKAGE_PATH is used here for uniformity with other packages which
-# adopt the same conventions.)
-#
-# If PACKAGE_PATH is defined, it is prepended to CMAKE_PREFIX_PATH.
-#
-# If INSTALL_PATH is not specified but PACKAGE_PATH is, then
-# INSTALL_PATH is set to
-#   ${PACKAGE_PATH}, if COMMON_INSTALL_PATH is ON;
-#   ${PACKAGE_PATH}/${PROJECT_NAME}-${PROJECT_VERSION}, otherwise.
-#
-# If INSTALL_PATH is now defined, then set CMAKE_INSTALL_PREFIX to
-# INSTALL_PATH.
-#
-# Typically, only PACKAGE_PATH needs to be specified, e.g.,
-# cmake -D PACKAGE_PATH=/opt .. (on Linux)
-#   => CMAKE_PREFIX_PATH=/opt   CMAKE_INSTALL_PREFIX=/opt
-# cmake -D PACKAGE_PATH=C:/pkg .. (on Windows)
-#   => CMAKE_PREFIX_PATH=C:/pkg CMAKE_INSTALL_PREFIX=C:/pkg/GeographicLib-1.22
-
-if (PACKAGE_PATH)
-  set (CMAKE_PREFIX_PATH ${PACKAGE_PATH} ${CMAKE_PREFIX_PATH})
-  message (STATUS "CMAKE_PREFIX_PATH set to ${CMAKE_PREFIX_PATH}")
-endif ()
-
-if (NOT INSTALL_PATH AND PACKAGE_PATH)
-  if (COMMON_INSTALL_PATH)
-    set (INSTALL_PATH ${PACKAGE_PATH} CACHE PATH "Installation directory" FORCE)
-  else ()
-    set (INSTALL_PATH ${PACKAGE_PATH}/${PROJECT_NAME}-${PROJECT_VERSION}
-      CACHE PATH "Installation directory" FORCE)
-  endif ()
-endif ()
-if (INSTALL_PATH)
-  file (TO_CMAKE_PATH ${INSTALL_PATH} CMAKE_INSTALL_PREFIX)
-  message (STATUS "CMAKE_INSTALL_PREFIX set to ${CMAKE_INSTALL_PREFIX}")
-endif ()
+# (2) PACKAGE_PATH and INSTALL_PATH have now been removed
 
 # (3) Where to look for data files.  Various classes look in the geoids,
 # gravity, magnetic, subdirectories of ${GEOGRAPHICLIB_DATA}.
@@ -160,7 +122,7 @@ else ()
 endif ()
 
 if (GEOGRAPHICLIB_SHARED_LIB)
-  set (PROJECT_SHARED_LIBRARIES GeographicLib)
+  set (PROJECT_SHARED_LIBRARIES GeographicLib_SHARED)
   set (PROJECT_LIBRARIES ${PROJECT_SHARED_LIBRARIES})
   set (PROJECT_SHARED_DEFINITIONS -DGEOGRAPHICLIB_SHARED_LIB=1)
   set (PROJECT_DEFINITIONS ${PROJECT_SHARED_DEFINITIONS})
@@ -170,6 +132,12 @@ else ()
   set (PROJECT_SHARED_DEFINITIONS)
   set (PROJECT_DEFINITIONS ${PROJECT_STATIC_DEFINITIONS})
 endif ()
+
+set (PROJECT_INTERFACE_LIBRARIES GeographicLib)
+set (PROJECT_ALL_LIBRARIES
+  ${PROJECT_STATIC_LIBRARIES}
+  ${PROJECT_SHARED_LIBRARIES}
+  ${PROJECT_INTERFACE_LIBRARIES})
 
 # (5) Create the documentation?  This depends on whether doxygen can be
 # found.  If this is OFF, then links will be provided to the online
@@ -198,11 +166,34 @@ set_property (CACHE GEOGRAPHICLIB_PRECISION PROPERTY STRINGS 1 2 3 4 5)
 option (PACKAGE_DEBUG_LIBS
   "Include debug versions of library in binary package" OFF)
 
+# (9) Try to link against boost when building the examples.  The
+# NearestNeighbor example optionally uses the Boost library.  Set to ON,
+# if you want to exercise this functionality.  Default is OFF, so that
+# cmake configuration isn't slowed down looking for Boost.
+option (USE_BOOST_FOR_EXAMPLES
+  "Look for Boost library when compiling examples" OFF)
+
+# (10) On Mac OS X, build multiple architectures?  Set to ON to build
+# i386 and x86_64.  Default is OFF, meaning build for default
+# architecture.
+option (APPLE_MULTIPLE_ARCHITECTURES
+  "Build multiple architectures for Apple systems" OFF)
+
+# (11) Convert warnings into errors?  Default is OFF.  If the tests
+# directory is present you get this behavior regardless.
+option (CONVERT_WARNINGS_TO_ERRORS "Convert warnings into errors?" OFF)
+
 set (LIBNAME Geographic)
 if (MSVC OR CMAKE_CONFIGURATION_TYPES)
   # For multi-config systems and for Visual Studio, the debug version of
   # the library is called Geographic_d.
   set (CMAKE_DEBUG_POSTFIX _d)
+endif ()
+
+if (EXISTS ${PROJECT_SOURCE_DIR}/tests/CMakeLists.txt)
+  set (DEVELOPER ON)
+else ()
+  set (DEVELOPER OFF)
 endif ()
 
 if (NOT MSVC)
@@ -218,51 +209,98 @@ if (NOT MSVC)
     # Use relative path so that package is relocatable
     set (CMAKE_INSTALL_RPATH "\$ORIGIN/../lib${LIB_SUFFIX}")
   else ()
-    if (CMAKE_VERSION VERSION_LESS 2.8.12)
-      # Use absolute path with MacOSx
-      set (CMAKE_INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}")
-    else ()
-      # cmake 2.8.12 introduced a way to make the package relocatable.
-      # See also INSTALL_RPATH property on the tools.
-      set (CMAKE_MACOSX_RPATH ON)
-    endif ()
+    # cmake 2.8.12 introduced a way to make the package relocatable.
+    # See also INSTALL_RPATH property on the tools.
+    set (CMAKE_MACOSX_RPATH ON)
   endif ()
 endif ()
 
 include (CheckTypeSize)
 check_type_size ("long double" LONG_DOUBLE BUILTIN_TYPES_ONLY)
-set (GEOGRAPHICLIB_HAVE_LONG_DOUBLE ${HAVE_LONG_DOUBLE})
+check_type_size ("double" DOUBLE BUILTIN_TYPES_ONLY)
+if (HAVE_LONG_DOUBLE AND (LONG_DOUBLE GREATER DOUBLE))
+  set (GEOGRAPHICLIB_HAVE_LONG_DOUBLE TRUE)
+else ()
+  set (GEOGRAPHICLIB_HAVE_LONG_DOUBLE FALSE)
+endif ()
 include (TestBigEndian)
 test_big_endian (GEOGRAPHICLIB_WORDS_BIGENDIAN)
 
 # Make the compiler more picky.
+include (CheckCXXCompilerFlag)
 if (MSVC)
   string (REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
   # Turn on parallel builds for Visual Studio
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /MP")
 else ()
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
-  # check for C++11 support.  This flag is *not* propagated to clients
-  # that use GeographicLib.  However, this is of no consequence.  When
-  # the client code is being compiled (and the GeographicLib headers
-  # being included), work-alike substitutions are used.
-  include (CheckCXXCompilerFlag)
-  foreach (_F 1z 14 1y 11 0x)
-    set (CXX11_FLAG "-std=c++${_F}")
-    set (_T CXX11TEST${_F})
-    check_cxx_compiler_flag (${CXX11_FLAG} ${_T})
-    if (${_T})
-      break ()
+  set (FLOAT_CONVERSION_FLAG "-Wfloat-conversion")
+  check_cxx_compiler_flag (${FLOAT_CONVERSION_FLAG} FLOAT_CONVERSION)
+  if (NOT FLOAT_CONVERSION)
+    set (FLOAT_CONVERSION_FLAG)
+  endif ()
+  set (CMAKE_CXX_FLAGS
+    "${CMAKE_CXX_FLAGS} -Wall -Wextra ${FLOAT_CONVERSION_FLAG}")
+  # g++ 6.0 defaults to -std=gnu++14
+  if (NOT (CMAKE_CXX_COMPILER_ID STREQUAL GNU AND
+        NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6.0)
+      # but Boost 1.60 quadmath needs c++14 and not gnu++14
+      # OR GEOGRAPHICLIB_PRECISION EQUAL 4
+      # This exception is no longer needed with Boost 1.66
+      )
+    # check for C++11 support.  This flag is *not* propagated to clients
+    # that use GeographicLib.  However, this is of no consequence.  When
+    # the client code is being compiled (and the GeographicLib headers
+    # being included), work-alike substitutions are used.
+    # The only "deprecated" flag included here is "0x" to activate C++11
+    # with old versions of g++.
+    # Note: C++11 (actually gnu++14) support is turned on by default in
+    # g++ 6.1 and later.
+    # Don't include 17 for Intel.
+    foreach (_F 14 11 0x)
+      set (CXX11_FLAG "-std=c++${_F}")
+      set (_T CXX11TEST${_F})
+      check_cxx_compiler_flag (${CXX11_FLAG} ${_T})
+      if (${_T})
+        break ()
+      endif ()
+      unset (CXX11_FLAG)
+    endforeach ()
+    if (CXX11_FLAG)
+      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAG}")
     endif ()
-    unset (CXX11_FLAG)
-  endforeach ()
-  if (CXX11_FLAG)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAG}")
+  endif ()
+endif ()
+if (DEVELOPER OR CONVERT_WARNINGS_TO_ERRORS)
+  if (MSVC)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
+    set (CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /WX")
+    set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /WX")
+    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /WX")
+  else ()
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+  endif ()
+endif ()
+
+# Tell Intel compiler to do arithmetic accurately.  This is needed to
+# stop the compiler from ignoring parentheses in expressions like
+# (a + b) + c and from simplifying 0.0 + x to x (which is wrong if
+# x = -0.0).
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+  if (MSVC)
+    set (CMAKE_CXX_FLAGS
+      "${CMAKE_CXX_FLAGS} /fp:precise /Qdiag-disable:11074,11076")
+  else ()
+    set (CMAKE_CXX_FLAGS
+      "${CMAKE_CXX_FLAGS} -fp-model precise -diag-disable=11074,11076")
   endif ()
 endif ()
 
 include (CheckCXXSourceCompiles)
-set (CMAKE_REQUIRED_FLAGS "${CMAKE_CXX_FLAGS}")
+if (MSVC)
+  set (CMAKE_REQUIRED_FLAGS "${CMAKE_CXX_FLAGS} /WX")
+else ()
+  set (CMAKE_REQUIRED_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+endif ()
 # Check whether the C++11 math function: std::expm1, std::atanh,
 # etc. are available.  This flag is *not* propagated to clients that use
 # GeographicLib.  However, this is of no consequence.  When the client
@@ -276,8 +314,9 @@ int main() {
              std::log1p(2.0) + std::asinh(10.0) +
              std::atanh(0.8) + std::cbrt(8.0) +
              std::fma(1.0, 2.0, 3.0) + std::remquo(100.0, 90.0, &q) +
-             std::remainder(100.0, 90.0) + std::copysign(1.0, -0.0)) +
-             std::isfinite(4.0) + std::isnan(0.0);
+             std::remainder(100.0, 90.0) + std::copysign(1.0, -0.0) +
+             std::round(3.5)) +
+         std::isfinite(4.0) + std::isnan(0.0) + int(std::lround(-3.5));
 }\n" CXX11_MATH)
 if (CXX11_MATH)
   add_definitions (-DGEOGRAPHICLIB_CXX11_MATH=1)
@@ -306,6 +345,17 @@ endif ()
 # first because that's where Config.h will be
 include_directories ("${PROJECT_BINARY_DIR}/include" include)
 
+if (USE_BOOST_FOR_EXAMPLES)
+  # quad precision numbers appeared in Boost 1.54.  Various
+  # workarounds stopped being needed with Boost 1.64.
+  find_package (Boost 1.64 COMPONENTS serialization)
+elseif (GEOGRAPHICLIB_PRECISION EQUAL 4)
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CXX11_MATH)
+    find_package (Boost 1.64)
+  endif ()
+endif ()
+
+set (HIGHPREC_LIBRARIES)
 if (GEOGRAPHICLIB_PRECISION EQUAL 1)
   message (WARNING "Compiling with floats which results in poor accuracy")
 elseif (GEOGRAPHICLIB_PRECISION EQUAL 2)
@@ -317,32 +367,19 @@ elseif (GEOGRAPHICLIB_PRECISION EQUAL 3)
     set (GEOGRAPHICLIB_PRECISION 2)
   endif ()
 elseif (GEOGRAPHICLIB_PRECISION EQUAL 4)
-  if (CMAKE_CXX_COMPILER_ID STREQUAL GNU AND CXX11_MATH)
-    # quad precision numbers appeared in Boost 1.54.
-    find_package (Boost 1.54)
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CXX11_MATH)
     if (Boost_FOUND)
       include_directories ("${Boost_INCLUDE_DIRS}")
-      set (QUAD_LIBRARIES quadmath)
-      if (NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
-        # Enable Q suffix for quad precision in g++ 4.8 and later
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals")
-      endif ()
-      # Boost uses std::auto_ptr which is deprecated in C++11.  Suppress
-      # ensuing warnings.  See also
-      # https://svn.boost.org/trac/boost/ticket/11411
-      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
-      # Suppress the warnings that boost can spew out, e.g.,
-      #   "typedef 'boost_concept_check905' locally defined but not used"
-      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
+      set (HIGHPREC_LIBRARIES quadmath)
     endif ()
   endif ()
-  if (NOT QUAD_LIBRARIES)
+  if (NOT HIGHPREC_LIBRARIES)
     message (WARNING "Cannot support quad precision, switching to double")
     set (GEOGRAPHICLIB_PRECISION 2)
   endif ()
 elseif (GEOGRAPHICLIB_PRECISION EQUAL 5)
   if (CXX11_MATH)
-    # Install MPFR C++ version 3.6.2 or later from
+    # Install MPFR C++ version 3.6.5 (2016-12-19) or later from
     # http://www.holoborodko.com/pavel/mpfr and install mpreal.h in the
     # include directory.  NOTE: MPFR C++ is covered by the GPL; be sure
     # to abide by the terms of this license.
@@ -371,7 +408,7 @@ elseif (GEOGRAPHICLIB_PRECISION EQUAL 5)
         # Studio (specifically version 12).
         link_directories (mpfr_mpir_x86_x64_msvc2010/mpfr/dll/${_ARCH}/Release
           mpfr_mpir_x86_x64_msvc2010/mpir/dll/${_ARCH}/Release)
-        set (MPFR_LIBRARIES mpfr mpir)
+        set (HIGHPREC_LIBRARIES mpfr mpir)
         # Suppress the myriad of "conditional expression is constant"
         # warnings
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4127")
@@ -382,19 +419,19 @@ elseif (GEOGRAPHICLIB_PRECISION EQUAL 5)
         link_directories (/usr/local/lib)
       endif ()
       # g++ before 4.5 doesn't work (no explicit cast operator)
-      if (NOT (CMAKE_CXX_COMPILER_ID STREQUAL GNU AND
+      if (NOT (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND
             CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.5))
-        set (MPFR_LIBRARIES mpfr gmp)
+        set (HIGHPREC_LIBRARIES mpfr gmp)
       endif ()
     endif ()
   endif ()
-  if (NOT MPFR_LIBRARIES)
+  if (NOT HIGHPREC_LIBRARIES)
     message (WARNING "Cannot support mpfr, switching to double")
     set (GEOGRAPHICLIB_PRECISION 2)
   endif ()
 endif ()
 
-if (APPLE AND GEOGRAPHICLIB_PRECISION EQUAL 2)
+if (APPLE AND APPLE_MULTIPLE_ARCHITECTURES)
   if (CMAKE_SYSTEM_PROCESSOR MATCHES "i.86" OR
       CMAKE_SYSTEM_PROCESSOR MATCHES "amd64" OR
       CMAKE_SYSTEM_PROCESSOR MATCHES "x86")
@@ -463,8 +500,8 @@ endif ()
 set (TOOLS CartConvert ConicProj GeodesicProj GeoConvert GeodSolve
   GeoidEval Gravity MagneticField Planimeter RhumbSolve TransverseMercatorProj)
 # The list of scripts (to be installed into, e.g., /usr/local/sbin)
-set (SCRIPTS
-  geographiclib-get-geoids geographiclib-get-gravity geographiclib-get-magnetic)
+set (SCRIPTS geographiclib-get-geoids geographiclib-get-gravity
+  geographiclib-get-magnetic)
 
 set_property (GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -489,7 +526,7 @@ if (MSVC AND BUILD_NETGEOGRAPHICLIB)
   endif ()
 endif ()
 add_subdirectory (cmake)
-if (EXISTS ${PROJECT_SOURCE_DIR}/tests/CMakeLists.txt)
+if (DEVELOPER)
   add_subdirectory (tests)
 endif ()
 
@@ -537,30 +574,31 @@ if (WIN32)
   # The Windows binary packager is NSIS.  Set the necessary variables
   # for this.
   set (CPACK_NSIS_CONTACT "charles@karney.com")
-  set (CPACK_NSIS_URL_INFO_ABOUT "http://geographiclib.sourceforge.net")
+  set (CPACK_NSIS_URL_INFO_ABOUT "https://geographiclib.sourceforge.io")
   set (CPACK_NSIS_HELP_LINK "mailto:charles@karney.com")
+  # No provision for accommodating different compiler versions.  However
+  # the Visual Studio 14 2015 build works also with Visual Studio 15
+  # 2017 and Visual Studio 16 2019.
   if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    # Hardcode the prefix for Visual Studio 12
-    set (CPACK_NSIS_INSTALL_ROOT "C:\\\\pkg-vc12-x64")
+    set (CPACK_NSIS_INSTALL_ROOT "C:\\\\Program Files")
     set (CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY}-win64")
     set (CPACK_NSIS_PACKAGE_NAME "${PROJECT_NAME} x64 ${PROJECT_VERSION}")
     set (CPACK_PACKAGE_INSTALL_REGISTRY_KEY
       "${PROJECT_NAME}-x64-${PROJECT_VERSION}")
   else ()
-    # Hardcode the prefix for Visual Studio 12
-    set (CPACK_NSIS_INSTALL_ROOT "C:\\\\pkg-vc12")
+    set (CPACK_NSIS_INSTALL_ROOT "C:\\\\Program Files (x86)")
     set (CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY}-win32")
-    set (CPACK_NSIS_PACKAGE_NAME "${PROJECT_NAME} ${PROJECT_VERSION}")
+    set (CPACK_NSIS_PACKAGE_NAME "${PROJECT_NAME} win32 ${PROJECT_VERSION}")
     set (CPACK_PACKAGE_INSTALL_REGISTRY_KEY
-      "${PROJECT_NAME}-${PROJECT_VERSION}")
+      "${PROJECT_NAME}-win32-${PROJECT_VERSION}")
   endif ()
   set (CPACK_NSIS_DISPLAY_NAME ${CPACK_NSIS_PACKAGE_NAME})
   set (CPACK_NSIS_MENU_LINKS
-    "http://geographiclib.sourceforge.net/${PROJECT_VERSION}/index.html"
+    "https://geographiclib.sourceforge.io/${PROJECT_VERSION}/index.html"
     "Library documentation"
-    "http://geographiclib.sourceforge.net/${PROJECT_VERSION}/utilities.html"
+    "https://geographiclib.sourceforge.io/${PROJECT_VERSION}/utilities.html"
     "Utilities documentation"
-    "http://geographiclib.sourceforge.net" "GeographicLib home page"
+    "https://geographiclib.sourceforge.io" "GeographicLib home page"
     "https://sourceforge.net/projects/geographiclib/" "Main project page")
   set (CPACK_NSIS_MODIFY_PATH ON)
 elseif (APPLE)
@@ -621,4 +659,5 @@ if (MAINTAINER)
 endif ()
 
 # The test suite -- split into a separate file because it's rather large.
+# N.B. Many of the tests fail with GEOGRAPHICLIB_PRECISION = 1 (float).
 include (tools/tests.cmake)

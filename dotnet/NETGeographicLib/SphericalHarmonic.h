@@ -7,7 +7,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 namespace NETGeographicLib
@@ -97,7 +97,7 @@ namespace NETGeographicLib
            * <b>P</b><sub><i>n</i></sub><sup><i>m</i></sup>(\e z), where
            * <b>P</b><sub><i>n</i></sub><sup><i>m</i></sup>(\e z) is Ferrers
            * function (also known as the Legendre function on the cut or the
-           * associated Legendre polynomial) http://dlmf.nist.gov/14.7.E10 and \e k
+           * associated Legendre polynomial) https://dlmf.nist.gov/14.7.E10 and \e k
            * = 1 for \e m = 0 and \e k = 2 otherwise.
            *
            * The mean squared value of
@@ -117,7 +117,7 @@ namespace NETGeographicLib
            * (\e n + \e m)!)  <b>P</b><sub><i>n</i></sub><sup><i>m</i></sup>(\e z),
            * where <b>P</b><sub><i>n</i></sub><sup><i>m</i></sup>(\e z) is Ferrers
            * function (also known as the Legendre function on the cut or the
-           * associated Legendre polynomial) http://dlmf.nist.gov/14.7.E10 and \e k
+           * associated Legendre polynomial) https://dlmf.nist.gov/14.7.E10 and \e k
            * = 1 for \e m = 0 and \e k = 2 otherwise.
            *
            * The mean squared value of

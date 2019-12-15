@@ -42,18 +42,18 @@ The public attributes for this class are
 # This is a rather literal translation of the GeographicLib::GeodesicLine class
 # to python.  See the documentation for the C++ class for more information at
 #
-#    http://geographiclib.sourceforge.net/html/annotated.html
+#    https://geographiclib.sourceforge.io/html/annotated.html
 #
 # The algorithms are derived in
 #
 #    Charles F. F. Karney,
 #    Algorithms for geodesics, J. Geodesy 87, 43-55 (2013),
-#    https://dx.doi.org/10.1007/s00190-012-0578-z
-#    Addenda: http://geographiclib.sourceforge.net/geod-addenda.html
+#    https://doi.org/10.1007/s00190-012-0578-z
+#    Addenda: https://geographiclib.sourceforge.io/geod-addenda.html
 #
-# Copyright (c) Charles Karney (2011-2016) <charles@karney.com> and licensed
+# Copyright (c) Charles Karney (2011-2019) <charles@karney.com> and licensed
 # under the MIT/X11 License.  For more information, see
-# http://geographiclib.sourceforge.net/
+# https://geographiclib.sourceforge.io/
 ######################################################################
 
 import math
@@ -112,7 +112,7 @@ class GeodesicLine(object):
       """the cosine of the azimuth at the first point (readonly)"""
 
     # real cbet1, sbet1
-    sbet1, cbet1 = Math.sincosd(Math.AngRound(lat1)); sbet1 *= self._f1
+    sbet1, cbet1 = Math.sincosd(Math.AngRound(self.lat1)); sbet1 *= self._f1
     # Ensure cbet1 = +epsilon at poles
     sbet1, cbet1 = Math.norm(sbet1, cbet1); cbet1 = max(Geodesic.tiny_, cbet1)
     self._dn1 = math.sqrt(1 + geod._ep2 * Math.sq(sbet1))
@@ -205,6 +205,7 @@ class GeodesicLine(object):
     else:
       # Interpret s12_a12 as distance
       tau12 = s12_a12 / (self._b * (1 + self._A1m1))
+      tau12 = tau12 if Math.isfinite(tau12) else Math.nan
       s = math.sin(tau12); c = math.cos(tau12)
       # tau2 = tau1 + tau12
       B12 = - Geodesic._SinCosSeries(True,
@@ -293,7 +294,6 @@ class GeodesicLine(object):
       lat2 = Math.atan2d(sbet2, self._f1 * cbet2)
 
     if outmask & Geodesic.AZIMUTH:
-      # minus signs give range [-180, 180). 0- converts -0 to +0.
       azi2 = Math.atan2d(salp2, calp2)
 
     if outmask & (Geodesic.REDUCEDLENGTH | Geodesic.GEODESICSCALE):

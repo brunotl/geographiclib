@@ -48,12 +48,13 @@ function geoid = geoid_load(name, dir)
 %   Information on downloading and installing the data for the supported
 %   geoid models is available at
 %
-%     http://geographiclib.sourceforge.net/html/geoid.html#geoidinst
+%     https://geographiclib.sourceforge.io/html/geoid.html#geoidinst
 %
 %   See also GEOID_HEIGHT.
 
-% Copyright (c) Charles Karney (2015) <charles@karney.com>.
+% Copyright (c) Charles Karney (2015-2019) <charles@karney.com>.
 
+  narginchk(0, 2)
   if nargin < 1
     file = geoid_file;
   elseif nargin < 2

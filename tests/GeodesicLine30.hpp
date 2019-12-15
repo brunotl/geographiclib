@@ -2,9 +2,9 @@
  * \file GeodesicLine30.hpp
  * \brief Header for GeographicLib::GeodesicLine30 class
  *
- * Copyright (c) Charles Karney (2009-2011) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2009-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #if !defined(GEOGRAPHICLIB_GEODESICLINEEXACT_HPP)
@@ -30,17 +30,17 @@ namespace GeographicLib {
    *
    * The calculations are accurate to better than 15 nm (15 nanometers).  See
    * Sec. 9 of
-   * <a href="http://arxiv.org/abs/1102.1215v1">arXiv:1102.1215v1</a> for
+   * <a href="https://arxiv.org/abs/1102.1215v1">arXiv:1102.1215v1</a> for
    * details.
    *
    * The algorithms are described in
    * - C. F. F. Karney,
-   *   <a href="https://dx.doi.org/10.1007/s00190-012-0578-z">
+   *   <a href="https://doi.org/10.1007/s00190-012-0578-z">
    *   Algorithms for geodesics</a>,
    *   J. Geodesy <b>87</b>, 43--55 (2013);
-   *   DOI: <a href="https://dx.doi.org/10.1007/s00190-012-0578-z">
+   *   DOI: <a href="https://doi.org/10.1007/s00190-012-0578-z">
    *   10.1007/s00190-012-0578-z</a>;
-   *   <a href="http://geographiclib.sourceforge.net/geod-addenda.html">
+   *   <a href="https://geographiclib.sourceforge.io/geod-addenda.html">
    *   addenda</a>.
    * .
    * For more information on geodesics see \ref geodesic.
@@ -531,6 +531,7 @@ namespace GeographicLib {
      * the equator in a northward direction.
      **********************************************************************/
     real EquatorialAzimuth() const {
+      using std::atan2;
       return Init() ?
         atan2(_salp0, _calp0) / Math::degree<real>() : Math::NaN<real>();
     }
@@ -540,6 +541,7 @@ namespace GeographicLib {
      * crossing and point 1.
      **********************************************************************/
     real EquatorialArc() const {
+      using std::atan2;
       return Init() ?
         atan2(_ssig1, _csig1) / Math::degree<real>() : Math::NaN<real>();
     }
@@ -549,7 +551,7 @@ namespace GeographicLib {
      *   the value inherited from the Geodesic30 object used in the
      *   constructor.
      **********************************************************************/
-    real MajorRadius() const
+    real EquatorialRadius() const
     { return Init() ? _a : Math::NaN<real>(); }
 
     /**

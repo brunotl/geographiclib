@@ -5,7 +5,7 @@
 #
 # Copyright (c) Charles Karney (2011-2014) <charles@karney.com> and
 # licensed under the MIT/X11 License.  For more information, see
-# http://geographiclib.sourceforge.net/
+# https://geographiclib.sourceforge.io/
 
 . ./utils.sh
 OPTION=`lookupkey "$QUERY_STRING" option`
@@ -31,16 +31,16 @@ if test "$INPUT"; then
     HEIGHT96=`echo $INPUT |
     $EXECDIR/$COMMAND -n egm96-5 | head -1`
     if test $? -eq 0; then
-	POSITION1=`echo $INPUT | $EXECDIR/GeoConvert | head -1`
-	POSITION1=`geohack $POSITION1 $POSITION1 Black`
-	POSITION2=\(`echo $INPUT | $EXECDIR/GeoConvert -d -p -1 | head -1`\)
-	HEIGHT2008=`echo $INPUT |
-	$EXECDIR/$COMMAND -n egm2008-1 | head -1`
-	HEIGHT84=`echo $INPUT |
-	$EXECDIR/$COMMAND -n egm84-15 | head -1`
+        POSITION1=`echo $INPUT | $EXECDIR/GeoConvert | head -1`
+        POSITION1=`geohack $POSITION1 $POSITION1 Black`
+        POSITION2=\(`echo $INPUT | $EXECDIR/GeoConvert -d -p -1 | head -1`\)
+        HEIGHT2008=`echo $INPUT |
+        $EXECDIR/$COMMAND -n egm2008-1 | head -1`
+        HEIGHT84=`echo $INPUT |
+        $EXECDIR/$COMMAND -n egm84-15 | head -1`
     else
-	POSITION1=`encodevalue "$HEIGHT96"`
-	HEIGHT96=
+        POSITION1=`encodevalue "$HEIGHT96"`
+        HEIGHT96=
     fi
     # echo `date +"%F %T"` "$COMMAND: $INPUT" >> ../persistent/utilities.log
 fi
@@ -56,27 +56,29 @@ cat <<EOF
     <meta name="description" content="Online geoid calculator" />
     <meta name="author" content="Charles F. F. Karney" />
     <meta name="keywords"
-	  content="geoid height,
-		   orthometric height,
-		   earth gravity model,
-		   EGM84, EGM96, EGM2008,
-		   mean sea level, MSL,
-		   height above ellipsoid, HAE,
-		   vertical datum,
-		   latitude and longitude,
-		   online calculator,
-		   WGS84 ellipsoid,
-		   GeographicLib" />
+          content="geoid height,
+                   orthometric height,
+                   earth gravity model,
+                   EGM84, EGM96, EGM2008,
+                   mean sea level, MSL,
+                   height above ellipsoid, HAE,
+                   vertical datum,
+                   latitude and longitude,
+                   online calculator,
+                   WGS84 ellipsoid,
+                   GeographicLib" />
   </head>
   <body>
     <h3>
       Online geoid calculations using the
-      <a href="http://geographiclib.sourceforge.net/html/GeoidEval.1.html">
-	GeoidEval</a> utility
+      <a href="https://geographiclib.sourceforge.io/html/GeoidEval.1.html">
+        GeoidEval</a> utility
     </h3>
     <form action="/cgi-bin/GeoidEval" method="get">
       <p>
-        Position (ex. &laquo;<tt>16.78 -3.01</tt>&raquo;, &laquo;<tt>16d46'33"N 3d0.6'W</tt>&raquo;):<br>
+        Position
+        (ex. &laquo;<tt>16.78 -3.01</tt>&raquo;,
+        &laquo;<tt>16d46'33"N 3d0.6'W</tt>&raquo;):<br>
         &nbsp;&nbsp;&nbsp;
         <input type=text name="input" size=30 value="$INPUTENC">
       </p>
@@ -91,14 +93,14 @@ cat <<EOF
 <font size="4"><pre>
     lat lon = $POSITION1 `convertdeg "$POSITION2"`
     geoid heights (m)
-	<a href="http://earth-info.nga.mil/GandG/wgs84/gravitymod/egm2008">EGM2008</a> = $F`encodevalue "$HEIGHT2008"`$G
-	<a href="http://earth-info.nga.mil/GandG/wgs84/gravitymod/egm96/egm96.html">EGM96</a>   = $F`encodevalue "$HEIGHT96"`$G
-	<a href="http://earth-info.nga.mil/GandG/wgs84/gravitymod/wgs84_180/wgs84_180.html">EGM84</a>   = $F`encodevalue "$HEIGHT84"`$G</pre></font>
+        <a href="http://earth-info.nga.mil/GandG/wgs84/gravitymod/egm2008">EGM2008</a> = $F`encodevalue "$HEIGHT2008"`$G
+        <a href="http://earth-info.nga.mil/GandG/wgs84/gravitymod/egm96/egm96.html">EGM96</a>   = $F`encodevalue "$HEIGHT96"`$G
+        <a href="http://earth-info.nga.mil/GandG/wgs84/gravitymod/wgs84_180/wgs84_180.html">EGM84</a>   = $F`encodevalue "$HEIGHT84"`$G</pre></font>
       </p>
     </form>
     <hr>
     <p>
-      <a href="http://geographiclib.sourceforge.net/html/GeoidEval.1.html">
+      <a href="https://geographiclib.sourceforge.io/html/GeoidEval.1.html">
         GeoidEval (version $VERSION)</a>
       computes the height of the geoid above the WGS84 ellipsoid
       using interpolation in a grid of values for the earth
@@ -119,8 +121,8 @@ cat <<EOF
         3:0:34W 16:46:33N</pre>
       The coordinates can also be given in UTM, UPS, or MGRS coordinates (see
       the documentation on the
-      <a href="http://geographiclib.sourceforge.net/html/GeoConvert.1.html">
-	GeoConvert</a> utility).
+      <a href="https://geographiclib.sourceforge.io/html/GeoConvert.1.html">
+        GeoConvert</a> utility).
     </p>
     <p>
       The height of the geoid above the ellipsoid, <i>N</i>, is
@@ -129,25 +131,25 @@ cat <<EOF
       height above the geoid (the orthometric height, roughly the height
       above mean sea level), <i>H</i>, using the relations
       <blockquote>
-	<i>h</i> = <i>N</i> + <i>H</i>;
-	&nbsp;&nbsp;<i>H</i> = &minus;<i>N</i> + <i>h</i>.
+        <i>h</i> = <i>N</i> + <i>H</i>;
+        &nbsp;&nbsp;<i>H</i> = &minus;<i>N</i> + <i>h</i>.
       </blockquote>
     </p>
     <p>
-      <a href="http://geographiclib.sourceforge.net/html/GeoidEval.1.html">
+      <a href="https://geographiclib.sourceforge.io/html/GeoidEval.1.html">
         GeoidEval</a>,
       which is a simple wrapper of the
-      <a href="http://geographiclib.sourceforge.net/html/classGeographicLib_1_1Geoid.html">
+      <a href="https://geographiclib.sourceforge.io/html/classGeographicLib_1_1Geoid.html">
         GeographicLib::Geoid</a> class,
       is one of the utilities provided
-      with <a href="http://geographiclib.sourceforge.net/">
+      with <a href="https://geographiclib.sourceforge.io/">
         GeographicLib</a>.
       This web interface illustrates a subset of its capabilities.  If
       you wish to use GeoidEval directly,
       <a href="https://sourceforge.net/projects/geographiclib/files/distrib">
         download</a>
       and compile GeographicLib.  A description of the methods is given
-      <a href="http://geographiclib.sourceforge.net/html/geoid.html">
+      <a href="https://geographiclib.sourceforge.io/html/geoid.html">
         here</a>.
     </p>
     <p>
@@ -156,7 +158,7 @@ cat <<EOF
     <address>Charles Karney
       <a href="mailto:charles@karney.com">&lt;charles@karney.com&gt;</a>
       (2014-11-06)</address>
-    <a href="http://geographiclib.sourceforge.net">
+    <a href="https://geographiclib.sourceforge.io">
       GeographicLib home
     </a>
   </body>

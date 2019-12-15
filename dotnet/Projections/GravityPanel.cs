@@ -10,7 +10,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 using System;
 using System.Collections.Generic;
@@ -158,7 +158,7 @@ namespace Projections
                 gm.W(5000000.0,5000000.0,5000000.0,out x,out y,out z);
                 NormalGravity ng = new NormalGravity(NormalGravity.StandardModels.GRS80);
                 ng = new NormalGravity( NormalGravity.StandardModels.WGS84);
-                ng = new NormalGravity(6378137.0,3.986005e+14,7.292115147e-5,-1.0,1.08263e-3);
+                ng = new NormalGravity(6378137.0,3.986005e+14,7.292115147e-5,1.08263e-3, false);
                 ng = gm.ReferenceEllipsoid();
                 ng.DynamicalFormFactor(1);
                 Geocentric geo = ng.Earth();

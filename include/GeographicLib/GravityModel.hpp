@@ -2,9 +2,9 @@
  * \file GravityModel.hpp
  * \brief Header for GeographicLib::GravityModel class
  *
- * Copyright (c) Charles Karney (2011) <charles@karney.com> and licensed under
- * the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * Copyright (c) Charles Karney (2011-2019) <charles@karney.com> and licensed
+ * under the MIT/X11 License.  For more information, see
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #if !defined(GEOGRAPHICLIB_GRAVITYMODEL_HPP)
@@ -32,7 +32,7 @@ namespace GeographicLib {
    * models treat only the gravitational field exterior to the mass of the
    * earth.  When computing the field at points near (but above) the surface of
    * the earth a small correction can be applied to account for the mass of the
-   * atomsphere above the point in question; see \ref gravityatmos.
+   * atmosphere above the point in question; see \ref gravityatmos.
    * Determining the height of the geoid above the ellipsoid entails correcting
    * for the mass of the earth above the geoid.  The egm96 and egm2008 include
    * separate correction terms to account for this mass.
@@ -87,6 +87,7 @@ namespace GeographicLib {
     static const int idlength_ = 8;
     std::string _name, _dir, _description, _date, _filename, _id;
     real _amodel, _GMmodel, _zeta0, _corrmult;
+    int _nmx, _mmx;
     SphericalHarmonic::normalization _norm;
     NormalGravity _earth;
     std::vector<real> _Cx, _Sx, _CC, _CS, _zonal;
@@ -165,8 +166,12 @@ namespace GeographicLib {
      *
      * @param[in] name the name of the model.
      * @param[in] path (optional) directory for data file.
+     * @param[in] Nmax (optional) if non-negative, truncate the degree of the
+     *   model this value.
+     * @param[in] Mmax (optional) if non-negative, truncate the order of the
+     *   model this value.
      * @exception GeographicErr if the data file cannot be found, is
-     *   unreadable, or is corrupt.
+     *   unreadable, or is corrupt, or if \e Mmax > \e Nmax.
      * @exception std::bad_alloc if the memory necessary for storing the model
      *   can't be allocated.
      *
@@ -179,9 +184,14 @@ namespace GeographicLib {
      * model.  The coefficients for the spherical harmonic sums are obtained
      * from a file obtained by appending ".cof" to metadata file (so the
      * filename ends in ".egm.cof").
+     *
+     * If \e Nmax &ge; 0 and \e Mmax < 0, then \e Mmax is set to \e Nmax.
+     * After the model is loaded, the maximum degree and order of the model can
+     * be found by the Degree() and Order() methods.
      **********************************************************************/
     explicit GravityModel(const std::string& name,
-                          const std::string& path = "");
+                          const std::string& path = "",
+                          int Nmax = -1, int Mmax = -1);
     ///@}
 
     /** \name Compute gravity in geodetic coordinates
@@ -200,7 +210,8 @@ namespace GeographicLib {
      *   (m s<sup>&minus;2</sup>).
      * @param[out] gz the upward component of the acceleration
      *   (m s<sup>&minus;2</sup>); this is usually negative.
-     * @return \e W the sum of the gravitational and centrifugal potentials.
+     * @return \e W the sum of the gravitational and centrifugal potentials
+     *   (m<sup>2</sup> s<sup>&minus;2</sup>).
      *
      * The function includes the effects of the earth's rotation.
      **********************************************************************/
@@ -220,7 +231,8 @@ namespace GeographicLib {
      *   (m s<sup>&minus;2</sup>).
      * @param[out] deltaz the upward component of the disturbance vector
      *   (m s<sup>&minus;2</sup>).
-     * @return \e T the corresponding disturbing potential.
+     * @return \e T the corresponding disturbing potential
+     *   (m<sup>2</sup> s<sup>&minus;2</sup>).
      **********************************************************************/
     Math::real Disturbance(real lat, real lon, real h,
                            real& deltax, real& deltay, real& deltaz)
@@ -281,7 +293,7 @@ namespace GeographicLib {
      * @return \e W = \e V + &Phi; the sum of the gravitational and
      *   centrifugal potentials (m<sup>2</sup> s<sup>&minus;2</sup>).
      *
-     * This calls NormalGravity::U for  ReferenceEllipsoid().
+     * This calls NormalGravity::U for ReferenceEllipsoid().
      **********************************************************************/
     Math::real W(real X, real Y, real Z,
                  real& gX, real& gY, real& gZ) const;
@@ -356,7 +368,7 @@ namespace GeographicLib {
      *   normal gravitational and centrifugal potentials
      *   (m<sup>2</sup> s<sup>&minus;2</sup>).
      *
-     * This calls NormalGravity::U for  ReferenceEllipsoid().
+     * This calls NormalGravity::U for ReferenceEllipsoid().
      **********************************************************************/
     Math::real U(real X, real Y, real Z,
                  real& gammaX, real& gammaY, real& gammaZ) const
@@ -374,7 +386,7 @@ namespace GeographicLib {
      * @return &Phi; the centrifugal potential (m<sup>2</sup>
      * s<sup>&minus;2</sup>).
      *
-     * This calls NormalGravity::Phi for  ReferenceEllipsoid().
+     * This calls NormalGravity::Phi for ReferenceEllipsoid().
      **********************************************************************/
     Math::real Phi(real X, real Y, real& fX, real& fY) const
     { return _earth.Phi(X, Y, fX, fY); }
@@ -457,7 +469,7 @@ namespace GeographicLib {
     /**
      * @return \e a the equatorial radius of the ellipsoid (meters).
      **********************************************************************/
-    Math::real MajorRadius() const { return _earth.MajorRadius(); }
+    Math::real EquatorialRadius() const { return _earth.EquatorialRadius(); }
 
     /**
      * @return \e GM the mass constant of the model (m<sup>3</sup>
@@ -485,6 +497,22 @@ namespace GeographicLib {
      * @return \e f the flattening of the ellipsoid.
      **********************************************************************/
     Math::real Flattening() const { return _earth.Flattening(); }
+
+    /**
+     * @return \e Nmax the maximum degree of the components of the model.
+     **********************************************************************/
+    int Degree() const { return _nmx; }
+
+    /**
+     * @return \e Mmax the maximum order of the components of the model.
+     **********************************************************************/
+    int Order() const { return _mmx; }
+
+    /**
+      * \deprecated An old name for EquatorialRadius().
+      **********************************************************************/
+    // GEOGRAPHICLIB_DEPRECATED("Use EquatorialRadius()")
+    Math::real MajorRadius() const { return EquatorialRadius(); }
     ///@}
 
     /**

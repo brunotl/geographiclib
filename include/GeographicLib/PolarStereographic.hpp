@@ -2,9 +2,9 @@
  * \file PolarStereographic.hpp
  * \brief Header for GeographicLib::PolarStereographic class
  *
- * Copyright (c) Charles Karney (2008-2015) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2008-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #if !defined(GEOGRAPHICLIB_POLARSTEREOGRAPHIC_HPP)
@@ -25,6 +25,10 @@ namespace GeographicLib {
    *
    * This is a straightforward implementation of the equations in Snyder except
    * that Newton's method is used to invert the projection.
+   *
+   * This class also returns the meridian convergence \e gamma and scale \e k.
+   * The meridian convergence is the bearing of grid north (the \e y axis)
+   * measured clockwise from true north.
    *
    * Example of use:
    * \include example-PolarStereographic.cpp
@@ -91,7 +95,7 @@ namespace GeographicLib {
      * @param[out] k scale of projection at point.
      *
      * No false easting or northing is added.  The value of \e lon returned is
-     * in the range [&minus;180&deg;, 180&deg;).
+     * in the range [&minus;180&deg;, 180&deg;].
      **********************************************************************/
     void Reverse(bool northp, real x, real y,
                  real& lat, real& lon, real& gamma, real& k) const;
@@ -121,7 +125,7 @@ namespace GeographicLib {
      * @return \e a the equatorial radius of the ellipsoid (meters).  This is
      *   the value used in the constructor.
      **********************************************************************/
-    Math::real MajorRadius() const { return _a; }
+    Math::real EquatorialRadius() const { return _a; }
 
     /**
      * @return \e f the flattening of the ellipsoid.  This is the value used in
@@ -135,6 +139,12 @@ namespace GeographicLib {
      * PolarStereographic::SetScale.
      **********************************************************************/
     Math::real CentralScale() const { return _k0; }
+
+    /**
+      * \deprecated An old name for EquatorialRadius().
+      **********************************************************************/
+    // GEOGRAPHICLIB_DEPRECATED("Use EquatorialRadius()")
+    Math::real MajorRadius() const { return EquatorialRadius(); }
     ///@}
 
     /**

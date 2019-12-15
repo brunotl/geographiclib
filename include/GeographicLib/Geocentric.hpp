@@ -2,9 +2,9 @@
  * \file Geocentric.hpp
  * \brief Header for GeographicLib::Geocentric class
  *
- * Copyright (c) Charles Karney (2008-2015) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2008-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #if !defined(GEOGRAPHICLIB_GEOCENTRIC_HPP)
@@ -29,7 +29,7 @@ namespace GeographicLib {
    * The conversion from geographic to geocentric coordinates is
    * straightforward.  For the reverse transformation we use
    * - H. Vermeille,
-   *   <a href="https://dx.doi.org/10.1007/s00190-002-0273-6"> Direct
+   *   <a href="https://doi.org/10.1007/s00190-002-0273-6"> Direct
    *   transformation from geocentric coordinates to geodetic coordinates</a>,
    *   J. Geodesy 76, 451--454 (2002).
    * .
@@ -37,15 +37,15 @@ namespace GeographicLib {
    * results for all finite inputs (even if \e h is infinite).  The changes are
    * described in Appendix B of
    * - C. F. F. Karney,
-   *   <a href="http://arxiv.org/abs/1102.1215v1">Geodesics
+   *   <a href="https://arxiv.org/abs/1102.1215v1">Geodesics
    *   on an ellipsoid of revolution</a>,
    *   Feb. 2011;
    *   preprint
-   *   <a href="http://arxiv.org/abs/1102.1215v1">arxiv:1102.1215v1</a>.
+   *   <a href="https://arxiv.org/abs/1102.1215v1">arxiv:1102.1215v1</a>.
    * .
    * Vermeille similarly updated his method in
    * - H. Vermeille,
-   *   <a href="https://dx.doi.org/10.1007/s00190-010-0419-x">
+   *   <a href="https://doi.org/10.1007/s00190-010-0419-x">
    *   An analytical method to transform geocentric into
    *   geodetic coordinates</a>, J. Geodesy 85, 105--117 (2011).
    * .
@@ -181,15 +181,16 @@ namespace GeographicLib {
      * @param[out] lon longitude of point (degrees).
      * @param[out] h height of point above the ellipsoid (meters).
      *
-     * In general there are multiple solutions and the result which maximizes
-     * \e h is returned.  If there are still multiple solutions with different
-     * latitudes (applies only if \e Z = 0), then the solution with \e lat > 0
-     * is returned.  If there are still multiple solutions with different
-     * longitudes (applies only if \e X = \e Y = 0) then \e lon = 0 is
-     * returned.  The value of \e h returned satisfies \e h &ge; &minus; \e a
-     * (1 &minus; <i>e</i><sup>2</sup>) / sqrt(1 &minus; <i>e</i><sup>2</sup>
-     * sin<sup>2</sup>\e lat).  The value of \e lon returned is in the range
-     * [&minus;180&deg;, 180&deg;).
+     * In general, there are multiple solutions and the result which minimizes
+     * |<i>h</i> |is returned, i.e., (<i>lat</i>, <i>lon</i>) corresponds to
+     * the closest point on the ellipsoid.  If there are still multiple
+     * solutions with different latitudes (applies only if \e Z = 0), then the
+     * solution with \e lat > 0 is returned.  If there are still multiple
+     * solutions with different longitudes (applies only if \e X = \e Y = 0)
+     * then \e lon = 0 is returned.  The value of \e h returned satisfies \e h
+     * &ge; &minus; \e a (1 &minus; <i>e</i><sup>2</sup>) / sqrt(1 &minus;
+     * <i>e</i><sup>2</sup> sin<sup>2</sup>\e lat).  The value of \e lon
+     * returned is in the range [&minus;180&deg;, 180&deg;].
      **********************************************************************/
     void Reverse(real X, real Y, real Z, real& lat, real& lon, real& h)
       const {
@@ -244,7 +245,7 @@ namespace GeographicLib {
      * @return \e a the equatorial radius of the ellipsoid (meters).  This is
      *   the value used in the constructor.
      **********************************************************************/
-    Math::real MajorRadius() const
+    Math::real EquatorialRadius() const
     { return Init() ? _a : Math::NaN(); }
 
     /**
@@ -253,6 +254,12 @@ namespace GeographicLib {
      **********************************************************************/
     Math::real Flattening() const
     { return Init() ? _f : Math::NaN(); }
+
+    /**
+      * \deprecated An old name for EquatorialRadius().
+      **********************************************************************/
+    // GEOGRAPHICLIB_DEPRECATED("Use EquatorialRadius()")
+    Math::real MajorRadius() const { return EquatorialRadius(); }
     ///@}
 
     /**

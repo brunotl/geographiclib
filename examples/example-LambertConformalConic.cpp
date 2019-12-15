@@ -10,7 +10,7 @@ using namespace GeographicLib;
 int main() {
   try {
     // Define the Pennsylvania South state coordinate system EPSG:3364
-    // http://www.spatialreference.org/ref/epsg/3364/
+    // https://www.spatialreference.org/ref/epsg/3364/
     const double
       a = Constants::WGS84_a(),
       f = 1/298.257222101,                      // GRS80
@@ -45,5 +45,4 @@ int main() {
     cerr << "Caught exception: " << e.what() << "\n";
     return 1;
   }
-  return 0;
 }

@@ -2,9 +2,9 @@
  * \file SphericalHarmonic.hpp
  * \brief Header for GeographicLib::SphericalHarmonic class
  *
- * Copyright (c) Charles Karney (2011) <charles@karney.com> and licensed under
- * the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * Copyright (c) Charles Karney (2011-2019) <charles@karney.com> and licensed
+ * under the MIT/X11 License.  For more information, see
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #if !defined(GEOGRAPHICLIB_SPHERICALHARMONIC_HPP)
@@ -45,7 +45,7 @@ namespace GeographicLib {
    *
    * References:
    * - C. W. Clenshaw,
-   *   <a href="https://dx.doi.org/10.1090/S0025-5718-1955-0071856-0">
+   *   <a href="https://doi.org/10.1090/S0025-5718-1955-0071856-0">
    *   A note on the summation of Chebyshev series</a>,
    *   %Math. Tables Aids Comput. 9(51), 118--120 (1955).
    * - R. E. Deakin, Derivatives of the earth's potentials, Geomatics
@@ -53,7 +53,7 @@ namespace GeographicLib {
    * - W. A. Heiskanen and H. Moritz, Physical Geodesy, (Freeman, San
    *   Francisco, 1967).  (See Sec. 1-14, for a definition of Pbar.)
    * - S. A. Holmes and W. E. Featherstone,
-   *   <a href="https://dx.doi.org/10.1007/s00190-002-0216-2">
+   *   <a href="https://doi.org/10.1007/s00190-002-0216-2">
    *   A unified approach to the Clenshaw summation and the recursive
    *   computation of very high degree and order normalised associated Legendre
    *   functions</a>, J. Geodesy 76(5), 279--299 (2002).
@@ -82,8 +82,8 @@ namespace GeographicLib {
        * <b>P</b><sub><i>n</i></sub><sup><i>m</i></sup>(\e z), where
        * <b>P</b><sub><i>n</i></sub><sup><i>m</i></sup>(\e z) is Ferrers
        * function (also known as the Legendre function on the cut or the
-       * associated Legendre polynomial) http://dlmf.nist.gov/14.7.E10 and \e k
-       * = 1 for \e m = 0 and \e k = 2 otherwise.
+       * associated Legendre polynomial) https://dlmf.nist.gov/14.7.E10 and
+       * \e k = 1 for \e m = 0 and \e k = 2 otherwise.
        *
        * The mean squared value of
        * <i>P</i><sub><i>nm</i></sub><sup>full</sup>(cos&theta;)
@@ -104,8 +104,8 @@ namespace GeographicLib {
        * <b>P</b><sub><i>n</i></sub><sup><i>m</i></sup>(\e z), where
        * <b>P</b><sub><i>n</i></sub><sup><i>m</i></sup>(\e z) is Ferrers
        * function (also known as the Legendre function on the cut or the
-       * associated Legendre polynomial) http://dlmf.nist.gov/14.7.E10 and \e k
-       * = 1 for \e m = 0 and \e k = 2 otherwise.
+       * associated Legendre polynomial) https://dlmf.nist.gov/14.7.E10 and
+       * \e k = 1 for \e m = 0 and \e k = 2 otherwise.
        *
        * The mean squared value of
        * <i>P</i><sub><i>nm</i></sub><sup>schmidt</sup>(cos&theta;)

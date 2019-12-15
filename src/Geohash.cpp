@@ -2,9 +2,9 @@
  * \file Geohash.cpp
  * \brief Implementation for GeographicLib::Geohash class
  *
- * Copyright (c) Charles Karney (2012-2015) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2012-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #include <GeographicLib/Geohash.hpp>
@@ -14,11 +14,11 @@ namespace GeographicLib {
 
   using namespace std;
 
-  const string Geohash::lcdigits_ = "0123456789bcdefghjkmnpqrstuvwxyz";
-  const string Geohash::ucdigits_ = "0123456789BCDEFGHJKMNPQRSTUVWXYZ";
+  const char* const Geohash::lcdigits_ = "0123456789bcdefghjkmnpqrstuvwxyz";
+  const char* const Geohash::ucdigits_ = "0123456789BCDEFGHJKMNPQRSTUVWXYZ";
 
   void Geohash::Forward(real lat, real lon, int len, std::string& geohash) {
-    static const real shift = pow(real(2), 45);
+    static const real shift = ldexp(real(1), 45);
     static const real loneps = 180 / shift;
     static const real lateps =  90 / shift;
     if (abs(lat) > 90)
@@ -29,7 +29,8 @@ namespace GeographicLib {
       return;
     }
     if (lat == 90) lat -= lateps / 2;
-    lon = Math::AngNormalize(lon); // lon in [-180,180)
+    lon = Math::AngNormalize(lon);
+    if (lon == 180) lon = -180; // lon now in [-180,180)
     // lon/loneps in [-2^45,2^45); lon/loneps + shift in [0,2^46)
     // similarly for lat
     len = max(0, min(int(maxlen_), len));
@@ -58,7 +59,7 @@ namespace GeographicLib {
 
   void Geohash::Reverse(const std::string& geohash, real& lat, real& lon,
                         int& len, bool centerp) {
-    static const real shift = pow(real(2), 45);
+    static const real shift = ldexp(real(1), 45);
     static const real loneps = 180 / shift;
     static const real lateps =  90 / shift;
     int len1 = min(int(maxlen_), int(geohash.length()));

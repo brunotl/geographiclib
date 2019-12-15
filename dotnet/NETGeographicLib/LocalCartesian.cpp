@@ -6,7 +6,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 #include "stdafx.h"
 #include "GeographicLib/LocalCartesian.hpp"
@@ -172,8 +172,8 @@ double LocalCartesian::HeightOrigin::get()
 { return m_pLocalCartesian->HeightOrigin(); }
 
 //*****************************************************************************
-double LocalCartesian::MajorRadius::get()
-{ return m_pLocalCartesian->MajorRadius(); }
+double LocalCartesian::EquatorialRadius::get()
+{ return m_pLocalCartesian->EquatorialRadius(); }
 
 //*****************************************************************************
 double LocalCartesian::Flattening::get()

@@ -2,9 +2,9 @@
  * \file GeoidEval.cpp
  * \brief Command line utility for evaluating geoid heights
  *
- * Copyright (c) Charles Karney (2009-2015) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2009-2017) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  *
  * See the <a href="GeoidEval.1.html">man page</a> for usage information.
  **********************************************************************/
@@ -26,7 +26,7 @@
 
 #include "GeoidEval.usage"
 
-int main(int argc, char* argv[]) {
+int main(int argc, const char* const argv[]) {
   try {
     using namespace GeographicLib;
     typedef Math::real real;
@@ -118,9 +118,10 @@ int main(int argc, char* argv[]) {
       } else {
         int retval = usage(!(arg == "-h" || arg == "--help"), arg != "--help");
         if (arg == "-h")
-          std::cout<< "\nDefault geoid path = \""   << Geoid::DefaultGeoidPath()
-                   << "\"\nDefault geoid name = \"" << Geoid::DefaultGeoidName()
-                   << "\"\n";
+          std::cout
+            << "\nDefault geoid path = \""   << Geoid::DefaultGeoidPath()
+            << "\"\nDefault geoid name = \"" << Geoid::DefaultGeoidName()
+            << "\"\n";
         return retval;
       }
     }
@@ -184,10 +185,11 @@ int main(int argc, char* argv[]) {
                   << "Max error (m): " << g.MaxError()      << "\n"
                   << "RMS error (m): " << g.RMSError()      << "\n";
         if (g.Cache())
-          std::cerr<< "Caching:"
-                   << "\n SW Corner: " << g.CacheSouth() << " " << g.CacheWest()
-                   << "\n NE Corner: " << g.CacheNorth() << " " << g.CacheEast()
-                   << "\n";
+          std::cerr
+            << "Caching:"
+            << "\n SW Corner: " << g.CacheSouth() << " " << g.CacheWest()
+            << "\n NE Corner: " << g.CacheNorth() << " " << g.CacheEast()
+            << "\n";
       }
 
       GeoCoords p;
@@ -221,7 +223,7 @@ int main(int argc, char* argv[]) {
               // End of i'th token
               pb = s.find_first_of(spaces, pa);
               (i == 2 ? height : (i == 0 ? easting : northing)) =
-                Utility::num<real>(s.substr(pa, (pb == std::string::npos ?
+                Utility::val<real>(s.substr(pa, (pb == std::string::npos ?
                                                  pb : pb - pa)));
             }
             p.Reset(zonenum, northp, easting, northing);
@@ -239,7 +241,7 @@ int main(int argc, char* argv[]) {
               std::string::size_type pa = s.find_last_of(spaces, pb);
               if (pa == std::string::npos || pb == std::string::npos)
                 throw GeographicErr("Incomplete input: " + s);
-              height = Utility::num<real>(s.substr(pa + 1, pb - pa));
+              height = Utility::val<real>(s.substr(pa + 1, pb - pa));
               s = s.substr(0, pa + 1);
             }
             p.Reset(s, true, longfirst);

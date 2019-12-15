@@ -7,7 +7,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 namespace NETGeographicLib
@@ -34,9 +34,15 @@ namespace NETGeographicLib
    * - WMM2010:
    *   - http://ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml
    *   - http://ngdc.noaa.gov/geomag/WMM/data/WMM2010/WMM2010COF.zip
-   * - WMM2015:
+   * - WMM2015 (deprecated):
    *   - http://ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml
    *   - http://ngdc.noaa.gov/geomag/WMM/data/WMM2015/WMM2015COF.zip
+   * - WMM2015v2:
+   *   - http://ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml
+   *   - http://ngdc.noaa.gov/geomag/WMM/data/WMM2015/WMM2015v2COF.zip
+   * - WMM2020:
+   *   - http://ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml
+   *   - http://ngdc.noaa.gov/geomag/WMM/data/WMM2020/WMM2020COF.zip
    * - IGRF11:
    *   - http://ngdc.noaa.gov/IAGA/vmod/igrf.html
    *   - http://ngdc.noaa.gov/IAGA/vmod/igrf11coeffs.txt
@@ -58,7 +64,7 @@ namespace NETGeographicLib
    * The following functions are implemented as properties:
    * Description, DateTime, MagneticFile, MagneticModelName,
    * MagneticModelDirectory, MinHeight, MaxHeight, MinTime, MaxTime,
-   * MajorRadius, and Flattening.
+   * EquatorialRadius, and Flattening.
    **********************************************************************/
     public ref class MagneticModel
     {
@@ -334,7 +340,7 @@ namespace NETGeographicLib
          *   the value of \e a inherited from the Geocentric object used in the
          *   constructor.
          **********************************************************************/
-        property double MajorRadius { double get(); }
+        property double EquatorialRadius { double get(); }
 
         /**
          * @return \e f the flattening of the ellipsoid.  This is the value
@@ -359,7 +365,7 @@ namespace NETGeographicLib
          * @return the default name for the magnetic model.
          *
          * This is the value of the environment variable
-         * GEOGRAPHICLIB_MAGNETIC_NAME, if set, otherwise, it is "wmm2015".
+         * GEOGRAPHICLIB_MAGNETIC_NAME, if set, otherwise, it is "wmm2020".
          * The MagneticModel class does not use this function; it is just
          * provided as a convenience for a calling program when constructing a
          * MagneticModel object.

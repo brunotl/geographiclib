@@ -10,6 +10,7 @@
 #include "GeographicLib/Geodesic.hpp"
 #include "GeographicLib/GeodesicLine.hpp"
 #include "GeographicLib/GeodesicExact.hpp"
+#include "GeographicLib/GeodesicLineExact.hpp"
 #include "GeographicLib/Constants.hpp"
 #include <GeographicLib/Utility.hpp>
 
@@ -36,6 +37,10 @@ Check GeographicLib::Geodesic class.\n\
 -t1 time GeodecicLine with angles using synthetic data\n\
 -t2 time Geodecic::Direct using synthetic data\n\
 -t3 time Geodecic::Inverse with synthetic data\n\
+-T0 time GeodecicLineExact with distances using synthetic data\n\
+-T1 time GeodecicLineExact with angles using synthetic data\n\
+-T2 time GeodecicExact::Direct using synthetic data\n\
+-T3 time GeodecicExact::Inverse with synthetic data\n\
 \n\
 -c requires an instrumented version of Geodesic.\n";
   return retval;
@@ -129,16 +134,16 @@ void GeodError(const test& tgeod,
                tlat1, tlon1, tazi1, tm12b,
                tM12, tM21, tS12b);
   tS12b -= tgeod.EllipsoidArea() * (tazi1-azi1)/720;
-  err[0] = max(dist(tgeod.MajorRadius(), tgeod.Flattening(),
+  err[0] = max(dist(tgeod.EquatorialRadius(), tgeod.Flattening(),
                     lat2, lon2, tlat2, tlon2),
-               dist(tgeod.MajorRadius(), tgeod.Flattening(),
+               dist(tgeod.EquatorialRadius(), tgeod.Flattening(),
                     lat1, lon1, tlat1, tlon1));
   err[1] = max(abs(azidiff(lat2, lon2, tlon2, azi2, tazi2)),
                abs(azidiff(lat1, lon1, tlon1, azi1, tazi1))) *
-    tgeod.MajorRadius();
+    tgeod.EquatorialRadius();
   err[2] = max(abs(tm12a - m12), abs(tm12b + m12));
   if (!Math::isnan(S12))
-    err[6] = max(abs(tS12a - S12), abs(tS12b + S12)) / tgeod.MajorRadius();
+    err[6] = max(abs(tS12a - S12), abs(tS12b + S12)) / tgeod.EquatorialRadius();
 
   /* ta12 = */ tgeod.Inverse(lat1, lon1, lat2, lon2,
                              ts12, tazi1, tazi2, tm12a,
@@ -152,30 +157,30 @@ void GeodError(const test& tgeod,
                  max(abs(angdiff(azi1, tazi2)), abs(angdiff(azi2, tazi1))) *
                  Math::degree() * abs(m12));
   // m12 and S12 are very sensitive with the inverse problem near conjugacy
-  if (!(s12 > tgeod.MajorRadius() && m12 < 10e3)) {
+  if (!(s12 > tgeod.EquatorialRadius() && m12 < 10e3)) {
     err[2] = max(err[2], abs(tm12a - m12));
     if (!Math::isnan(S12))
-      err[6] = max(err[6], abs(tS12a - S12) / tgeod.MajorRadius());
+      err[6] = max(err[6], abs(tS12a - S12) / tgeod.EquatorialRadius());
   }
-  if (s12 > tgeod.MajorRadius()) {
+  if (s12 > tgeod.EquatorialRadius()) {
     tgeod.Direct(lat1, lon1, tazi1,   ts12/2, rlat2, rlon2, razi2, rm12);
     tgeod.Direct(lat2, lon2, tazi2, - ts12/2, rlat1, rlon1, razi1, rm12);
-    err[5] = dist(tgeod.MajorRadius(), tgeod.Flattening(),
+    err[5] = dist(tgeod.EquatorialRadius(), tgeod.Flattening(),
                   rlat1, rlon1, rlat2, rlon2);
   } else {
     tgeod.Direct(lat1, lon1, tazi1,
-                 ts12 + tgeod.MajorRadius(),
+                 ts12 + tgeod.EquatorialRadius(),
                  rlat2, rlon2, razi2, rm12);
-    tgeod.Direct(lat2, lon2, tazi2, tgeod.MajorRadius(),
+    tgeod.Direct(lat2, lon2, tazi2, tgeod.EquatorialRadius(),
                  rlat1, rlon1, razi1, rm12);
-    err[5] = dist(tgeod.MajorRadius(), tgeod.Flattening(),
+    err[5] = dist(tgeod.EquatorialRadius(), tgeod.Flattening(),
                   rlat1, rlon1, rlat2, rlon2);
-    tgeod.Direct(lat1, lon1, tazi1, - tgeod.MajorRadius(),
+    tgeod.Direct(lat1, lon1, tazi1, - tgeod.EquatorialRadius(),
                  rlat2, rlon2, razi2, rm12);
     tgeod.Direct(lat2, lon2, tazi2,
-                 - ts12 - tgeod.MajorRadius(),
+                 - ts12 - tgeod.EquatorialRadius(),
                  rlat1, rlon1, razi1, rm12);
-    err[5] = max(err[5], dist(tgeod.MajorRadius(), tgeod.Flattening(),
+    err[5] = max(err[5], dist(tgeod.EquatorialRadius(), tgeod.Flattening(),
                               rlat1, rlon1, rlat2, rlon2));
   }
 }
@@ -240,90 +245,196 @@ int main(int argc, char* argv[]) {
       timing = true;
       timecase = 3;
       exact = false;
+    } else if (arg == "-T0") {
+      accuracytest = false;
+      coverage = false;
+      timing = true;
+      timecase = 0;
+      exact = true;
+    } else if (arg == "-T1") {
+      accuracytest = false;
+      coverage = false;
+      timing = true;
+      timecase = 1;
+      exact = true;
+    } else if (arg == "-T2") {
+      accuracytest = false;
+      coverage = false;
+      timing = true;
+      timecase = 2;
+      exact = true;
+    } else if (arg == "-T3") {
+      accuracytest = false;
+      coverage = false;
+      timing = true;
+      timecase = 3;
+      exact = true;
     } else
       return usage(arg == "-h" ? 0 : 1);
   } else if (argc > 2)
     return usage(1);
 
   if (timing) {
-    const Geodesic& geod = Geodesic::WGS84();
-    unsigned cnt = 0;
-    Math::real s = 0;
-    Math::real dl;
-    switch (timecase) {
-    case 0:
-      // Time Line
-      dl = 2e7/1000;
-      for (int i = 0; i <= 90; ++i) {
-        Math::real lat1 = i;
-        for (int j = 0; j <= 180; ++j) {
-          Math::real azi1 = j;
-          const GeodesicLine l(geod, lat1, 0.0, azi1);
-          for (int k = 0; k <= 1000; ++k) {
-            Math::real s12 = dl * k;
-            Math::real lat2, lon2;
-            l.Position(s12, lat2, lon2);
-            ++cnt;
-            s += lat2;
+    if (!exact) {
+      const Geodesic& geod = Geodesic::WGS84();
+      unsigned cnt = 0;
+      Math::real s = 0;
+      Math::real dl;
+      switch (timecase) {
+      case 0:
+        // Time Line
+        dl = 2e7/1000;
+        for (int i = 0; i <= 90; ++i) {
+          Math::real lat1 = i;
+          for (int j = 0; j <= 180; ++j) {
+            Math::real azi1 = j;
+            const GeodesicLine l(geod, lat1, 0.0, azi1);
+            for (int k = 0; k <= 1000; ++k) {
+              Math::real s12 = dl * k;
+              Math::real lat2, lon2;
+              l.Position(s12, lat2, lon2);
+              ++cnt;
+              s += lat2;
+            }
           }
         }
-      }
-      cout << cnt << " " << s << "\n";
-      break;
-    case 1:
-      // Time Line ang
-      dl = 180.0/1000;
-      for (int i = 0; i <= 90; ++i) {
-        Math::real lat1 = i;
-        for (int j = 0; j <= 180; ++j) {
-          Math::real azi1 = j;
-          GeodesicLine l(geod, lat1, 0.0, azi1);
-          for (int k = 0; k <= 1000; ++k) {
-            Math::real s12 = dl * k;
-            Math::real lat2, lon2;
-            l.ArcPosition(s12, lat2, lon2);
-            ++cnt;
-            s += lat2;
+        cout << cnt << " " << s << "\n";
+        break;
+      case 1:
+        // Time Line ang
+        dl = Math::real(180)/1000;
+        for (int i = 0; i <= 90; ++i) {
+          Math::real lat1 = i;
+          for (int j = 0; j <= 180; ++j) {
+            Math::real azi1 = j;
+            GeodesicLine l(geod, lat1, 0.0, azi1);
+            for (int k = 0; k <= 1000; ++k) {
+              Math::real s12 = dl * k;
+              Math::real lat2, lon2;
+              l.ArcPosition(s12, lat2, lon2);
+              ++cnt;
+              s += lat2;
+            }
           }
         }
-      }
-      cout << cnt << " " << s << "\n";
-      break;
-    case 2:
-      // Time Direct
-      dl = 2e7/200;
-      for (int i = 0; i <= 90; ++i) {
-        Math::real lat1 = i;
-        for (int j = 0; j <= 180; ++j) {
-          Math::real azi1 = j;
-          for (int k = 0; k <= 200; ++k) {
-            Math::real s12 = dl * k;
-            Math::real lat2, lon2;
-            geod.Direct(lat1, 0.0, azi1, s12, lat2, lon2);
-            ++cnt;
-            s += lat2;
+        cout << cnt << " " << s << "\n";
+        break;
+      case 2:
+        // Time Direct
+        dl = 2e7/200;
+        for (int i = 0; i <= 90; ++i) {
+          Math::real lat1 = i;
+          for (int j = 0; j <= 180; ++j) {
+            Math::real azi1 = j;
+            for (int k = 0; k <= 200; ++k) {
+              Math::real s12 = dl * k;
+              Math::real lat2, lon2;
+              geod.Direct(lat1, 0.0, azi1, s12, lat2, lon2);
+              ++cnt;
+              s += lat2;
+            }
           }
         }
-      }
-      cout << cnt << " " << s << "\n";
-      break;
-    case 3:
-      // Time Inverse
-      for (int i = 0; i <= 179; ++i) {
-        Math::real lat1 = i * 0.5;
-        for (int j = -179; j <= 179; ++j) {
-          Math::real lat2 = j * 0.5;
-          for (int k = 0; k <= 359; ++k) {
-            Math::real lon2 = k * 0.5;
-            Math::real s12;
-            geod.Inverse(lat1, 0.0, lat2, lon2, s12);
-            ++cnt;
-            s += s12;
+        cout << cnt << " " << s << "\n";
+        break;
+      case 3:
+        // Time Inverse
+        for (int i = 1; i <= 179; i += 2) {
+          Math::real lat1 = i * Math::real(0.5);
+          for (int j = -179; j <= 179; j += 2) {
+            Math::real lat2 = j * Math::real(0.5);
+            for (int k = 1; k <= 359; k += 2) {
+              Math::real lon2 = k * Math::real(0.5);
+              Math::real s12;
+              geod.Inverse(lat1, 0.0, lat2, lon2, s12);
+              ++cnt;
+              s += s12;
+            }
           }
         }
+        cout << cnt << " " << s << "\n";
+        break;
       }
-      cout << cnt << " " << s << "\n";
-      break;
+    } else {
+      const GeodesicExact& geod = GeodesicExact::WGS84();
+      unsigned cnt = 0;
+      Math::real s = 0;
+      Math::real dl;
+      switch (timecase) {
+      case 0:
+        // Time Line
+        dl = 2e7/1000;
+        for (int i = 0; i <= 90; ++i) {
+          Math::real lat1 = i;
+          for (int j = 0; j <= 180; ++j) {
+            Math::real azi1 = j;
+            const GeodesicLineExact l(geod, lat1, 0.0, azi1);
+            for (int k = 0; k <= 1000; ++k) {
+              Math::real s12 = dl * k;
+              Math::real lat2, lon2;
+              l.Position(s12, lat2, lon2);
+              ++cnt;
+              s += lat2;
+            }
+          }
+        }
+        cout << cnt << " " << s << "\n";
+        break;
+      case 1:
+        // Time Line ang
+        dl = Math::real(180)/1000;
+        for (int i = 0; i <= 90; ++i) {
+          Math::real lat1 = i;
+          for (int j = 0; j <= 180; ++j) {
+            Math::real azi1 = j;
+            GeodesicLineExact l(geod, lat1, 0.0, azi1);
+            for (int k = 0; k <= 1000; ++k) {
+              Math::real s12 = dl * k;
+              Math::real lat2, lon2;
+              l.ArcPosition(s12, lat2, lon2);
+              ++cnt;
+              s += lat2;
+            }
+          }
+        }
+        cout << cnt << " " << s << "\n";
+        break;
+      case 2:
+        // Time Direct
+        dl = 2e7/200;
+        for (int i = 0; i <= 90; ++i) {
+          Math::real lat1 = i;
+          for (int j = 0; j <= 180; ++j) {
+            Math::real azi1 = j;
+            for (int k = 0; k <= 200; ++k) {
+              Math::real s12 = dl * k;
+              Math::real lat2, lon2;
+              geod.Direct(lat1, 0.0, azi1, s12, lat2, lon2);
+              ++cnt;
+              s += lat2;
+            }
+          }
+        }
+        cout << cnt << " " << s << "\n";
+        break;
+      case 3:
+        // Time Inverse
+        for (int i = 1; i <= 179; i += 2) {
+          Math::real lat1 = i * Math::real(0.5);
+          for (int j = -179; j <= 179; j += 2) {
+            Math::real lat2 = j * Math::real(0.5);
+            for (int k = 1; k <= 359; k += 2) {
+              Math::real lon2 = k * Math::real(0.5);
+              Math::real s12;
+              geod.Inverse(lat1, 0.0, lat2, lon2, s12);
+              ++cnt;
+              s += s12;
+            }
+          }
+        }
+        cout << cnt << " " << s << "\n";
+        break;
+      }
     }
   }
   else if (accuracytest || coverage) {

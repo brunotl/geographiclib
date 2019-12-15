@@ -6,8 +6,8 @@ The data is provided either as a compressed tar (extension .tar.bz2), a
 zip file, or a windows installer (extension .exe).  If you're unsure
 which one to install, start with
 
- wmm2015
+ wmm2020
 
 For more information, see
 
- http://geographiclib.sourceforge.net/html/magnetic.html#magneticinst
+ https://geographiclib.sourceforge.io/html/magnetic.html#magneticinst

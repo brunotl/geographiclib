@@ -38,7 +38,6 @@ set_tests_properties (GeoConvert5 PROPERTIES WILL_FAIL ON)
 if (NOT (MSVC AND MSVC_VERSION MATCHES "1[78].."))
   # Check fix for DMS::Decode double rounding bug fixed on 2012-11-15
   # This test is known to fail for VC 11 and 12 bug reported 2013-01-10
-  # http://connect.microsoft.com/VisualStudio/feedback/details/776287
   # OK to skip this test for these compilers because this is a question
   # of accuracy of the least significant bit.  The bug is fixed in VC 14.
   #
@@ -92,6 +91,20 @@ set_tests_properties (GeoConvert17
 set_tests_properties (GeoConvert18
   PROPERTIES PASS_REGULAR_EXPRESSION "38NNF000000000000638110")
 
+# Check prec = -6 for UPS (to check fix to Matlab mgrs_fwd, 2018-03-19)
+add_test (NAME GeoConvert19 COMMAND GeoConvert
+  -m -p -6 --input-string "s 2746000 1515000")
+add_test (NAME GeoConvert20 COMMAND GeoConvert
+  -m -p -5 --input-string "s 2746000 1515000")
+add_test (NAME GeoConvert21 COMMAND GeoConvert
+  -m -p -4 --input-string "s 2746000 1515000")
+set_tests_properties (GeoConvert19
+  PROPERTIES PASS_REGULAR_EXPRESSION "^B[\r\n]")
+set_tests_properties (GeoConvert20
+  PROPERTIES PASS_REGULAR_EXPRESSION "^BKH[\r\n]")
+set_tests_properties (GeoConvert21
+  PROPERTIES PASS_REGULAR_EXPRESSION "^BKH41[\r\n]")
+
 add_test (NAME GeodSolve0 COMMAND GeodSolve
   -i -p 0 --input-string "40.6 -73.8 49d01'N 2d33'E")
 set_tests_properties (GeodSolve0 PROPERTIES PASS_REGULAR_EXPRESSION
@@ -119,7 +132,7 @@ set_tests_properties (GeodSolve4 PROPERTIES PASS_REGULAR_EXPRESSION
 add_test (NAME GeodSolve5 COMMAND GeodSolve
   -p 0 --input-string "0.01777745589997 30 0 10e6")
 set_tests_properties (GeodSolve5 PROPERTIES PASS_REGULAR_EXPRESSION
-  "90\\.00000 -150\\.00000 -180\\.00000;90\\.00000 30\\.00000 0\\.00000")
+  "90\\.00000 -150\\.00000 -?180\\.00000;90\\.00000 30\\.00000 0\\.00000")
 
 # Check fix for volatile sbet12a bug found 2011-06-25 (gcc 4.4.4 x86 -O3)
 # Found again on 2012-03-27 with tdm-mingw32 (g++ 4.6.1).
@@ -142,26 +155,29 @@ add_test (NAME GeodSolve9 COMMAND GeodSolve -i --input-string
 set_tests_properties (GeodSolve9 PROPERTIES PASS_REGULAR_EXPRESSION
   ".* .* 19993558.287")
 
-# Check fix for adjust tol1_ bug found 2011-06-25 (Visual Studio 10 rel + debug)
+# Check fix for adjust tol1_ bug found 2011-06-25 (Visual Studio 10 rel
+# + debug)
 add_test (NAME GeodSolve10 COMMAND GeodSolve -i --input-string
   "52.784459512564 0 -52.784459512563990912 179.634407464943777557")
 set_tests_properties (GeodSolve10 PROPERTIES PASS_REGULAR_EXPRESSION
   ".* .* 19991596.095")
 
-# Check fix for bet2 = -bet1 bug found 2011-06-25 (Visual Studio 10 rel + debug)
+# Check fix for bet2 = -bet1 bug found 2011-06-25 (Visual Studio 10 rel
+# + debug)
 add_test (NAME GeodSolve11 COMMAND GeodSolve -i --input-string
   "48.522876735459 0 -48.52287673545898293 179.599720456223079643")
 set_tests_properties (GeodSolve11 PROPERTIES PASS_REGULAR_EXPRESSION
   ".* .* 19989144.774")
 
 # Check fix for inverse geodesics on extreme prolate/oblate ellipsoids
-# Reported 2012-08-29 Stefan Guenther <stefan.gunther@embl.de>; fixed 2012-10-07
+# Reported 2012-08-29 Stefan Guenther <stefan.gunther@embl.de>; fixed
+# 2012-10-07
 add_test (NAME GeodSolve12 COMMAND GeodSolve
   -i -e 89.8 -1.83 -p 1 --input-string "0 0 -10 160")
 add_test (NAME GeodSolve13 COMMAND GeodSolve
   -i -e 89.8 -1.83 -p 1 --input-string "0 0 -10 160" -E)
-set_tests_properties (GeodSolve12 GeodSolve13 PROPERTIES PASS_REGULAR_EXPRESSION
-  "120\\.27.* 105\\.15.* 266\\.7")
+set_tests_properties (GeodSolve12 GeodSolve13
+  PROPERTIES PASS_REGULAR_EXPRESSION "120\\.27.* 105\\.15.* 266\\.7")
 
 if (NOT (GEOGRAPHICLIB_PRECISION EQUAL 4 AND Boost_VERSION LESS 106000))
   # mpfr (nan == 0 is true) and boost-quadmath (nan > 0 is true) have
@@ -182,7 +198,8 @@ add_test (NAME GeodSolve15 COMMAND GeodSolve
   -e 6.4e6 -1/150 -f --input-string "1 2 3 4")
 add_test (NAME GeodSolve16 COMMAND GeodSolve
   -e 6.4e6 -1/150 -f --input-string "1 2 3 4" -E)
-set_tests_properties (GeodSolve15 GeodSolve16 PROPERTIES PASS_REGULAR_EXPRESSION
+set_tests_properties (GeodSolve15 GeodSolve16
+  PROPERTIES PASS_REGULAR_EXPRESSION
   "1\\..* 2\\..* 3\\..* 1\\..* 2\\..* 3\\..* 4\\..* 0\\..* 4\\..* 1\\..* 1\\..* 23700")
 
 # Check fix for LONG_UNROLL bug found on 2015-05-07
@@ -195,7 +212,8 @@ add_test (NAME GeodSolve19 COMMAND GeodSolve
 add_test (NAME GeodSolve20 COMMAND GeodSolve
   -u -L 40 -75 -10 --input-string "2e7" -E)
 set_tests_properties (GeodSolve17 GeodSolve18 GeodSolve19 GeodSolve20
-  PROPERTIES PASS_REGULAR_EXPRESSION "-39\\.[0-9]* -254\\.[0-9]* -170\\.[0-9]*")
+  PROPERTIES PASS_REGULAR_EXPRESSION
+  "-39\\.[0-9]* -254\\.[0-9]* -170\\.[0-9]*")
 add_test (NAME GeodSolve21 COMMAND GeodSolve
   --input-string "40 -75 -10 2e7")
 add_test (NAME GeodSolve22 COMMAND GeodSolve
@@ -234,13 +252,15 @@ add_test (NAME GeodSolve29 COMMAND GeodSolve
   -i -f -p 0 --input-string "0 539 0 181")
 add_test (NAME GeodSolve30 COMMAND GeodSolve
   -i -f -p 0 --input-string "0 539 0 181" -E)
-set_tests_properties (GeodSolve29 GeodSolve30 PROPERTIES PASS_REGULAR_EXPRESSION
+set_tests_properties (GeodSolve29 GeodSolve30
+  PROPERTIES PASS_REGULAR_EXPRESSION
   "0\\..* 179\\..* 90\\..* 0\\..* -179\\..* 90\\..* 222639 ")
 add_test (NAME GeodSolve31 COMMAND GeodSolve
   -i -f -p 0 --input-string "0 539 0 181" -u)
 add_test (NAME GeodSolve32 COMMAND GeodSolve
   -i -f -p 0 --input-string "0 539 0 181" -u -E)
-set_tests_properties (GeodSolve31 GeodSolve32 PROPERTIES PASS_REGULAR_EXPRESSION
+set_tests_properties (GeodSolve31 GeodSolve32
+  PROPERTIES PASS_REGULAR_EXPRESSION
   "0\\..* 539\\..* 90\\..* 0\\..* 541\\..* 90\\..* 222639 ")
 
 # Check max(-0.0,+0.0) issues 2015-08-22 (triggered by bugs in Octave --
@@ -251,59 +271,59 @@ add_test (NAME GeodSolve33 COMMAND GeodSolve
 add_test (NAME GeodSolve34 COMMAND GeodSolve
   -i -p 0 --input-string "0 0 0 179" -E)
 add_test (NAME GeodSolve35 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 0 179.5")
+  -i -p 0 --input-string "0 0 0 179.5")
 add_test (NAME GeodSolve36 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 0 179.5" -E)
+  -i -p 0 --input-string "0 0 0 179.5" -E)
 add_test (NAME GeodSolve37 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 0 180")
+  -i -p 0 --input-string "0 0 0 180")
 add_test (NAME GeodSolve38 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 0 180" -E)
+  -i -p 0 --input-string "0 0 0 180" -E)
 add_test (NAME GeodSolve39 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 1 180")
+  -i -p 0 --input-string "0 0 1 180")
 add_test (NAME GeodSolve40 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 1 180" -E)
+  -i -p 0 --input-string "0 0 1 180" -E)
 add_test (NAME GeodSolve41 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 0 179" -e 6.4e6 0)
+  -i -p 0 --input-string "0 0 0 179" -e 6.4e6 0)
 add_test (NAME GeodSolve42 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 0 179" -e 6.4e6 0 -E)
+  -i -p 0 --input-string "0 0 0 179" -e 6.4e6 0 -E)
 add_test (NAME GeodSolve43 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 0 180" -e 6.4e6 0)
+  -i -p 0 --input-string "0 0 0 180" -e 6.4e6 0)
 add_test (NAME GeodSolve44 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 0 180" -e 6.4e6 0 -E)
+  -i -p 0 --input-string "0 0 0 180" -e 6.4e6 0 -E)
 add_test (NAME GeodSolve45 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 1 180" -e 6.4e6 0)
+  -i -p 0 --input-string "0 0 1 180" -e 6.4e6 0)
 add_test (NAME GeodSolve46 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 1 180" -e 6.4e6 0 -E)
+  -i -p 0 --input-string "0 0 1 180" -e 6.4e6 0 -E)
 add_test (NAME GeodSolve47 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 0 179" -e 6.4e6 -1/300)
+  -i -p 0 --input-string "0 0 0 179" -e 6.4e6 -1/300)
 add_test (NAME GeodSolve48 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 0 179" -e 6.4e6 -1/300 -E)
+  -i -p 0 --input-string "0 0 0 179" -e 6.4e6 -1/300 -E)
 add_test (NAME GeodSolve49 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 0 180" -e 6.4e6 -1/300)
+  -i -p 0 --input-string "0 0 0 180" -e 6.4e6 -1/300)
 add_test (NAME GeodSolve50 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 0 180" -e 6.4e6 -1/300 -E)
+  -i -p 0 --input-string "0 0 0 180" -e 6.4e6 -1/300 -E)
 add_test (NAME GeodSolve51 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 0.5 180" -e 6.4e6 -1/300)
+  -i -p 0 --input-string "0 0 0.5 180" -e 6.4e6 -1/300)
 add_test (NAME GeodSolve52 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 0.5 180" -e 6.4e6 -1/300 -E)
+  -i -p 0 --input-string "0 0 0.5 180" -e 6.4e6 -1/300 -E)
 add_test (NAME GeodSolve53 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 1 180" -e 6.4e6 -1/300)
+  -i -p 0 --input-string "0 0 1 180" -e 6.4e6 -1/300)
 add_test (NAME GeodSolve54 COMMAND GeodSolve
- -i -p 0 --input-string "0 0 1 180" -e 6.4e6 -1/300 -E)
+  -i -p 0 --input-string "0 0 1 180" -e 6.4e6 -1/300 -E)
 set_tests_properties (GeodSolve33 GeodSolve34
   PROPERTIES PASS_REGULAR_EXPRESSION "90\\.00000 90\\.00000 19926189")
 set_tests_properties (GeodSolve35 GeodSolve36
   PROPERTIES PASS_REGULAR_EXPRESSION "55\\.96650 124\\.03350 19980862")
 set_tests_properties (GeodSolve37 GeodSolve38
-  PROPERTIES PASS_REGULAR_EXPRESSION "0\\.00000 -180\\.00000 20003931")
+  PROPERTIES PASS_REGULAR_EXPRESSION "0\\.00000 -?180\\.00000 20003931")
 set_tests_properties (GeodSolve39 GeodSolve40
-  PROPERTIES PASS_REGULAR_EXPRESSION "0\\.00000 -180\\.00000 19893357")
+  PROPERTIES PASS_REGULAR_EXPRESSION "0\\.00000 -?180\\.00000 19893357")
 set_tests_properties (GeodSolve41 GeodSolve42
   PROPERTIES PASS_REGULAR_EXPRESSION "90\\.00000 90\\.00000 19994492")
 set_tests_properties (GeodSolve43 GeodSolve44
-  PROPERTIES PASS_REGULAR_EXPRESSION "0\\.00000 -180\\.00000 20106193")
+  PROPERTIES PASS_REGULAR_EXPRESSION "0\\.00000 -?180\\.00000 20106193")
 set_tests_properties (GeodSolve45 GeodSolve46
-  PROPERTIES PASS_REGULAR_EXPRESSION "0\\.00000 -180\\.00000 19994492")
+  PROPERTIES PASS_REGULAR_EXPRESSION "0\\.00000 -?180\\.00000 19994492")
 set_tests_properties (GeodSolve47 GeodSolve48
   PROPERTIES PASS_REGULAR_EXPRESSION "90\\.00000 90\\.00000 19994492")
 set_tests_properties (GeodSolve49 GeodSolve50
@@ -311,7 +331,7 @@ set_tests_properties (GeodSolve49 GeodSolve50
 set_tests_properties (GeodSolve51 GeodSolve52
   PROPERTIES PASS_REGULAR_EXPRESSION "33\\.02493 146\\.97364 20082617")
 set_tests_properties (GeodSolve53 GeodSolve54
-  PROPERTIES PASS_REGULAR_EXPRESSION "0\\.00000 -180\\.00000 20027270")
+  PROPERTIES PASS_REGULAR_EXPRESSION "0\\.00000 -?180\\.00000 20027270")
 
 if (NOT (GEOGRAPHICLIB_PRECISION EQUAL 4 AND Boost_VERSION LESS 106000))
   # Check fix for nan + point on equator or pole not returning all nans in
@@ -346,7 +366,7 @@ add_test (NAME GeodSolve63 COMMAND GeodSolve
 add_test (NAME GeodSolve64 COMMAND GeodSolve
   -u -p 0 -I 45 0 80 -0.000000000000000003 --input-string 1e7 -E)
 set_tests_properties (GeodSolve61 GeodSolve62 GeodSolve63 GeodSolve64
-  PROPERTIES PASS_REGULAR_EXPRESSION "45\\.30632 -180\\.00000 -180\\.00000")
+  PROPERTIES PASS_REGULAR_EXPRESSION "45\\.30632 -180\\.00000 -?180\\.00000")
 
 # Check for bug in east-going check in GeodesicLine (needed to check for
 # sign of 0) and sign error in area calculation due to a bogus override
@@ -357,7 +377,7 @@ add_test (NAME GeodSolve66 COMMAND GeodSolve
   -I 30 -0.000000000000000001 -31 180 -f -u -p 0 --input-string "1e7;2e7" -E)
 set_tests_properties (GeodSolve65 GeodSolve66
   PROPERTIES PASS_REGULAR_EXPRESSION
-  "30\\.00000 -0\\.00000 -180\\.00000 -60\\.23169 -0\\.00000 -180\\.00000 10000000 90\\.06544 6363636 -0\\.0012834 0\\.0013749 0[\r\n]+30\\.00000 -0\\.00000 -180\\.00000 -30\\.03547 -180\\.00000 -0\\.00000 20000000 179\\.96459 54342 -1\\.0045592 -0\\.9954339 127516405431022")
+  "30\\.00000 -0\\.00000 -?180\\.00000 -60\\.23169 -0\\.00000 -?180\\.00000 10000000 90\\.06544 6363636 -0\\.0012834 0\\.0013749 0[\r\n]+30\\.00000 -0\\.00000 -?180\\.00000 -30\\.03547 -180\\.00000 -0\\.00000 20000000 179\\.96459 54342 -1\\.0045592 -0\\.9954339 127516405431022")
 
 # Check for InverseLine if line is slightly west of S and that s13 is
 # correctly set.
@@ -385,10 +405,89 @@ set_tests_properties (GeodSolve71 GeodSolve72
 # Check for backwards from the pole bug reported by Anon on 2016-02-13.
 # This only affected the Java implementation.  It was introduced in Java
 # version 1.44 and fixed in 1.46-SNAPSHOT on 2016-01-17.
+# Also the + sign on azi2 is a check on the normalizing of azimuths
+# (converting -0.0 to +0.0).
 add_test (NAME GeodSolve73 COMMAND GeodSolve
   -p 0 --input-string "90 10 180 -1e6")
 set_tests_properties (GeodSolve73
   PROPERTIES PASS_REGULAR_EXPRESSION "81\\.04623 -170\\.00000 0\\.00000")
+
+# Check fix for inaccurate areas, bug introduced in v1.46, fixed
+# 2015-10-16.
+add_test (NAME GeodSolve74 COMMAND GeodSolve
+  -i -p 10 -f --input-string "54.1589 15.3872 54.1591 15.3877")
+set_tests_properties (GeodSolve74
+  PROPERTIES PASS_REGULAR_EXPRESSION
+  # Exact area is 286698586.30197
+  "54.* 15.* 55\\.72311035.* 54.* 15.* 55\\.72351567.* 39\\.52768638.* 0\\.00035549.* 39\\.52768638.* 0\\.99999999.* 0\\.99999999.* 286698586\\.302")
+add_test (NAME GeodSolve75 COMMAND GeodSolve
+  -i -p 10 -f --input-string "54.1589 15.3872 54.1591 15.3877" -E)
+set_tests_properties (GeodSolve75
+  PROPERTIES PASS_REGULAR_EXPRESSION
+  # Exact area is 286698586.30197, but -E calculation is less accurate
+  "54.* 15.* 55\\.72311035.* 54.* 15.* 55\\.72351567.* 39\\.52768638.* 0\\.00035549.* 39\\.52768638.* 0\\.99999999.* 0\\.99999999.* 286698586\\.(29[89]|30[0-5])")
+
+# The distance from Wellington and Salamanca (a classic failure of Vincenty)
+add_test (NAME GeodSolve76 COMMAND GeodSolve
+  -i -p 6 --input-string "41:19S 174:49E 40:58N 5:30W")
+add_test (NAME GeodSolve77 COMMAND GeodSolve
+  -i -p 6 --input-string "41:19S 174:49E 40:58N 5:30W" -E)
+set_tests_properties (GeodSolve76 GeodSolve77
+  PROPERTIES PASS_REGULAR_EXPRESSION
+  "160\\.39137649664 19\\.50042925176 19960543\\.857179")
+
+# An example where the NGS calculator fails to converge
+add_test (NAME GeodSolve78 COMMAND GeodSolve
+  -i -p 6 --input-string "27.2 0 -27.1 179.5")
+add_test (NAME GeodSolve79 COMMAND GeodSolve
+  -i -p 6 --input-string "27.2 0 -27.1 179.5" -E)
+set_tests_properties (GeodSolve78 GeodSolve79
+  PROPERTIES PASS_REGULAR_EXPRESSION
+  "45\\.82468716758 134\\.22776532670 19974354\\.765767")
+
+# Some tests to add code coverage: computing scale in special cases
+add_test (NAME GeodSolve80 COMMAND GeodSolve
+  -i --input-string "0 0 0 90" -f)
+set_tests_properties (GeodSolve80 PROPERTIES PASS_REGULAR_EXPRESSION
+  " -0\\.0052842753 -0\\.0052842753 ")
+add_test (NAME GeodSolve81 COMMAND GeodSolve
+  -i --input-string "0 0 0.000001 0.000001" -f)
+set_tests_properties (GeodSolve81 PROPERTIES PASS_REGULAR_EXPRESSION
+  " 0\\.157 1\\.0000000000 1\\.0000000000 0")
+
+# Tests to add code coverage: zero length geodesics
+add_test (NAME GeodSolve82 COMMAND GeodSolve
+  -i --input-string "20.001 0 20.001 0" -f)
+set_tests_properties (GeodSolve82 PROPERTIES PASS_REGULAR_EXPRESSION
+  "20\\.0010* 0\\.0* 180\\.0* 20\\.0010* 0\\.0* 180\\.0* 0\\.0* 0\\.0* 0\\.0* 1\\.0* 1\\.0* -?0")
+add_test (NAME GeodSolve83 COMMAND GeodSolve
+  -i --input-string "90 0 90 180" -f)
+set_tests_properties (GeodSolve83 PROPERTIES PASS_REGULAR_EXPRESSION
+  "90\\.0* 0\\.0* 0\\.0* 90\\.0* 180\\.0* 180\\.0* 0\\.0* 0\\.0* 0\\.0* 1\\.0* 1\\.0* 127516405431022")
+
+# Tests for python implementation to check fix for range errors with
+# {fmod,sin,cos}(inf).
+add_test (NAME GeodSolve84 COMMAND GeodSolve
+  --input-string "0 0 90 inf")
+add_test (NAME GeodSolve85 COMMAND GeodSolve
+  --input-string "0 0 90 nan")
+add_test (NAME GeodSolve86 COMMAND GeodSolve
+  --input-string "0 0 inf 1000")
+add_test (NAME GeodSolve87 COMMAND GeodSolve
+  --input-string "0 0 nan 1000")
+add_test (NAME GeodSolve88 COMMAND GeodSolve
+  --input-string "0 inf 90 1000")
+add_test (NAME GeodSolve89 COMMAND GeodSolve
+  --input-string "0 nan 90 1000")
+add_test (NAME GeodSolve90 COMMAND GeodSolve
+  --input-string "inf 0 90 1000")
+add_test (NAME GeodSolve91 COMMAND GeodSolve
+  --input-string "nan 0 90 1000")
+set_tests_properties (GeodSolve84 GeodSolve85 GeodSolve86 GeodSolve87
+  GeodSolve91 PROPERTIES PASS_REGULAR_EXPRESSION "nan nan nan")
+set_tests_properties (GeodSolve88 GeodSolve89 PROPERTIES PASS_REGULAR_EXPRESSION
+  "0\\.0* nan 90\\.0*")
+set_tests_properties (GeodSolve90 PROPERTIES WILL_FAIL ON)
 
 # Check fix for pole-encircling bug found 2011-03-16
 add_test (NAME Planimeter0 COMMAND Planimeter
@@ -400,7 +499,8 @@ add_test (NAME Planimeter2 COMMAND Planimeter
 add_test (NAME Planimeter3 COMMAND Planimeter --input-string "90 0; 0 0; 0 90")
 add_test (NAME Planimeter4 COMMAND Planimeter
   -l --input-string "90 0; 0 0; 0 90")
-set_tests_properties (Planimeter0 Planimeter1 PROPERTIES PASS_REGULAR_EXPRESSION
+set_tests_properties (Planimeter0 Planimeter1
+  PROPERTIES PASS_REGULAR_EXPRESSION
   "4 631819\\.8745[0-9]+ 2495230567[78]\\.[0-9]+")
 set_tests_properties (Planimeter2 PROPERTIES PASS_REGULAR_EXPRESSION
   "4 627598\\.2731[0-9]+ 24619419146.[0-9]+")
@@ -447,6 +547,73 @@ add_test (NAME Planimeter14 COMMAND Planimeter
 set_tests_properties (Planimeter13 Planimeter14
   PROPERTIES PASS_REGULAR_EXPRESSION "6 1160741\\..* 32415230256\\.")
 
+# Some tests to add code coverage: all combinations of -r and -s
+add_test (NAME Planimeter15 COMMAND Planimeter
+  --input-string "2 1;1 2;3 3")
+add_test (NAME Planimeter16 COMMAND Planimeter
+  --input-string "2 1;1 2;3 3" -s)
+add_test (NAME Planimeter17 COMMAND Planimeter
+  --input-string "2 1;1 2;3 3" -r)
+add_test (NAME Planimeter18 COMMAND Planimeter
+  --input-string "2 1;1 2;3 3" -r -s)
+set_tests_properties (Planimeter15 Planimeter16
+  PROPERTIES PASS_REGULAR_EXPRESSION
+  " 18454562325\\.5")           # more digits 18454562325.45119
+set_tests_properties (Planimeter17 PROPERTIES PASS_REGULAR_EXPRESSION
+  " -18454562325\\.5")
+set_tests_properties (Planimeter18 PROPERTIES PASS_REGULAR_EXPRESSION
+  " 510047167161763\\.[01]")    # 510065621724088.5093-18454562325.45119
+
+# Some test to add code coverage: degerate polygons
+add_test (NAME Planimeter19 COMMAND Planimeter --input-string "1 1")
+set_tests_properties (Planimeter19 PROPERTIES PASS_REGULAR_EXPRESSION
+  "1 0\\.0* 0\\.0")
+add_test (NAME Planimeter20 COMMAND Planimeter --input-string "1 1" -l)
+set_tests_properties (Planimeter20 PROPERTIES PASS_REGULAR_EXPRESSION
+  "1 0\\.0*")
+
+# Some test to add code coverage: multiple circlings of pole
+set (_t "45 60;45 180;45 -60")
+# r =   39433884866571.4277 = Area for one circuit
+# a0 = 510065621724088.5093 = Ellipsoid area
+add_test (NAME Planimeter21 COMMAND Planimeter
+  --input-string "${_t};${_t};${_t}")
+add_test (NAME Planimeter22 COMMAND Planimeter
+  --input-string "${_t};${_t};${_t}" -s)
+add_test (NAME Planimeter23 COMMAND Planimeter
+  --input-string "${_t};${_t};${_t}" -r)
+add_test (NAME Planimeter24 COMMAND Planimeter
+  --input-string "${_t};${_t};${_t}" -r -s)
+set_tests_properties (Planimeter21 Planimeter22 PROPERTIES
+  PASS_REGULAR_EXPRESSION " 118301654599714\\.[2-5]") # 3*r
+set_tests_properties (Planimeter23 PROPERTIES
+  PASS_REGULAR_EXPRESSION " -118301654599714\\.[2-5]") # -3*r
+set_tests_properties (Planimeter24 PROPERTIES
+  PASS_REGULAR_EXPRESSION " 391763967124374\\.[0-3]") # -3*r+a0
+add_test (NAME Planimeter25 COMMAND Planimeter
+  --input-string "${_t};${_t};${_t};${_t}")
+add_test (NAME Planimeter26 COMMAND Planimeter
+  --input-string "${_t};${_t};${_t};${_t}" -s)
+add_test (NAME Planimeter27 COMMAND Planimeter
+  --input-string "${_t};${_t};${_t};${_t}" -r)
+add_test (NAME Planimeter28 COMMAND Planimeter
+  --input-string "${_t};${_t};${_t};${_t}" -r -s)
+# BUG (found 2018-02-32)! In version 1.49, Planimeter2[56] and
+# Planimeter27 returned 4*r-a0 and -4*r+a0, resp.  Fixed in 1.50 to
+# return +/-4*r
+set_tests_properties (Planimeter25 Planimeter26 PROPERTIES
+  PASS_REGULAR_EXPRESSION " 157735539466285\\.[6-9]") # 4*r
+set_tests_properties (Planimeter27 PROPERTIES
+  PASS_REGULAR_EXPRESSION " -157735539466285\\.[6-9]") # -4*r
+set_tests_properties (Planimeter28 PROPERTIES
+  PASS_REGULAR_EXPRESSION " 352330082257802\\.[5-9]") # -4*r+a0
+
+# Placeholder to implement check on AddEdge bug: AddPoint(0,0) +
+# AddEdge(90, 1000) + AddEdge(0, 1000) + AddEdge(-90, 0).  The area
+# should be 1e6.  Prior to the fix it was 1e6 - A/2, where A = ellipsoid
+# area.
+# add_test (NAME Planimeter29 COMMAND Planimeter ...)
+
 # Check fix for AlbersEqualArea::Reverse bug found 2011-05-01
 add_test (NAME ConicProj0 COMMAND ConicProj
   -a 40d58 39d56 -l 77d45W -r --input-string "220e3 -52e3")
@@ -474,14 +641,16 @@ add_test (NAME ConicProj5 COMMAND ConicProj
   -r -c 45 45 --input-string "0 -1e100")
 set_tests_properties (ConicProj5 PROPERTIES PASS_REGULAR_EXPRESSION
   "^-90\\.0+ -?0\\.00[0-9]+ ")
-add_test (NAME ConicProj6 COMMAND ConicProj -r -c 45 45 --input-string "0 -inf")
+add_test (NAME ConicProj6 COMMAND ConicProj
+  -r -c 45 45 --input-string "0 -inf")
 set_tests_properties (ConicProj6 PROPERTIES PASS_REGULAR_EXPRESSION
   "^-90\\.0+ -?0\\.00[0-9]+ ")
 add_test (NAME ConicProj7 COMMAND ConicProj
   -r -c 90 90 --input-string "0 -1e150")
 set_tests_properties (ConicProj7 PROPERTIES PASS_REGULAR_EXPRESSION
   "^-90\\.0+ -?0\\.00[0-9]+ ")
-add_test (NAME ConicProj8 COMMAND ConicProj -r -c 90 90 --input-string "0 -inf")
+add_test (NAME ConicProj8 COMMAND ConicProj
+  -r -c 90 90 --input-string "0 -inf")
 set_tests_properties (ConicProj8 PROPERTIES PASS_REGULAR_EXPRESSION
   "^-90\\.0+ -?0\\.00[0-9]+ ")
 
@@ -498,23 +667,61 @@ set_tests_properties (CartConvert1 PROPERTIES PASS_REGULAR_EXPRESSION
 # TransverseMercatorExact found 2013-06-26
 add_test (NAME TransverseMercatorProj0 COMMAND TransverseMercatorProj
   -k 1 --input-string "90 75")
-set_tests_properties (TransverseMercatorProj0 PROPERTIES PASS_REGULAR_EXPRESSION
+add_test (NAME TransverseMercatorProj1 COMMAND TransverseMercatorProj
+  -k 1 --input-string "90 75" -s)
+set_tests_properties (TransverseMercatorProj0 TransverseMercatorProj1
+  PROPERTIES PASS_REGULAR_EXPRESSION
   "^0\\.0+ 10001965\\.7293[0-9]+ 75\\.0+ 1\\.0+")
 # Test fix to bad scale at pole with TransverseMercatorExact
 # found 2013-06-30 (quarter meridian = 10001965.7293127228128889202m)
-add_test (NAME TransverseMercatorProj1 COMMAND TransverseMercatorProj
+add_test (NAME TransverseMercatorProj2 COMMAND TransverseMercatorProj
   -k 1 -r --input-string "0 10001965.7293127228")
-set_tests_properties (TransverseMercatorProj1 PROPERTIES PASS_REGULAR_EXPRESSION
+add_test (NAME TransverseMercatorProj3 COMMAND TransverseMercatorProj
+  -k 1 -r --input-string "0 10001965.7293127228" -s)
+set_tests_properties (TransverseMercatorProj2 TransverseMercatorProj3
+  PROPERTIES PASS_REGULAR_EXPRESSION
   "(90\\.0+ 0\\.0+ 0\\.0+|(90\\.0+|89\\.99999999999[0-9]+) -?180\\.0+ -?180\\.0+) (1\\.0000+|0\\.9999+)")
+# Generic tests for transverse Mercator added 2017-04-15 to check use of
+# complex arithmetic to do Clenshaw sum.
+add_test (NAME TransverseMercatorProj4 COMMAND TransverseMercatorProj
+  -e 6.4e6 1/150 --input-string "20 30")
+add_test (NAME TransverseMercatorProj5 COMMAND TransverseMercatorProj
+  -e 6.4e6 1/150 --input-string "20 30" -s)
+set_tests_properties (TransverseMercatorProj4 TransverseMercatorProj5
+  PROPERTIES PASS_REGULAR_EXPRESSION
+  "3266035\\.453860 2518371\\.552676 11\\.207356502141 1\\.134138960741")
+add_test (NAME TransverseMercatorProj6 COMMAND TransverseMercatorProj
+  -e 6.4e6 1/150 --input-string "3.3e6 2.5e6" -r)
+add_test (NAME TransverseMercatorProj7 COMMAND TransverseMercatorProj
+  -e 6.4e6 1/150 --input-string "3.3e6 2.5e6" -r -s)
+set_tests_properties (TransverseMercatorProj6 TransverseMercatorProj7
+  PROPERTIES PASS_REGULAR_EXPRESSION
+  "19\\.80370996793 30\\.24919702282 11\\.214378172893 1\\.137025775759")
 
 # Test fix to bad handling of pole by RhumbSolve -i
-# Reported  2015-02-24 by Thomas Murray <thomas.murray56@gmail.com>
+# Reported 2015-02-24 by Thomas Murray <thomas.murray56@gmail.com>
+# Supplement with tests of fix to bad areas (nan or inf) for this case
+# Reported 2018-02-08 by Natalia Sabourova <natalia.sabourova@ltu.se>
 add_test (NAME RhumbSolve0 COMMAND RhumbSolve
   -p 3 -i --input-string "0 0 90 0")
 add_test (NAME RhumbSolve1 COMMAND RhumbSolve
   -p 3 -i --input-string "0 0 90 0" -s)
-set_tests_properties (RhumbSolve0 RhumbSolve1 PROPERTIES PASS_REGULAR_EXPRESSION
-  "^0\\.0+ 10001965\\.729 ")
+# Treatment of the pole depends on the precision, so only check the area
+# for doubles
+if (GEOGRAPHICLIB_PRECISION EQUAL 2)
+  set_tests_properties (RhumbSolve0 RhumbSolve1
+    PROPERTIES PASS_REGULAR_EXPRESSION "^0\\.0+ 10001965\\.729 0[\r\n]")
+  add_test (NAME RhumbSolve2 COMMAND RhumbSolve
+    -p 3 -i --input-string "0 0 90 30")
+  add_test (NAME RhumbSolve3 COMMAND RhumbSolve
+    -p 3 -i --input-string "0 0 90 30" -s)
+  set_tests_properties (RhumbSolve2 RhumbSolve3
+    PROPERTIES PASS_REGULAR_EXPRESSION
+    "^0.41222947 10002224.609 21050634712282[\r\n]")
+else ()
+  set_tests_properties (RhumbSolve0 RhumbSolve1
+    PROPERTIES PASS_REGULAR_EXPRESSION "^0\\.0+ 10001965\\.729 ")
+endif ()
 
 # Test fix to CassiniSoldner::Forward bug found 2015-06-20
 add_test (NAME GeodesicProj0 COMMAND GeodesicProj

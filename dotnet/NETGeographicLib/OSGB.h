@@ -6,7 +6,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 #pragma once
 
@@ -162,7 +162,7 @@ namespace NETGeographicLib
          * 10<sup>9.48401603&minus;10</sup> m.  (The Airy 1830 value is returned
          * because the OSGB projection is based on this ellipsoid.)
          **********************************************************************/
-        static double MajorRadius();
+        static double EquatorialRadius();
 
         /**
          * @return \e f the inverse flattening of the Airy 1830 ellipsoid.

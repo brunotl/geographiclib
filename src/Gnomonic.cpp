@@ -2,9 +2,9 @@
  * \file Gnomonic.cpp
  * \brief Implementation for GeographicLib::Gnomonic class
  *
- * Copyright (c) Charles Karney (2010-2015) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2010-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #include <GeographicLib/Gnomonic.hpp>
@@ -23,13 +23,12 @@ namespace GeographicLib {
     : eps0_(numeric_limits<real>::epsilon())
     , eps_(real(0.01) * sqrt(eps0_))
     , _earth(earth)
-    , _a(_earth.MajorRadius())
+    , _a(_earth.EquatorialRadius())
     , _f(_earth.Flattening())
   {}
 
   void Gnomonic::Forward(real lat0, real lon0, real lat, real lon,
-                         real& x, real& y, real& azi, real& rk)
-    const {
+                         real& x, real& y, real& azi, real& rk) const {
     real azi0, m, M, t;
     _earth.GenInverse(lat0, lon0, lat, lon,
                       Geodesic::AZIMUTH | Geodesic::REDUCEDLENGTH |
@@ -46,8 +45,7 @@ namespace GeographicLib {
   }
 
   void Gnomonic::Reverse(real lat0, real lon0, real x, real y,
-                         real& lat, real& lon, real& azi, real& rk)
-    const {
+                         real& lat, real& lon, real& azi, real& rk) const {
     real
       azi0 = Math::atan2d(x, y),
       rho = Math::hypot(x, y),
@@ -69,7 +67,7 @@ namespace GeographicLib {
         break;
       // If little, solve rho(s) = rho with drho(s)/ds = 1/M^2
       // else solve 1/rho(s) = 1/rho with d(1/rho(s))/ds = -1/m^2
-      real ds = little ? (m/M - rho) * M * M : (rho - M/m) * m * m;
+      real ds = little ? (m - rho * M) * M : (rho * m - M) * m;
       s -= ds;
       // Reversed test to allow escape with NaNs
       if (!(abs(ds) >= eps_ * _a))

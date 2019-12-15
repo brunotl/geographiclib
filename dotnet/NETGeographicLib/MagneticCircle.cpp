@@ -6,7 +6,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 #include "stdafx.h"
 #include "GeographicLib/MagneticCircle.hpp"
@@ -71,11 +71,11 @@ void MagneticCircle::Field(double lon,
 }
 
 //*****************************************************************************
-double MagneticCircle::MajorRadius::get()
+double MagneticCircle::EquatorialRadius::get()
 {
     if ( m_pMagneticCircle->Init() )
-        return m_pMagneticCircle->MajorRadius();
-    throw  gcnew GeographicErr("MagneticCircle::MajorRadius failed because the MagneticCircle is not initialized.");
+        return m_pMagneticCircle->EquatorialRadius();
+    throw  gcnew GeographicErr("MagneticCircle::EquatorialRadius failed because the MagneticCircle is not initialized.");
 }
 
 //*****************************************************************************

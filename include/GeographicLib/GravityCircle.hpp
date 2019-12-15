@@ -2,9 +2,9 @@
  * \file GravityCircle.hpp
  * \brief Header for GeographicLib::GravityCircle class
  *
- * Copyright (c) Charles Karney (2011-2015) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2011-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #if !defined(GEOGRAPHICLIB_GRAVITYCIRCLE_HPP)
@@ -117,7 +117,8 @@ namespace GeographicLib {
      *   (m s<sup>&minus;2</sup>).
      * @param[out] gz the upward component of the acceleration
      *   (m s<sup>&minus;2</sup>); this is usually negative.
-     * @return \e W the sum of the gravitational and centrifugal potentials.
+     * @return \e W the sum of the gravitational and centrifugal potentials
+     *   (m<sup>2</sup> s<sup>&minus;2</sup>).
      *
      * The function includes the effects of the earth's rotation.
      **********************************************************************/
@@ -133,7 +134,8 @@ namespace GeographicLib {
      *   (m s<sup>&minus;2</sup>).
      * @param[out] deltaz the upward component of the disturbance vector
      *   (m s<sup>&minus;2</sup>).
-     * @return \e T the corresponding disturbing potential.
+     * @return \e T the corresponding disturbing potential
+     *   (m<sup>2</sup> s<sup>&minus;2</sup>).
      **********************************************************************/
     Math::real Disturbance(real lon, real& deltax, real& deltay, real& deltaz)
       const;
@@ -258,7 +260,7 @@ namespace GeographicLib {
      *   the value inherited from the GravityModel object used in the
      *   constructor.
      **********************************************************************/
-    Math::real MajorRadius() const
+    Math::real EquatorialRadius() const
     { return Init() ? _a : Math::NaN(); }
 
     /**
@@ -293,6 +295,12 @@ namespace GeographicLib {
     bool Capabilities(unsigned testcaps) const {
       return (_caps & testcaps) == testcaps;
     }
+
+    /**
+      * \deprecated An old name for EquatorialRadius().
+      **********************************************************************/
+    // GEOGRAPHICLIB_DEPRECATED("Use EquatorialRadius()")
+    Math::real MajorRadius() const { return EquatorialRadius(); }
     ///@}
   };
 

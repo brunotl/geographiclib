@@ -2,9 +2,9 @@
  * \file TMTest.cpp
  * \brief Command line utility for testing transverse Mercator projections
  *
- * Copyright (c) Charles Karney (2008-2010) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2008-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #include "GeographicLib/TransverseMercator.hpp"
@@ -28,14 +28,14 @@ dist(GeographicLib::Math::real a, GeographicLib::Math::real f,
      GeographicLib::Math::extended lat0, GeographicLib::Math::extended lon0,
      GeographicLib::Math::real lat1, GeographicLib::Math::real lon1) {
   using namespace GeographicLib;
-  using std::cos; using std::sqrt;
+  using std::cos; using std::sin; using std::sqrt;
   typedef Math::real real;
   real
     phi = real(lat0) * Math::degree(),
     e2 = f * (2 - f),
     sinphi = sin(phi),
     n = 1/sqrt(1 - e2 * sinphi * sinphi),
-      // See Wikipedia article on latitude
+    // See Wikipedia article on latitude
     hlon = cos(phi) * n,
     hlat = (1 - e2) * n * n * n;
   Math::extended dlon = Math::extended(lon1) - lon0;
@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
   if (timefor || timerev) {
     real s = 0;
     int count = 0;
-    real dlat = 0.015, dlon = 0.015, dx = 2e3, dy = 2e3;
+    real dlat = real(0.015), dlon = real(0.015), dx = 2e3, dy = 2e3;
     if (series) {
       const TransverseMercator& tm = TransverseMercator::UTM();
       if (timefor) {
@@ -140,10 +140,11 @@ int main(int argc, char* argv[]) {
     std::vector<real> errv(nbins, 0);
     std::vector<real> errvg(nbins, 0);
     std::vector<real> errvk(nbins, 0);
-    real esterr = sizeof(real) == sizeof(double) ? (series ? 3e-9 : 8e-9) :
-      (series ? 4e-12 : 4e-12);
+    real esterr = real(sizeof(real) == sizeof(double) ?
+                       (series ? 3e-9 : 8e-9) :
+                       (series ? 4e-12 : 4e-12));
     for (unsigned i = 0; i < nbins; ++i)
-      d[i] = 100e3 * i;
+      d[i] = real(100e3 * i);
     d[0] = 10e3;
     d[nbins - 1] = 10001966;
     const TransverseMercator& tm = TransverseMercator::UTM();
@@ -152,7 +153,7 @@ int main(int argc, char* argv[]) {
                                       Constants::UTM_k0<real>(),
                                       true);
     real
-      a = series ? tm.MajorRadius() : tme.MajorRadius(),
+      a = series ? tm.EquatorialRadius() : tme.EquatorialRadius(),
       f = series ? tm.Flattening() : tme.Flattening();
     const Geodesic geod(a, f);
     Math::extended lat0l, lon0l, x0l, y0l, gam0l, k0l;

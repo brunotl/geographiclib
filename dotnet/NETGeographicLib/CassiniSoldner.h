@@ -6,7 +6,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 #pragma once
 
@@ -64,7 +64,7 @@ namespace NETGeographicLib
    * \include example-CassiniSoldner.vb
    *
    * <B>INTERFACE DIFFERENCES:</B><BR>
-   * The LatitudeOrigin, LongitudeOrigin, MajorRadius and Flattening
+   * The LatitudeOrigin, LongitudeOrigin, EquatorialRadius and Flattening
    * functions are implimented as properties.
    **********************************************************************/
     public ref class CassiniSoldner
@@ -186,7 +186,7 @@ namespace NETGeographicLib
          * @return \e a the equatorial radius of the ellipsoid (meters).  This is
          *   the value inherited from the Geodesic object used in the constructor.
          **********************************************************************/
-        property double MajorRadius { double get(); }
+        property double EquatorialRadius { double get(); }
 
         /**
          * @return \e f the flattening of the ellipsoid.  This is the value

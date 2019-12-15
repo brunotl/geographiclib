@@ -39,7 +39,7 @@ if (DOXYGEN_FOUND)
     ../examples/[A-Za-z]*.hpp)
   file (GLOB EXTRA_FILES ../maxima/[A-Za-z]*.mac
     tmseries30.html geodseries30.html ../LICENSE.txt)
-  file (GLOB FIGURES *.png)
+  file (GLOB FIGURES *.png *.svg *.gif)
   file (COPY ${EXTRA_FILES} DESTINATION html-stage)
   add_custom_target (cxxdoc ALL
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/html/index.html)
@@ -70,7 +70,8 @@ if (DOXYGEN_FOUND)
   add_custom_target (fortrandoc ALL
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/html/Fortran/index.html)
   add_dependencies (fortrandoc cxxdoc)
-  add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/html/Fortran/index.html
+  add_custom_command (OUTPUT
+      ${CMAKE_CURRENT_BINARY_DIR}/html/Fortran/index.html
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/doxyfile-for
       geodesic-for.dox ${FORTRANSOURCES}
     COMMAND ${DOXYGEN_EXECUTABLE} doxyfile-for > doxygen-for.log

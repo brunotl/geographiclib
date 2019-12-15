@@ -6,7 +6,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 #include "stdafx.h"
 #include "GeographicLib/GravityModel.hpp"
@@ -246,8 +246,8 @@ NormalGravity^ GravityModel::ReferenceEllipsoid()
 }
 
 //*****************************************************************************
-double GravityModel::MajorRadius::get()
-{ return m_pGravityModel->MajorRadius(); }
+double GravityModel::EquatorialRadius::get()
+{ return m_pGravityModel->EquatorialRadius(); }
 
 //*****************************************************************************
 double GravityModel::MassConstant::get()

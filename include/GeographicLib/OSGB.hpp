@@ -2,9 +2,9 @@
  * \file OSGB.hpp
  * \brief Header for GeographicLib::OSGB class
  *
- * Copyright (c) Charles Karney (2010-2015) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2010-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #if !defined(GEOGRAPHICLIB_OSGB_HPP)
@@ -33,7 +33,7 @@ namespace GeographicLib {
    * - <a href="http://www.ordnancesurvey.co.uk/docs/support/national-grid.pdf">
    *   Guide to the National Grid</a>
    *
-   * \b WARNING: the latitudes and longitudes for the Ordnance Survey grid
+   * \warning the latitudes and longitudes for the Ordnance Survey grid
    * system do not use the WGS84 datum.  Do not use the values returned by this
    * class in the UTMUPS, MGRS, or Geoid classes without first converting the
    * datum (and vice versa).
@@ -44,8 +44,8 @@ namespace GeographicLib {
   class GEOGRAPHICLIB_EXPORT OSGB {
   private:
     typedef Math::real real;
-    static const std::string letters_;
-    static const std::string digits_;
+    static const char* const letters_;
+    static const char* const digits_;
     static const TransverseMercator& OSGBTM();
     enum {
       base_ = 10,
@@ -96,7 +96,7 @@ namespace GeographicLib {
      * @param[out] k scale of projection at point.
      *
      * The value of \e lon returned is in the range [&minus;180&deg;,
-     * 180&deg;).
+     * 180&deg;].
      **********************************************************************/
 
     static void Reverse(real x, real y,
@@ -187,11 +187,11 @@ namespace GeographicLib {
      * of Britain; see Section A.1 (p. 37) of <i>A guide to coordinate systems
      * in Great Britain</i>, v2.2 (Dec. 2013).
      **********************************************************************/
-    static Math::real MajorRadius() {
+    static Math::real EquatorialRadius() {
     // result is about 6377563.3960320664406 m
       using std::pow;
       return pow(real(10), real(48401603 - 100000000) / 100000000)
-        * 20923713;
+        * real(20923713);
     }
 
     /**
@@ -203,7 +203,7 @@ namespace GeographicLib {
      * because the OSGB projection is based on this ellipsoid.)
      **********************************************************************/
     static Math::real Flattening()
-    { return real(20923713 - 20853810) / 20923713; }
+    { return real(20923713 - 20853810) / real(20923713); }
 
     /**
      * @return \e k0 central scale for the OSGB projection (0.9996012717...).
@@ -236,6 +236,12 @@ namespace GeographicLib {
      * @return false easting the OSGB projection (400000 meters).
      **********************************************************************/
     static Math::real FalseEasting() { return real(400000); }
+
+    /**
+      * \deprecated An old name for EquatorialRadius().
+      **********************************************************************/
+    // GEOGRAPHICLIB_DEPRECATED("Use EquatorialRadius()")
+    static Math::real MajorRadius() { return EquatorialRadius(); }
     ///@}
 
   };

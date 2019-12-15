@@ -6,7 +6,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 using System;
 using System.Collections.Generic;
@@ -27,7 +27,7 @@ namespace Projections
         {
             InitializeComponent();
             m_poly = new PolygonArea(false);
-            m_majorRadiusTextBox.Text = m_poly.MajorRadius.ToString();
+            m_majorRadiusTextBox.Text = m_poly.EquatorialRadius.ToString();
             m_flatteningTextBox.Text = m_poly.Flattening.ToString();
             m_lengthTextBox.Text = m_areaTextBox.Text = m_numPointsTextBox.Text = "0";
             m_currLatTextBox.Text = m_currLonTextBox.Text = "";

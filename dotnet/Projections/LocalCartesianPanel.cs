@@ -6,7 +6,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 using System;
 using System.Collections.Generic;
@@ -35,7 +35,7 @@ namespace Projections
             InitializeComponent();
 
             Geocentric g = new Geocentric();
-            m_majorRadiusTextBox.Text = g.MajorRadius.ToString();
+            m_majorRadiusTextBox.Text = g.EquatorialRadius.ToString();
             m_flatteningTextBox.Text = g.Flattening.ToString();
             m_lc = new LocalCartesian(g);
             m_functionComboBox.SelectedIndex = (int)m_function;

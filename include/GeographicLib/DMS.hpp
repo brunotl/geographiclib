@@ -2,9 +2,9 @@
  * \file DMS.hpp
  * \brief Header for GeographicLib::DMS class
  *
- * Copyright (c) Charles Karney (2008-2015) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2008-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #if !defined(GEOGRAPHICLIB_DMS_HPP)
@@ -90,21 +90,22 @@ namespace GeographicLib {
 
   private:
     typedef Math::real real;
-    // Replace all occurrences of pat by c
+    // Replace all occurrences of pat by c.  If c is NULL remove pat.
     static void replace(std::string& s, const std::string& pat, char c) {
       std::string::size_type p = 0;
+      int count = c ? 1 : 0;
       while (true) {
         p = s.find(pat, p);
         if (p == std::string::npos)
           break;
-        s.replace(p, pat.length(), 1, c);
+        s.replace(p, pat.length(), count, c);
       }
     }
-    static const std::string hemispheres_;
-    static const std::string signs_;
-    static const std::string digits_;
-    static const std::string dmsindicators_;
-    static const std::string components_[3];
+    static const char* const hemispheres_;
+    static const char* const signs_;
+    static const char* const digits_;
+    static const char* const dmsindicators_;
+    static const char* const components_[3];
     static Math::real NumMatch(const std::string& s);
     static Math::real InternalDecode(const std::string& dmsa, flag& ind);
     DMS();                      // Disable constructor
@@ -170,12 +171,12 @@ namespace GeographicLib {
      * - <i>ILLEGAL</i> (the exception thrown explains the problem)
      *   - 70:01:15W+0:0:15N, W70:01:15+W0:0:15
      *
-     * <b>WARNING:</b> "Exponential" notation is not recognized.  Thus
+     * \warning The "exponential" notation is not recognized.  Thus
      * <code>7.0E1</code> is illegal, while <code>7.0E+1</code> is parsed as
      * <code>(7.0E) + (+1)</code>, yielding the same result as
      * <code>8.0E</code>.
      *
-     * <b>NOTE:</b> At present, all the string handling in the C++
+     * \note At present, all the string handling in the C++
      * implementation %GeographicLib is with 8-bit characters.  The support for
      * unicode symbols for degrees, minutes, and seconds is therefore via the
      * <a href="https://en.wikipedia.org/wiki/UTF-8">UTF-8</a> encoding.  (The
@@ -270,7 +271,7 @@ namespace GeographicLib {
      * @exception GeographicErr if \e azistr is malformed.
      * @exception GeographicErr if \e azistr includes a N/S designator.
      * @return azimuth (degrees) reduced to the range [&minus;180&deg;,
-     *   180&deg;).
+     *   180&deg;].
      *
      * A hemisphere designator E/W can be used; the result is multiplied by
      * &minus;1 if W is present.

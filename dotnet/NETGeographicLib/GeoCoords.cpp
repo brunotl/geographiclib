@@ -6,7 +6,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 #include "stdafx.h"
 #include "GeographicLib/GeoCoords.hpp"
@@ -188,7 +188,7 @@ double GeoCoords::AltConvergence::get()
 double GeoCoords::AltScale::get() { return m_pGeoCoords->AltScale(); }
 
 //*****************************************************************************
-double GeoCoords::MajorRadius::get() { return UTMUPS::MajorRadius(); }
+double GeoCoords::EquatorialRadius::get() { return UTMUPS::EquatorialRadius(); }
 
 //*****************************************************************************
 double GeoCoords::Flattening::get() { return UTMUPS::Flattening(); }

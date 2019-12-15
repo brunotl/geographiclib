@@ -2,9 +2,9 @@
  * \file DMS.cpp
  * \brief Implementation for GeographicLib::DMS class
  *
- * Copyright (c) Charles Karney (2008-2015) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2008-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 #include <GeographicLib/DMS.hpp>
@@ -19,27 +19,31 @@ namespace GeographicLib {
 
   using namespace std;
 
-  const string DMS::hemispheres_ = "SNWE";
-  const string DMS::signs_ = "-+";
-  const string DMS::digits_ = "0123456789";
-  const string DMS::dmsindicators_ = "D'\":";
-  const string DMS::components_[] = {"degrees", "minutes", "seconds"};
+  const char* const DMS::hemispheres_ = "SNWE";
+  const char* const DMS::signs_ = "-+";
+  const char* const DMS::digits_ = "0123456789";
+  const char* const DMS::dmsindicators_ = "D'\":";
+  const char* const DMS::components_[] = {"degrees", "minutes", "seconds"};
 
   Math::real DMS::Decode(const std::string& dms, flag& ind) {
     string dmsa = dms;
+    replace(dmsa, "\xe2\x88\x92", '-');  // U+2212 minus sign
     replace(dmsa, "\xc2\xb0", 'd');      // U+00b0 degree symbol
+    replace(dmsa, "\xb0", 'd');          // 0xb0 bare degree symbol
     replace(dmsa, "\xc2\xba", 'd');      // U+00ba alt symbol
+    replace(dmsa, "\xba", 'd');          // 0xba bare alt symbol
     replace(dmsa, "\xe2\x81\xb0", 'd');  // U+2070 sup zero
     replace(dmsa, "\xcb\x9a", 'd');      // U+02da ring above
     replace(dmsa, "\xe2\x80\xb2", '\''); // U+2032 prime
     replace(dmsa, "\xc2\xb4", '\'');     // U+00b4 acute accent
+    replace(dmsa, "\xb4", '\'');         // 0xb4 bare acute accent
     replace(dmsa, "\xe2\x80\x99", '\''); // U+2019 right single quote
     replace(dmsa, "\xe2\x80\xb3", '"');  // U+2033 double prime
     replace(dmsa, "\xe2\x80\x9d", '"');  // U+201d right double quote
-    replace(dmsa, "\xe2\x88\x92", '-');  // U+2212 minus sign
-    replace(dmsa, "\xb0", 'd');          // 0xb0 bare degree symbol
-    replace(dmsa, "\xba", 'd');          // 0xba bare alt symbol
-    replace(dmsa, "\xb4", '\'');         // 0xb4 bare acute accent
+    replace(dmsa, "\xc2\xa0", '\0');     // U+00a0 non-breaking space
+    replace(dmsa, "\xa0", '\0');         // 0xa0 bare non-breaking space
+    replace(dmsa, "\xe2\x80\xaf", '\0'); // U+202f narrow space
+    replace(dmsa, "\xe2\x80\x87", '\0'); // U+2007 figure space
     replace(dmsa, "''", '"');            // '' -> "
     string::size_type
       beg = 0,
@@ -157,17 +161,17 @@ namespace GeographicLib {
             k = npiece;
           }
           if (unsigned(k) == npiece - 1) {
-            errormsg = "Repeated " + components_[k] +
+            errormsg = "Repeated " + string(components_[k]) +
               " component in " + dmsa.substr(beg, end - beg);
             break;
           } else if (unsigned(k) < npiece) {
-            errormsg = components_[k] + " component follows "
-              + components_[npiece - 1] + " component in "
+            errormsg = string(components_[k]) + " component follows "
+              + string(components_[npiece - 1]) + " component in "
               + dmsa.substr(beg, end - beg);
             break;
           }
           if (ncurrent == 0) {
-            errormsg = "Missing numbers in " + components_[k] +
+            errormsg = "Missing numbers in " + string(components_[k]) +
               " component of " + dmsa.substr(beg, end - beg);
             break;
           }
@@ -236,8 +240,10 @@ namespace GeographicLib {
       // Assume check on range of result is made by calling routine (which
       // might be able to offer a better diagnostic).
       return real(sign) *
-        ( fpieces[2] ? (60*(60*fpieces[0] + fpieces[1]) + fpieces[2]) / 3600 :
-          ( fpieces[1] ? (60*fpieces[0] + fpieces[1]) / 60 : fpieces[0] ) );
+        ( fpieces[2] != 0 ?
+          (60*(60*fpieces[0] + fpieces[1]) + fpieces[2]) / 3600 :
+          ( fpieces[1] != 0 ?
+            (60*fpieces[0] + fpieces[1]) / 60 : fpieces[0] ) );
     } while (false);
     real val = Utility::nummatch<real>(dmsa);
     if (val == 0)

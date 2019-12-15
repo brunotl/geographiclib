@@ -6,7 +6,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 using System;
 using System.Collections.Generic;
@@ -61,7 +61,7 @@ namespace Projections
             m_geoidFileNameTextBox.Text = dlg.FileName;
             m_dateTimeTextBox.Text = m_geoid.DateTime;
             m_descriptionTextBox.Text = m_geoid.Description;
-            m_majorRadiusTextBox.Text = m_geoid.MajorRadius.ToString();
+            m_majorRadiusTextBox.Text = m_geoid.EquatorialRadius.ToString();
             m_flatteningTtextBox.Text = m_geoid.Flattening.ToString();
         }
 

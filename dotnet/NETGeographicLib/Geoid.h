@@ -7,7 +7,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 namespace NETGeographicLib
@@ -65,7 +65,7 @@ namespace NETGeographicLib
    * The following functions are implemented as properties:
    * Description, DateTime, GeoidFile, GeoidName, GeoidDirectory,
    * Interpolation, MaxError, RMSError, Offset, Scale, ThreadSafe,
-   * Cache, CacheWest, CacheEast, CacheNorth, CacheSouth, MajorRadius,
+   * Cache, CacheWest, CacheEast, CacheNorth, CacheSouth, EquatorialRadius,
    * and Flattening.
    **********************************************************************/
     public ref class Geoid
@@ -316,7 +316,7 @@ namespace NETGeographicLib
          * (The WGS84 value is returned because the supported geoid models are all
          * based on this ellipsoid.)
          **********************************************************************/
-        property double MajorRadius { double get(); }
+        property double EquatorialRadius { double get(); }
 
         /**
          * @return \e f the flattening of the WGS84 ellipsoid.

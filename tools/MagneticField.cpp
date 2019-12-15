@@ -2,9 +2,9 @@
  * \file MagneticField.cpp
  * \brief Command line utility for evaluating magnetic fields
  *
- * Copyright (c) Charles Karney (2011-2016) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2011-2018) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  *
  * See the <a href="MagneticField.1.html">man page</a> for usage information.
  **********************************************************************/
@@ -25,7 +25,7 @@
 
 #include "MagneticField.usage"
 
-int main(int argc, char* argv[]) {
+int main(int argc, const char* const argv[]) {
   try {
     using namespace GeographicLib;
     typedef Math::real real;
@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
     real time = 0, lat = 0, h = 0;
     bool timeset = false, circle = false, rate = false;
     real hguard = 500000, tguard = 50;
-    int prec = 1;
+    int prec = 1, Nmax = -1, Mmax = -1;
 
     for (int m = 1; m < argc; ++m) {
       std::string arg(argv[m]);
@@ -48,6 +48,32 @@ int main(int argc, char* argv[]) {
       } else if (arg == "-d") {
         if (++m == argc) return usage(1, true);
         dir = argv[m];
+      } else if (arg == "-N") {
+        if (++m == argc) return usage(1, true);
+        try {
+          Nmax = Utility::val<int>(std::string(argv[m]));
+          if (Nmax < 0) {
+            std::cerr << "Maximum degree " << argv[m] << " is negative\n";
+            return 1;
+          }
+        }
+        catch (const std::exception&) {
+          std::cerr << "Precision " << argv[m] << " is not a number\n";
+          return 1;
+        }
+      } else if (arg == "-M") {
+        if (++m == argc) return usage(1, true);
+        try {
+          Mmax = Utility::val<int>(std::string(argv[m]));
+          if (Mmax < 0) {
+            std::cerr << "Maximum order " << argv[m] << " is negative\n";
+            return 1;
+          }
+        }
+        catch (const std::exception&) {
+          std::cerr << "Precision " << argv[m] << " is not a number\n";
+          return 1;
+        }
       } else if (arg == "-t") {
         if (++m == argc) return usage(1, true);
         try {
@@ -71,7 +97,7 @@ int main(int argc, char* argv[]) {
             throw GeographicErr("Bad hemisphere letter on latitude");
           if (!(abs(lat) <= 90))
             throw GeographicErr("Latitude not in [-90d, 90d]");
-          h = Utility::num<real>(std::string(argv[++m]));
+          h = Utility::val<real>(std::string(argv[++m]));
           timeset = false;
           circle = true;
         }
@@ -87,7 +113,7 @@ int main(int argc, char* argv[]) {
       else if (arg == "-p") {
         if (++m == argc) return usage(1, true);
         try {
-          prec = Utility::num<int>(std::string(argv[m]));
+          prec = Utility::val<int>(std::string(argv[m]));
         }
         catch (const std::exception&) {
           std::cerr << "Precision " << argv[m] << " is not a number\n";
@@ -96,7 +122,7 @@ int main(int argc, char* argv[]) {
       } else if (arg == "-T") {
         if (++m == argc) return usage(1, true);
         try {
-          tguard = Utility::num<real>(std::string(argv[m]));
+          tguard = Utility::val<real>(std::string(argv[m]));
         }
         catch (const std::exception& e) {
           std::cerr << "Error decoding argument of " << arg << ": "
@@ -106,7 +132,7 @@ int main(int argc, char* argv[]) {
       } else if (arg == "-H") {
         if (++m == argc) return usage(1, true);
         try {
-          hguard = Utility::num<real>(std::string(argv[m]));
+          hguard = Utility::val<real>(std::string(argv[m]));
         }
         catch (const std::exception& e) {
           std::cerr << "Error decoding argument of " << arg << ": "
@@ -192,7 +218,7 @@ int main(int argc, char* argv[]) {
     prec = std::min(10 + Math::extra_digits(), std::max(0, prec));
     int retval = 0;
     try {
-      const MagneticModel m(model, dir);
+      const MagneticModel m(model, dir, Geocentric::WGS84(), Nmax, Mmax);
       if ((timeset || circle)
           && (!Math::isfinite(time) ||
               time < m.MinTime() - tguard ||

@@ -7,7 +7,7 @@
  * GeographicLib is Copyright (c) Charles Karney (2010-2012)
  * <charles@karney.com> and licensed under the MIT/X11 License.
  * For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 
 namespace NETGeographicLib
@@ -235,7 +235,7 @@ namespace NETGeographicLib
          * (The WGS84 value is returned because the UTM and UPS projections are
          * based on this ellipsoid.)
          **********************************************************************/
-        static double MajorRadius();
+        static double EquatorialRadius();
 
         /**
          * @return \e f the flattening of the WGS84 ellipsoid.

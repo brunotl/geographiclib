@@ -1,9 +1,9 @@
 /**
  * Implementation of the net.sf.geographiclib.PolygonArea class
  *
- * Copyright (c) Charles Karney (2013-2016) <charles@karney.com> and licensed
+ * Copyright (c) Charles Karney (2013-2019) <charles@karney.com> and licensed
  * under the MIT/X11 License.  For more information, see
- * http://geographiclib.sourceforge.net/
+ * https://geographiclib.sourceforge.io/
  **********************************************************************/
 package net.sf.geographiclib;
 
@@ -15,11 +15,16 @@ package net.sf.geographiclib;
  * <ul>
  * <li>
  *   C. F. F. Karney,
- *   <a href="https://dx.doi.org/10.1007/s00190-012-0578-z">
+ *   <a href="https://doi.org/10.1007/s00190-012-0578-z">
  *   Algorithms for geodesics</a>,
  *   J. Geodesy <b>87</b>, 43&ndash;55 (2013)
- *   (<a href="http://geographiclib.sourceforge.net/geod-addenda.html">addenda</a>).
+ *   (<a href="https://geographiclib.sourceforge.io/geod-addenda.html">
+ *   addenda</a>).
  * </ul>
+ * <p>
+ * Arbitrarily complex polygons are allowed.  In the case self-intersecting of
+ * polygons the area is accumulated "algebraically", e.g., the areas of the 2
+ * loops in a figure-8 polygon will partially cancel.
  * <p>
  * This class lets you add vertices one at a time to the polygon.  The area
  * and perimeter are accumulated at two times the standard floating point
@@ -74,21 +79,71 @@ public class PolygonArea {
     lon2 = GeoMath.AngNormalize(lon2);
     double lon12 = GeoMath.AngDiff(lon1, lon2).first;
     int cross =
-      lon1 < 0 && lon2 >= 0 && lon12 > 0 ? 1 :
-      (lon2 < 0 && lon1 >= 0 && lon12 < 0 ? -1 : 0);
+      lon1 <= 0 && lon2 > 0 && lon12 > 0 ? 1 :
+      (lon2 <= 0 && lon1 > 0 && lon12 < 0 ? -1 : 0);
     return cross;
   }
   // an alternate version of transit to deal with longitudes in the direct
   // problem.
   private static int transitdirect(double lon1, double lon2) {
     // We want to compute exactly
-    //   int(floor(lon2 / 360)) - int(floor(lon1 / 360))
+    //   int(ceil(lon2 / 360)) - int(ceil(lon1 / 360))
     // Since we only need the parity of the result we can use std::remquo but
     // this is buggy with g++ 4.8.3 and requires C++11.  So instead we do
     lon1 = lon1 % 720.0; lon2 = lon2 % 720.0;
-    return ( ((lon2 >= 0 && lon2 < 360) || lon2 < -360 ? 0 : 1) -
-             ((lon1 >= 0 && lon1 < 360) || lon1 < -360 ? 0 : 1) );
+    return ( ((lon2 <= 0 && lon2 > -360) || lon2 > 360 ? 1 : 0) -
+             ((lon1 <= 0 && lon1 > -360) || lon1 > 360 ? 1 : 0) );
+  }
+  // reduce Accumulator area to allowed range
+  private static double AreaReduceA(Accumulator area, double area0,
+                                    int crossings,
+                                    boolean reverse, boolean sign) {
+    area.Remainder(area0);
+    if ((crossings & 1) != 0)
+      area.Add((area.Sum() < 0 ? 1 : -1) * area0/2);
+    // area is with the clockwise sense.  If !reverse convert to
+    // counter-clockwise convention.
+    if (!reverse)
+      area.Negate();
+    // If sign put area in (-area0/2, area0/2], else put area in [0, area0)
+    if (sign) {
+      if (area.Sum() > area0/2)
+        area.Add(-area0);
+      else if (area.Sum() <= -area0/2)
+        area.Add(+area0);
+    } else {
+      if (area.Sum() >= area0)
+        area.Add(-area0);
+      else if (area.Sum() < 0)
+        area.Add(+area0);
     }
+    return 0 + area.Sum();
+  }
+  // reduce double area to allowed range
+  private static double AreaReduceB(double area, double area0,
+                                    int crossings,
+                                    boolean reverse, boolean sign) {
+    area = GeoMath.remainder(area, area0);
+    if ((crossings & 1) != 0)
+      area += (area < 0 ? 1 : -1) * area0/2;
+    // area is with the clockwise sense.  If !reverse convert to
+    // counter-clockwise convention.
+    if (!reverse)
+      area *= -1;
+    // If sign put area in (-area0/2, area0/2], else put area in [0, area0)
+    if (sign) {
+      if (area > area0/2)
+        area -= area0;
+      else if (area <= -area0/2)
+        area += area0;
+    } else {
+      if (area >= area0)
+        area -= area0;
+      else if (area < 0)
+        area += area0;
+    }
+    return 0 + area;
+  }
 
   /**
    * Constructor for PolygonArea.
@@ -206,26 +261,12 @@ public class PolygonArea {
     GeodesicData g = _earth.Inverse(_lat1, _lon1, _lat0, _lon0, _mask);
     Accumulator tempsum = new Accumulator(_areasum);
     tempsum.Add(g.S12);
-    int crossings = _crossings + transit(_lon1, _lon0);
-    if ((crossings & 1) != 0)
-      tempsum.Add((tempsum.Sum() < 0 ? 1 : -1) * _area0/2);
-    // area is with the clockwise sense.  If !reverse convert to
-    // counter-clockwise convention.
-    if (!reverse)
-      tempsum.Negate();
-    // If sign put area in (-area0/2, area0/2], else put area in [0, area0)
-    if (sign) {
-      if (tempsum.Sum() > _area0/2)
-        tempsum.Add(-_area0);
-      else if (tempsum.Sum() <= -_area0/2)
-        tempsum.Add(+_area0);
-    } else {
-      if (tempsum.Sum() >= _area0)
-        tempsum.Add(-_area0);
-      else if (tempsum.Sum() < 0)
-        tempsum.Add(+_area0);
-    }
-    return new PolygonResult(_num, _perimetersum.Sum(g.s12), 0 + tempsum.Sum());
+
+    return
+      new PolygonResult(_num, _perimetersum.Sum(g.s12),
+                        AreaReduceA(tempsum, _area0,
+                                    _crossings + transit(_lon1, _lon0),
+                                    reverse, sign));
   }
 
   /**
@@ -276,25 +317,9 @@ public class PolygonArea {
     if (_polyline)
       return new PolygonResult(num, perimeter, Double.NaN);
 
-    if ((crossings & 1) != 0)
-      tempsum += (tempsum < 0 ? 1 : -1) * _area0/2;
-    // area is with the clockwise sense.  If !reverse convert to
-    // counter-clockwise convention.
-    if (!reverse)
-      tempsum *= -1;
-    // If sign put area in (-area0/2, area0/2], else put area in [0, area0)
-    if (sign) {
-      if (tempsum > _area0/2)
-        tempsum -= _area0;
-      else if (tempsum <= -_area0/2)
-        tempsum += _area0;
-    } else {
-      if (tempsum >= _area0)
-        tempsum -= _area0;
-      else if (tempsum < 0)
-        tempsum += _area0;
-    }
-    return new PolygonResult(num, perimeter, 0 + tempsum);
+    return new PolygonResult(num, perimeter,
+                             AreaReduceB(tempsum, _area0, crossings,
+                                         reverse, sign));
   }
 
   /**
@@ -336,40 +361,22 @@ public class PolygonArea {
         _earth.Direct(_lat1, _lon1, azi, false, s, _mask);
       tempsum += g.S12;
       crossings += transitdirect(_lon1, g.lon2);
+      crossings += transit(g.lon2, _lon0);
       g = _earth.Inverse(g.lat2, g.lon2, _lat0, _lon0, _mask);
       perimeter += g.s12;
       tempsum += g.S12;
-      crossings += transit(g.lon2, _lon0);
     }
 
-    if ((crossings & 1) != 0)
-      tempsum += (tempsum < 0 ? 1 : -1) * _area0/2;
-    // area is with the clockwise sense.  If !reverse convert to
-    // counter-clockwise convention.
-    if (!reverse)
-      tempsum *= -1;
-    // If sign put area in (-area0/2, area0/2], else put area in [0, area0)
-    if (sign) {
-      if (tempsum > _area0/2)
-        tempsum -= _area0;
-      else if (tempsum <= -_area0/2)
-        tempsum += _area0;
-    } else {
-      if (tempsum >= _area0)
-        tempsum -= _area0;
-      else if (tempsum < 0)
-        tempsum += _area0;
-    }
-
-    return new PolygonResult(num, perimeter, 0 + tempsum);
+    return new PolygonResult(num, perimeter,
+                             AreaReduceB(tempsum, _area0, crossings,
+                                         reverse, sign));
   }
 
   /**
    * @return <i>a</i> the equatorial radius of the ellipsoid (meters).  This is
    *   the value inherited from the Geodesic object used in the constructor.
    **********************************************************************/
-
-  public double MajorRadius() { return _earth.MajorRadius(); }
+  public double EquatorialRadius() { return _earth.EquatorialRadius(); }
 
   /**
    * @return <i>f</i> the flattening of the ellipsoid.  This is the value
@@ -383,7 +390,14 @@ public class PolygonArea {
    * @return Pair(<i>lat</i>, <i>lon</i>), the current latitude and longitude.
    * <p>
    * If no points have been added, then Double.NaN is returned.  Otherwise,
-   * <i>lon</i> will be in the range [&minus;180&deg;, 180&deg;).
+   * <i>lon</i> will be in the range [&minus;180&deg;, 180&deg;].
    **********************************************************************/
   public Pair CurrentPoint() { return new Pair(_lat1, _lon1); }
+
+  /**
+   * @deprecated An old name for {@link #EquatorialRadius()}.
+   * @return <i>a</i> the equatorial radius of the ellipsoid (meters).
+   **********************************************************************/
+  // @Deprecated
+  public double MajorRadius() { return EquatorialRadius(); }
 }
