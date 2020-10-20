@@ -1,0 +1,8 @@
+{
+    "export_libraries": [],
+    "library_name": "libGeographic",
+    "android": {
+      "export_libraries": [],
+      "library_name": null
+    }
+}
