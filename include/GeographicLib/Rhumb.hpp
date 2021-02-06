@@ -468,10 +468,14 @@ namespace GeographicLib {
     const Rhumb& _rh;
     bool _exact;
     real _lat1, _lon1, _azi12, _salp, _calp, _mu1, _psi1, _r1;
-    RhumbLine& operator=(const RhumbLine&); // copy assignment not allowed
+
+    RhumbLine(const RhumbLine&) = delete; // copy ctor not allowed
+    RhumbLine& operator=(const RhumbLine&) = delete; // copy assignment not allowed
     RhumbLine(const Rhumb& rh, real lat1, real lon1, real azi12,
               bool exact);
   public:
+
+    RhumbLine(RhumbLine&&) = default;
 
     /**
      * This is a duplication of Rhumb::mask.
