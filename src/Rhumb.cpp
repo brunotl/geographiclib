@@ -166,7 +166,7 @@ namespace GeographicLib {
   }
 
   RhumbLine Rhumb::Line(real lat1, real lon1, real azi12) const
-  { return RhumbLine(*this, lat1, lon1, azi12, _exact); }
+  { return RhumbLine(*this, lat1, lon1, azi12); }
 
   void Rhumb::GenDirect(real lat1, real lon1, real azi12, real s12,
                         unsigned outmask,
@@ -328,10 +328,8 @@ namespace GeographicLib {
       + SinCosSeries(false, gd(psix), gd(psiy), _R, maxpow_) * Dgd(psix, psiy);
   }
 
-  RhumbLine::RhumbLine(const Rhumb& rh, real lat1, real lon1, real azi12,
-                       bool exact)
+  RhumbLine::RhumbLine(const Rhumb& rh, real lat1, real lon1, real azi12)
     : _rh(rh)
-    , _exact(exact)
     , _lat1(Math::LatFix(lat1))
     , _lon1(lon1)
     , _azi12(Math::AngNormalize(azi12))
