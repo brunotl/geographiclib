@@ -1,0 +1,68 @@
+plugins {
+    id 'com.android.library'
+}
+
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
+    ndkVersion "22.0.7026061"
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 30
+
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_STL=c++_shared", "-DGEOGRAPHICLIB_LIB_TYPE=SHARED"
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            version "3.10.2"
+            path "../../CMakeLists.txt"
+        }
+    }
+
+    buildFeatures {
+        prefabPublishing true
+    }
+
+    prefab {
+        Geographic {
+            name "GeographicLib_SHARED"
+            headers "src/main/include"
+        }
+    }
+
+    // Avoid packing the unnecessary libraries into final AAR. For details
+    // refer to https://issuetracker.google.com/issues/168777344#comment5
+    packagingOptions {
+        exclude("**/libGeographic.so")
+        exclude("**/libc++_shared.so")
+    }
+}
+
+tasks.whenTaskAdded {
+    theTask ->
+        if (theTask.name.contains('externalNativeBuild')) {
+            theTask.doLast {
+
+                project.delete "src/main/include/GeographicLib"
+
+                project.copy {
+                    from "../../include/GeographicLib"
+                    into "src/main/include/GeographicLib"
+                    include "*.hpp"
+                }
+
+                project.copy {
+                    from  "../../include/GeographicLib"
+                    into "src/main/include/GeographicLib"
+                    include "*.h"
+                }
+            }
+        }
+}
